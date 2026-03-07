@@ -11,6 +11,8 @@ analysis/*_cache
 analysis/site_libs
 output/sequences
 output/EISA
+output/DET-list.Rda
 data/fastq
 data/fastqc
+data/genewalk/
 tmp
