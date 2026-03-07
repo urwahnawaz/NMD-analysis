@@ -16,3 +16,7 @@ data/fastq
 data/fastqc
 data/genewalk/
 tmp
+data/genewalk/resources/goa_human.gaf
+output/DET-list.Rda
+*.Rda
+output/
