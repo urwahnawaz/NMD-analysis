@@ -1,7 +1,7 @@
 name: NMD-analysis
 output_dir: ../docs
 navbar:
-  title: NMD-analysis
+  title: Analysis of UPF3 paralogs
   left:
   - text: Home
     href: index.html
@@ -11,14 +11,18 @@ navbar:
     menu:
     - text: DEG analysis
       href: DEG-analysis.html
-    - text: Enrichment analysis using goseq
-      href: Enichment-analysis-goseq.html
     - text: Enrichment analysis using fgsea
       href: Enichment-analysis-fgsea.html
   - text: Transcript Analysis
     menu:
     - text: DET analysis
       href: Differential-transcript-expression.html
+  - text: RNA Stability analysis
+    href: RNA-stability.html
+  - text: Figures
+    menu:
+      - text: Main Figures
+        href: Publication-Main-figures.Rmd
   right:
   - icon: fab fa-github
     text: Source code

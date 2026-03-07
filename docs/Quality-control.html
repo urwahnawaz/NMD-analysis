@@ -15,7 +15,7 @@
 
 <title>Quality Assessment of NMD RNA-seq data</title>
 
-<script src="site_libs/header-attrs-2.21/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -31,23 +31,22 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<script src="site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
 <link href="site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
-<script src="site_libs/datatables-binding-0.27/datatables.js"></script>
-<link href="site_libs/dt-core-1.12.1/css/jquery.dataTables.min.css" rel="stylesheet" />
-<link href="site_libs/dt-core-1.12.1/css/jquery.dataTables.extra.css" rel="stylesheet" />
-<script src="site_libs/dt-core-1.12.1/js/jquery.dataTables.min.js"></script>
-<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
-<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
-<link href="site_libs/font-awesome-6.2.1/css/all.min.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-6.2.1/css/v4-shims.min.css" rel="stylesheet" />
+<script src="site_libs/datatables-binding-0.31/datatables.js"></script>
+<link href="site_libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="site_libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="site_libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -242,9 +241,6 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
-<style type="text/css">
-.code-folding-btn { margin-bottom: 4px; }
-</style>
 
 
 
@@ -376,12 +372,12 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="transcript-proprocessing.html">Transcript exploration</a>
-    </li>
-    <li>
-      <a href="Differential-transcript-usage.html">Isoform usage analysis</a>
+      <a href="Differential-transcript-expression.html">DET analysis</a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="RNA-stability.html">RNA Stability analysis</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -398,14 +394,6 @@ div.tocify {
 </div><!--/.navbar -->
 
 <div id="header">
-
-<div class="btn-group pull-right float-right">
-<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
-<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
-<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
-<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
-</ul>
-</div>
 
 
 
@@ -440,13 +428,13 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-04-24
+<strong>Last updated:</strong> 2024-04-20
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 1
+aria-hidden="true"></span> 2
 </p>
 <p>
 <strong>Knit directory:</strong> <code>NMD-analysis/</code> <span
@@ -458,7 +446,7 @@ title="This is the local directory in which the code in this file was executed."
 This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
 analysis was created with <a
   href="https://github.com/workflowr/workflowr">workflowr</a> (version
-1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
 that were applied when the results were created. The <em>Past
 versions</em> tab lists the development history.
 </p>
@@ -469,18 +457,21 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
@@ -583,6 +574,22 @@ relative
 <tbody>
 <tr>
 <td style="text-align:left;">
+/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/QC/Thesis_figures/upf3a-check.svg
+</td>
+<td style="text-align:left;">
+output/QC/Thesis_figures/upf3a-check.svg
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/QC/Thesis_figures/upf3b-check.svg
+</td>
+<td style="text-align:left;">
+output/QC/Thesis_figures/upf3b-check.svg
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 /home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/transcript-distribution.svg
 </td>
 <td style="text-align:left;">
@@ -597,6 +604,30 @@ output/Transcript/Thesis_figures/transcript-distribution.svg
 output/Transcript/Thesis_figures/transcript-composition.svg
 </td>
 </tr>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/trans-pca.svg
+</td>
+<td style="text-align:left;">
+output/Thesis_plots/trans-pca.svg
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/QC/Thesis_figures/PCA.svg
+</td>
+<td style="text-align:left;">
+output/QC/Thesis_figures/PCA.svg
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/trans-pca-final.svg
+</td>
+<td style="text-align:left;">
+output/Thesis_plots/trans-pca-final.svg
+</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -605,15 +636,15 @@ output/Transcript/Thesis_figures/transcript-composition.svg
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996NMDanalysistree6110b63d1ba586cb64035203369ea8f1230244cdtargetblank6110b63a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996NMDanalysistree08bbafdab99816f40a57c3c5dd83827d85201f53targetblank08bbafda">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/unawaz1996/NMD-analysis/tree/6110b63d1ba586cb64035203369ea8f1230244cd" target="_blank">6110b63</a>
+<a href="https://github.com/unawaz1996/NMD-analysis/tree/08bbafdab99816f40a57c3c5dd83827d85201f53" target="_blank">08bbafd</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996NMDanalysistree6110b63d1ba586cb64035203369ea8f1230244cdtargetblank6110b63a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996NMDanalysistree08bbafdab99816f40a57c3c5dd83827d85201f53targetblank08bbafda"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -623,7 +654,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/unawaz1996/NMD-analysis/tree/6110b63d1ba586cb64035203369ea8f1230244cd" target="_blank">6110b63</a>.
+<a href="https://github.com/unawaz1996/NMD-analysis/tree/08bbafdab99816f40a57c3c5dd83827d85201f53" target="_blank">08bbafd</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -643,47 +674,121 @@ Ignored files:
     Ignored:    analysis/Differential-transcript-usage.nb.html
     Ignored:    analysis/Enichment-analysis-fgsea.nb.html
     Ignored:    analysis/Enichment-analysis-goseq.nb.html
+    Ignored:    tmp/
 
 Untracked files:
-    Untracked:  PCA.png
-    Untracked:  PCA_plot.pdf
-    Untracked:  PCA_transcript.png
-    Untracked:  analysis/Differential-transcript-expression.Rmd
+    Untracked:  Rplots.pdf
+    Untracked:  Upf3b-all-DEGs-genes.tsv
+    Untracked:  Upf3b-bf-genes.tsv
+    Untracked:  Upf3b-bf-genes.xlsx
     Untracked:  analysis/Differential-transcript-usage.Rmd
     Untracked:  analysis/UPF3B_KD.Rmd
-    Untracked:  analysis/figures.Rmd
+    Untracked:  analysis/mtor-pathway.Rmd
+    Untracked:  analysis/transcript-features.Rmd
     Untracked:  analysis/transcript-preprocessing.Rmd
-    Untracked:  code/QuasR_log_7219053fb51a5.txt
-    Untracked:  code/QuasR_log_74f7f374c3271.txt
-    Untracked:  code/QuasR_log_7a13e31c3d08a.txt
-    Untracked:  code/QuasR_log_7ac9f1cedf971.txt
-    Untracked:  code/QuasR_log_7bbdc44874ffd.txt
+    Untracked:  code/Archive/
     Untracked:  code/eisaR.R
     Untracked:  code/external_code/
     Untracked:  data/LTK_Sample Metafile_V3.txt
     Untracked:  data/Mus_musculus.GRCm39.105__nifs.tsv
+    Untracked:  data/data.txt
+    Untracked:  data/data2.txt
+    Untracked:  data/fastq/
     Untracked:  data/fastqc/
+    Untracked:  data/geneLists/
+    Untracked:  data/genesets/
+    Untracked:  data/genewalk/
+    Untracked:  data/human_mouse_1to1_orthologs.csv
     Untracked:  data/nif_output/
     Untracked:  data/samples.txt
+    Untracked:  genesets.csv
+    Untracked:  output/Bona-fide-genes.xlsx
     Untracked:  output/DEG-limma-results.Rda
     Untracked:  output/DEG-list.Rda
+    Untracked:  output/DEG-results.xlsx
     Untracked:  output/DEG/
+    Untracked:  output/DET-analysis.xlsx
+    Untracked:  output/DET-list.Rda
+    Untracked:  output/EISA/
+    Untracked:  output/For_presentation/
+    Untracked:  output/GOseq-results.xlsx
     Untracked:  output/ISAR/
+    Untracked:  output/Overlap-stability-DEG.xlsx
+    Untracked:  output/Poster_plots/
     Untracked:  output/QC/
+    Untracked:  output/RNA-stability.xlsx
+    Untracked:  output/Stability/
+    Untracked:  output/Thesis_plots/DEG_ratios.svg
+    Untracked:  output/Thesis_plots/GO-DEGs.svg
+    Untracked:  output/Thesis_plots/NIFs/
+    Untracked:  output/Thesis_plots/Proprotion_NIF.svg
+    Untracked:  output/Thesis_plots/Upf2.svg
+    Untracked:  output/Thesis_plots/Upf3-dKD-stability-overlap.svg
+    Untracked:  output/Thesis_plots/Upf3-dKD-stability.svg
+    Untracked:  output/Thesis_plots/Upf3_cumulative.svg
+    Untracked:  output/Thesis_plots/Upf3_paralog_cor.svg
+    Untracked:  output/Thesis_plots/Upf3a-bf-NIF-proportion.svg
+    Untracked:  output/Thesis_plots/Upf3a-bf-candidates-features.svg
+    Untracked:  output/Thesis_plots/Upf3a-bf-exp.svg
+    Untracked:  output/Thesis_plots/Upf3a-bf-features.svg
+    Untracked:  output/Thesis_plots/Upf3a-down-bf.svg
+    Untracked:  output/Thesis_plots/Upf3a-down-exp.svg
+    Untracked:  output/Thesis_plots/Upf3a-stability-overlap.svg
+    Untracked:  output/Thesis_plots/Upf3a-stability.svg
+    Untracked:  output/Thesis_plots/Upf3a-transcript-overlap.svg
+    Untracked:  output/Thesis_plots/Upf3a_bf_cumulative.svg
+    Untracked:  output/Thesis_plots/Upf3a_oR_cor.svg
+    Untracked:  output/Thesis_plots/Upf3a_specific_cumulative.svg
+    Untracked:  output/Thesis_plots/Upf3b-NIF-proportion.svg
+    Untracked:  output/Thesis_plots/Upf3b-bf-NIF-proportion.svg
+    Untracked:  output/Thesis_plots/Upf3b-bf-candidates-features.svg
+    Untracked:  output/Thesis_plots/Upf3b-bf-exp.svg
+    Untracked:  output/Thesis_plots/Upf3b-bf-features.svg
+    Untracked:  output/Thesis_plots/Upf3b-stability-overlap.svg
+    Untracked:  output/Thesis_plots/Upf3b-stability.svg
+    Untracked:  output/Thesis_plots/Upf3b-transcript-overlap.svg
+    Untracked:  output/Thesis_plots/Upf3b_bf_cumulative.svg
+    Untracked:  output/Thesis_plots/Upf3dKD-bf-NIF-features.svg
+    Untracked:  output/Thesis_plots/Upf3dKD-bf-NIF-proportion.svg
+    Untracked:  output/Thesis_plots/Upf3dKD-bf-candidates-features.svg
+    Untracked:  output/Thesis_plots/Upf3dKD-transcript-overlap.svg
+    Untracked:  output/Thesis_plots/all_overlaps-transcript.svg
+    Untracked:  output/Thesis_plots/all_overlaps.svg
+    Untracked:  output/Thesis_plots/all_overlaps_enrichment.svg
+    Untracked:  output/Thesis_plots/overlap-bf-exp.svg
+    Untracked:  output/Thesis_plots/overlapping-bf-features.svg
+    Untracked:  output/Thesis_plots/ratio_DET.svg
+    Untracked:  output/Thesis_plots/total_DEG.svg
+    Untracked:  output/Thesis_plots/trans-pca-final.svg
+    Untracked:  output/Thesis_plots/trans-pca.svg
+    Untracked:  output/Thesis_plots/transcript-gc-qc.pdf
+    Untracked:  output/Thesis_plots/transcript_det_ma.pdf
+    Untracked:  output/Thesis_plots/venn-bona-fide.pdf
     Untracked:  output/Transcript/
+    Untracked:  output/Upf3b-high-confident-genes.xlsx
+    Untracked:  output/fgsea-output.xlsx
+    Untracked:  output/fgsea_geneset_characterization.csv
     Untracked:  output/isoformSwitchAnalyzeR_isoform_AA_complete.fasta
     Untracked:  output/isoformSwitchAnalyzeR_isoform_AA_subset_1_of_3.fasta
     Untracked:  output/isoformSwitchAnalyzeR_isoform_AA_subset_2_of_3.fasta
     Untracked:  output/isoformSwitchAnalyzeR_isoform_AA_subset_3_of_3.fasta
     Untracked:  output/isoformSwitchAnalyzeR_isoform_nt.fasta
     Untracked:  output/limma-matrices.Rda
+    Untracked:  output/sequences/
 
 Unstaged changes:
+    Deleted:    .Rprofile
+    Modified:   .gitignore
     Modified:   analysis/DEG-analysis.Rmd
+    Modified:   analysis/Differential-transcript-expression.Rmd
     Modified:   analysis/Enichment-analysis-fgsea.Rmd
+    Modified:   analysis/Enichment-analysis-goseq.Rmd
+    Modified:   analysis/Quality-control.Rmd
+    Modified:   analysis/RNA-stability.Rmd
     Modified:   analysis/_site.yml
     Modified:   code/functions.R
     Modified:   code/libraries.R
+    Modified:   output/Thesis_plots/Count_NIF.svg
 
 </code></pre>
 <p>
@@ -729,6 +834,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/unawaz1996/NMD-analysis/feb333f4958c9ccc5a506b8d2856e2a27d0ef196/docs/Quality-control.html" target="_blank">feb333f</a>
+</td>
+<td>
+unawaz1996
+</td>
+<td>
+2023-04-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1021,47 +1143,22 @@ and strand-oriented library construction protocol.</p>
 <p>GC content allows the exploration of the sequencing coverage and can
 indicate issues in overrepresentation. It has been observed that either
 high or low GC content will result in lower depth coverage.</p>
-<p><img src="figure/Quality-control.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
-Past versions of unnamed-chunk-10-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-10-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/5196f4120527db07aaf6583bc6850638d325cac7/docs/figure/Quality-control.Rmd/unnamed-chunk-10-1.png" target="_blank">5196f41</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-04-21
-</td>
-</tr>
-</tbody>
-</table>
+<pre><code>function (which = dev.cur()) 
+{
+    if (which == 1) 
+        stop(&quot;cannot shut down device 1 (the null device)&quot;)
+    .External(C_devoff, as.integer(which))
+    dev.cur()
+}
+&lt;bytecode: 0x55eeee218e78&gt;
+&lt;environment: namespace:grDevices&gt;</code></pre>
+<div id="per-base-sequence-quality" class="section level3">
+<h3>Per base sequence quality</h3>
 </div>
-</div>
-</div>
-<div id="trimmed-data" class="section level2">
-<h2>Trimmed data</h2>
+<div id="per-base-sequence-content" class="section level3">
+<h3>Per base sequence content</h3>
+<p><img src="figure/Quality-control.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/Quality-control.Rmd/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/Quality-control.Rmd/unnamed-chunk-12-3.png" width="672" style="display: block; margin: auto;" />
+## Trimmed data</p>
 <table>
 <colgroup>
 <col width="5%" />
@@ -1527,6 +1624,7 @@ unawaz1996
 <p>After adapter trimming, &lt; 1% of reads were discarded.</p>
 </div>
 </div>
+</div>
 <div id="aligned-data---salmon-quantifications" class="section level1">
 <h1>Aligned data - Salmon quantifications</h1>
 <p>Counts were generated using Salmon. Briefly, an index was generated
@@ -1547,53 +1645,12 @@ transcripts</li>
 <div id="genotype-checking" class="section level2">
 <h2>Genotype checking</h2>
 <div class="figure" style="text-align: center">
-<img src="figure/Quality-control.Rmd/unnamed-chunk-14-1.png" alt="All samples demonstrated the expected expression patterns, no mislabeling was detected in the dataset." width="960" />
+<img src="figure/Quality-control.Rmd/unnamed-chunk-16-1.png" alt="All samples demonstrated the expected expression patterns, no mislabeling was detected in the dataset." width="960" />
 <p class="caption">
 All samples demonstrated the expected expression patterns, no
 mislabeling was detected in the dataset.
 </p>
 </div>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-14-1">
-Past versions of unnamed-chunk-14-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-14-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/5196f4120527db07aaf6583bc6850638d325cac7/docs/figure/Quality-control.Rmd/unnamed-chunk-14-1.png" target="_blank">5196f41</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-04-21
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div id="filtering" class="section level2">
-<h2>Filtering</h2>
-<p><img src="figure/Quality-control.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-16-1">
 Past versions of unnamed-chunk-16-1.png
@@ -1632,49 +1689,8 @@ unawaz1996
 </div>
 </div>
 </div>
-<div id="library-size" class="section level2">
-<h2>Library size</h2>
-<p><img src="figure/Quality-control.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-17-1">
-Past versions of unnamed-chunk-17-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-17-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/5196f4120527db07aaf6583bc6850638d325cac7/docs/figure/Quality-control.Rmd/unnamed-chunk-17-1.png" target="_blank">5196f41</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-04-21
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div id="counts-assingment-rate" class="section level2">
-<h2>Counts assingment rate</h2>
+<div id="filtering" class="section level2">
+<h2>Filtering</h2>
 <p><img src="figure/Quality-control.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-18-1">
@@ -1714,8 +1730,8 @@ unawaz1996
 </div>
 </div>
 </div>
-<div id="total-detected-genes" class="section level2">
-<h2>Total detected genes</h2>
+<div id="library-size" class="section level2">
+<h2>Library size</h2>
 <p><img src="figure/Quality-control.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-1">
@@ -1755,20 +1771,13 @@ unawaz1996
 </div>
 </div>
 </div>
-<div id="transcript-level-exploration-of-data" class="section level2">
-<h2>Transcript level exploration of data</h2>
-<pre><code># A tibble: 2 × 3
-  Filter `median(rowMeans)` `sd(rowMeans)`
-  &lt;fct&gt;               &lt;dbl&gt;          &lt;dbl&gt;
-1 before             0.0370           115.
-2 after             13.3              298.</code></pre>
-<div class="figure" style="text-align: center">
-<img src="figure/Quality-control.Rmd/unnamed-chunk-21-1.png" alt="*Log10 of the mean TPMs (transcript per million) over all samples before and after filtering out low-expressed transcripts and genes*" width="576" />
-<p class="caption">
-<em>Log10 of the mean TPMs (transcript per million) over all samples
-before and after filtering out low-expressed transcripts and genes</em>
-</p>
+<div id="counts-assingment-rate" class="section level2">
+<h2>Counts assingment rate</h2>
+<p><img src="figure/Quality-control.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
+<div id="total-detected-genes" class="section level2">
+<h2>Total detected genes</h2>
+<p><img src="figure/Quality-control.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-21-1">
 Past versions of unnamed-chunk-21-1.png
@@ -1806,13 +1815,19 @@ unawaz1996
 </table>
 </div>
 </div>
+</div>
+<div id="transcript-level-exploration-of-data" class="section level2">
+<h2>Transcript level exploration of data</h2>
+<pre><code># A tibble: 2 × 3
+  Filter `median(rowMeans)` `sd(rowMeans)`
+  &lt;fct&gt;               &lt;dbl&gt;          &lt;dbl&gt;
+1 before             0.0370           115.
+2 after             13.3              298.</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/Quality-control.Rmd/unnamed-chunk-23-1.png" alt="*Violin plots showing the distribution of the number of transcripts per gene (in logarithmic scale). Violin width is scaled by the total number of observations while jittered points represent actual observations.*" width="576" />
+<img src="figure/Quality-control.Rmd/unnamed-chunk-23-1.png" alt="*Log10 of the mean TPMs (transcript per million) over all samples before and after filtering out low-expressed transcripts and genes*" width="576" />
 <p class="caption">
-<em>Violin plots showing the distribution of the number of transcripts
-per gene (in logarithmic scale). Violin width is scaled by the total
-number of observations while jittered points represent actual
-observations.</em>
+<em>Log10 of the mean TPMs (transcript per million) over all samples
+before and after filtering out low-expressed transcripts and genes</em>
 </p>
 </div>
 <p>
@@ -1852,77 +1867,13 @@ unawaz1996
 </table>
 </div>
 </div>
-</div>
-<div id="pca" class="section level2">
-<h2>PCA</h2>
 <div class="figure" style="text-align: center">
-<img src="figure/Quality-control.Rmd/unnamed-chunk-24-1.png" alt="*Principal component analysis of gene (left) and transcript (right) level data. PCA was performed on log2 transformed TPMs after filtering for each respective datatype (gene and transcript level). Gene level PCA shows that all samples are clustering closely based on condition, with no impact of library size in PC1 and PC2. Transcript level PCA shows that samples are clustering close to their conditions based on PC1, however one of the samples of the UPF3A OE in UPF3B KD cell line (sample 223), seems to deviate from its condition group and the rest of the data, so needs to be further investigated*" width="960" />
+<img src="figure/Quality-control.Rmd/unnamed-chunk-25-1.png" alt="*Violin plots showing the distribution of the number of transcripts per gene (in logarithmic scale). Violin width is scaled by the total number of observations while jittered points represent actual observations.*" width="576" />
 <p class="caption">
-<em>Principal component analysis of gene (left) and transcript (right)
-level data. PCA was performed on log2 transformed TPMs after filtering
-for each respective datatype (gene and transcript level). Gene level PCA
-shows that all samples are clustering closely based on condition, with
-no impact of library size in PC1 and PC2. Transcript level PCA shows
-that samples are clustering close to their conditions based on PC1,
-however one of the samples of the UPF3A OE in UPF3B KD cell line (sample
-223), seems to deviate from its condition group and the rest of the
-data, so needs to be further investigated</em>
-</p>
-</div>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-24-1">
-Past versions of unnamed-chunk-24-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-24-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/be057f211fab4959f5a2c0a5db98d864490d6e34/docs/figure/Quality-control.Rmd/unnamed-chunk-24-1.png" target="_blank">be057f2</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-04-24
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/5196f4120527db07aaf6583bc6850638d325cac7/docs/figure/Quality-control.Rmd/unnamed-chunk-24-1.png" target="_blank">5196f41</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-04-21
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>To check if the same variation is observed at PC3 in gene level:</p>
-<div class="figure" style="text-align: center">
-<img src="figure/Quality-control.Rmd/unnamed-chunk-25-1.png" alt="*Principal component analysis of gene level data showing PC2 and PC3. Sample 223 seems to cluster away from its condition group in PC3*" width="576" />
-<p class="caption">
-<em>Principal component analysis of gene level data showing PC2 and PC3.
-Sample 223 seems to cluster away from its condition group in PC3</em>
+<em>Violin plots showing the distribution of the number of transcripts
+per gene (in logarithmic scale). Violin width is scaled by the total
+number of observations while jittered points represent actual
+observations.</em>
 </p>
 </div>
 <p>
@@ -1962,48 +1913,17 @@ unawaz1996
 </table>
 </div>
 </div>
-<div id="investigating-the-differences-in-samples-at-transcript-level"
-class="section level3">
-<h3>Investigating the differences in samples at transcript level</h3>
-<p><img src="figure/Quality-control.Rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-26-1">
-Past versions of unnamed-chunk-26-1.png
-</button>
+</div>
+<div id="pca" class="section level2">
+<h2>PCA</h2>
+<p>To check if the same variation is observed at PC3 in gene level:</p>
+<div class="figure" style="text-align: center">
+<img src="figure/Quality-control.Rmd/unnamed-chunk-27-1.png" alt="*Principal component analysis of gene level data showing PC2 and PC3. Sample 223 seems to cluster away from its condition group in PC3*" width="576" />
+<p class="caption">
+<em>Principal component analysis of gene level data showing PC2 and PC3.
+Sample 223 seems to cluster away from its condition group in PC3</em>
 </p>
-<div id="fig-unnamed-chunk-26-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/5196f4120527db07aaf6583bc6850638d325cac7/docs/figure/Quality-control.Rmd/unnamed-chunk-26-1.png" target="_blank">5196f41</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-04-21
-</td>
-</tr>
-</tbody>
-</table>
 </div>
-</div>
-<p><img src="figure/Quality-control.Rmd/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-27-1">
 Past versions of unnamed-chunk-27-1.png
@@ -2041,15 +1961,11 @@ unawaz1996
 </table>
 </div>
 </div>
-<div class="figure" style="text-align: center">
-<img src="figure/Quality-control.Rmd/unnamed-chunk-29-1.png" alt="*Correlations between the first three principal components and measured variables at transcript level. Sample conditions were converted to an ordered categorical variable for the purposes of visualisation*" width="672" />
-<p class="caption">
-<em>Correlations between the first three principal components and
-measured variables at transcript level. Sample conditions were converted
-to an ordered categorical variable for the purposes of
-visualisation</em>
-</p>
-</div>
+<div id="investigating-the-differences-in-samples-at-transcript-level"
+class="section level3">
+<h3>Investigating the differences in samples at transcript level</h3>
+<p><img src="figure/Quality-control.Rmd/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Quality-control.Rmd/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-29-1">
 Past versions of unnamed-chunk-29-1.png
@@ -2074,6 +1990,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/unawaz1996/NMD-analysis/blob/feb333f4958c9ccc5a506b8d2856e2a27d0ef196/docs/figure/Quality-control.Rmd/unnamed-chunk-29-1.png" target="_blank">feb333f</a>
+</td>
+<td>
+unawaz1996
+</td>
+<td>
+2023-04-24
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/unawaz1996/NMD-analysis/blob/5196f4120527db07aaf6583bc6850638d325cac7/docs/figure/Quality-control.Rmd/unnamed-chunk-29-1.png" target="_blank">5196f41</a>
 </td>
 <td>
@@ -2087,65 +2014,15 @@ unawaz1996
 </table>
 </div>
 </div>
-<p>Transcripts were divided in 10 approximately equal sized bins based
-on increasing length, and 10 approximately equal sized bins based on
-increasing GC content, with the final GC/Length bins being the
-combination 100 bins using both sets. The contribution of each gene to
-PC1 and PC2 was assessed and a t-test performed on each bin.</p>
-<p>If any bin makes a contribution to PC1 the mean will be clearly
-non-zero, whilst if there is no contribution the mean will be near zero.
-In this way, the impact of gene length and GC content on variance within
-the dataset can be assessed.</p>
 <div class="figure" style="text-align: center">
-<img src="figure/Quality-control.Rmd/unnamed-chunk-30-1.png" alt="*Contribution of each GC/Length Bin to PC1 and PC2. Fill colours indicate the t-statistic, with tranparency denoting significance as -log10(p), using Bonferroni-adjusted p-values.*" width="672" />
+<img src="figure/Quality-control.Rmd/unnamed-chunk-31-1.png" alt="*Correlations between the first three principal components and measured variables at transcript level. Sample conditions were converted to an ordered categorical variable for the purposes of visualisation*" width="672" />
 <p class="caption">
-<em>Contribution of each GC/Length Bin to PC1 and PC2. Fill colours
-indicate the t-statistic, with tranparency denoting significance as
--log10(p), using Bonferroni-adjusted p-values.</em>
+<em>Correlations between the first three principal components and
+measured variables at transcript level. Sample conditions were converted
+to an ordered categorical variable for the purposes of
+visualisation</em>
 </p>
 </div>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-30-1">
-Past versions of unnamed-chunk-30-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-30-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/5196f4120527db07aaf6583bc6850638d325cac7/docs/figure/Quality-control.Rmd/unnamed-chunk-30-1.png" target="_blank">5196f41</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-04-21
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-<div id="correlation-of-samples" class="section level2">
-<h2>Correlation of samples</h2>
-<p><img src="figure/Quality-control.Rmd/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-31-1">
 Past versions of unnamed-chunk-31-1.png
@@ -2183,11 +2060,27 @@ unawaz1996
 </table>
 </div>
 </div>
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-e73b99e6611f7d9abfab" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-e73b99e6611f7d9abfab">{"x":{"filter":"none","vertical":false,"caption":"<caption>For each sample, a mean of its correlation to the other samples was calculated followed by a z-score transformation. In principle, samples that deviate 3 standard deviations away from the mean would be removed.<\/caption>","data":[["212","213","214","215","216","217","218","219","220","221","222","223","224","225","226","227","228","229"],[0.954734286747732,0.535319230574479,0.826775360096044,-0.821323088684962,0.0408621209623087,0.104786900612033,0.56241047767458,0.16463033904994,0.170966691558411,0.634588998011526,0.277382192530707,-3.47139484798005,0.692749219205917,0.515706887916418,0.244482446503435,-0.361895743984819,-0.631282137678046,-0.439499333115646],[0.804394359198634,1.85538259776234,1.21446816644299,0.100602146627092,-0.122318734007776,0.64345378346285,-0.0513398699649521,0.028159421919556,0.399166289539115,1.16483054573848,0.541942311912305,-2.27633986472193,-0.535863004478317,-0.62535398074132,-0.725044495679846,-0.311916663388157,-1.54524634057724,-0.558976669043756]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>transcript<\/th>\n      <th>gene<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script>
-<div id="correlation-of-samples-with-gc-and-transcript-length"
-class="section level3">
-<h3>Correlation of samples with GC and transcript length</h3>
+<p>Transcripts were divided in 10 approximately equal sized bins based
+on increasing length, and 10 approximately equal sized bins based on
+increasing GC content, with the final GC/Length bins being the
+combination 100 bins using both sets. The contribution of each gene to
+PC1 and PC2 was assessed and a t-test performed on each bin.</p>
+<p>If any bin makes a contribution to PC1 the mean will be clearly
+non-zero, whilst if there is no contribution the mean will be near zero.
+In this way, the impact of gene length and GC content on variance within
+the dataset can be assessed.</p>
+<div class="figure" style="text-align: center">
+<img src="figure/Quality-control.Rmd/unnamed-chunk-32-1.png" alt="*Contribution of each GC/Length Bin to PC1 and PC2. Fill colours indicate the t-statistic, with tranparency denoting significance as -log10(p), using Bonferroni-adjusted p-values.*" width="672" />
+<p class="caption">
+<em>Contribution of each GC/Length Bin to PC1 and PC2. Fill colours
+indicate the t-statistic, with tranparency denoting significance as
+-log10(p), using Bonferroni-adjusted p-values.</em>
+</p>
+</div>
+</div>
+</div>
+<div id="correlation-of-samples" class="section level2">
+<h2>Correlation of samples</h2>
 <p><img src="figure/Quality-control.Rmd/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-33-1">
@@ -2226,91 +2119,12 @@ unawaz1996
 </table>
 </div>
 </div>
-<p><img src="figure/Quality-control.Rmd/unnamed-chunk-33-2.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-33-2">
-Past versions of unnamed-chunk-33-2.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-33-2" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/5196f4120527db07aaf6583bc6850638d325cac7/docs/figure/Quality-control.Rmd/unnamed-chunk-33-2.png" target="_blank">5196f41</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-04-21
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p><img src="figure/Quality-control.Rmd/unnamed-chunk-34-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-34-1">
-Past versions of unnamed-chunk-34-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-34-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/5196f4120527db07aaf6583bc6850638d325cac7/docs/figure/Quality-control.Rmd/unnamed-chunk-34-1.png" target="_blank">5196f41</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-04-21
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="figure/Quality-control.Rmd/unnamed-chunk-35-1.png" alt="PCA on logCPM from counts post normalization with cqn. As a result of the normlization, it seems that whilst the overall variation within the dataset has reduced, sample 223 is no longer cluster with its condition group on PC1 and PC2" width="672" />
-<p class="caption">
-PCA on logCPM from counts post normalization with cqn. As a result of
-the normlization, it seems that whilst the overall variation within the
-dataset has reduced, sample 223 is no longer cluster with its condition
-group on PC1 and PC2
-</p>
-</div>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-67abe73b99e6611f7d9a" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-67abe73b99e6611f7d9a">{"x":{"filter":"none","vertical":false,"caption":"<caption>For each sample, a mean of its correlation to the other samples was calculated followed by a z-score transformation. In principle, samples that deviate 3 standard deviations away from the mean would be removed.<\/caption>","data":[["212","213","214","215","216","217","218","219","220","221","222","223","224","225","226","227","228","229"],[0.954734286747732,0.5353192305744795,0.8267753600960436,-0.8213230886849615,0.04086212096230872,0.1047869006120327,0.5624104776745801,0.1646303390499395,0.1709666915584113,0.634588998011526,0.2773821925307068,-3.471394847980053,0.6927492192059168,0.5157068879164183,0.2444824465034353,-0.3618957439848194,-0.6312821376780458,-0.4394993331156463],[0.8043943591986342,1.855382597762339,1.214468166442986,0.1006021466270922,-0.1223187340077758,0.6434537834628498,-0.05133986996495211,0.02815942191955596,0.3991662895391154,1.16483054573848,0.5419423119123048,-2.276339864721934,-0.5358630044783173,-0.6253539807413195,-0.7250444956798464,-0.311916663388157,-1.545246340577238,-0.5589766690437561]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>transcript<\/th>\n      <th>gene<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"transcript","targets":1},{"name":"gene","targets":2}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script>
+<div id="correlation-of-samples-with-gc-and-transcript-length"
+class="section level3">
+<h3>Correlation of samples with GC and transcript length</h3>
+<p><img src="figure/Quality-control.Rmd/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-35-1">
 Past versions of unnamed-chunk-35-1.png
@@ -2335,6 +2149,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/unawaz1996/NMD-analysis/blob/feb333f4958c9ccc5a506b8d2856e2a27d0ef196/docs/figure/Quality-control.Rmd/unnamed-chunk-35-1.png" target="_blank">feb333f</a>
+</td>
+<td>
+unawaz1996
+</td>
+<td>
+2023-04-24
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/unawaz1996/NMD-analysis/blob/5196f4120527db07aaf6583bc6850638d325cac7/docs/figure/Quality-control.Rmd/unnamed-chunk-35-1.png" target="_blank">5196f41</a>
 </td>
 <td>
@@ -2348,11 +2173,58 @@ unawaz1996
 </table>
 </div>
 </div>
+<p><img src="figure/Quality-control.Rmd/unnamed-chunk-35-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Quality-control.Rmd/unnamed-chunk-36-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-36-1">
+Past versions of unnamed-chunk-36-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-36-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/unawaz1996/NMD-analysis/blob/feb333f4958c9ccc5a506b8d2856e2a27d0ef196/docs/figure/Quality-control.Rmd/unnamed-chunk-36-1.png" target="_blank">feb333f</a>
+</td>
+<td>
+unawaz1996
+</td>
+<td>
+2023-04-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="figure/Quality-control.Rmd/unnamed-chunk-37-1.png" alt="PCA on logCPM from counts post normalization with cqn. As a result of the normlization, it seems that whilst the overall variation within the dataset has reduced, sample 223 is no longer cluster with its condition group on PC1 and PC2" width="672" />
+<p class="caption">
+PCA on logCPM from counts post normalization with cqn. As a result of
+the normlization, it seems that whilst the overall variation within the
+dataset has reduced, sample 223 is no longer cluster with its condition
+group on PC1 and PC2
+</p>
+</div>
 </div>
 </div>
 <div id="removing-sample" class="section level2">
 <h2>Removing sample</h2>
-<p><img src="figure/Quality-control.Rmd/unnamed-chunk-36-1.png" width="672" style="display: block; margin: auto;" /></p>
 <!-- # ```{r} -->
 <!-- # ## deseq2 -->
 <!-- # ddsTxi <- DESeqDataSet(se, design = ~Group) -->
@@ -2390,12 +2262,12 @@ Session information
 </button>
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
-<pre><code>R version 4.2.2 Patched (2022-11-10 r83330)
+<pre><code>R version 4.3.3 (2024-02-29)
 Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 22.04.2 LTS
+Running under: Ubuntu 22.04.4 LTS
 
 Matrix products: default
-BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.10.0
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.10.0 
 LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.10.0
 
 locale:
@@ -2406,128 +2278,131 @@ locale:
  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
 [11] LC_MEASUREMENT=en_AU.UTF-8 LC_IDENTIFICATION=C       
 
+time zone: Australia/Adelaide
+tzcode source: system (glibc)
+
 attached base packages:
  [1] splines   grid      stats4    tools     stats     graphics  grDevices
  [8] utils     datasets  methods   base     
 
 other attached packages:
- [1] cqn_1.44.0                    quantreg_5.94                
- [3] SparseM_1.81                  preprocessCore_1.60.2        
- [5] nor1mix_1.3-0                 mclust_6.0.0                 
- [7] naniar_1.0.0                  glmpca_0.2.0                 
- [9] broom_1.0.4                   glue_1.6.2                   
-[11] ggfortify_0.4.16              stargazer_5.2.3              
-[13] IsoformSwitchAnalyzeR_2.01.04 pfamAnalyzeR_0.99.0          
-[15] sva_3.46.0                    genefilter_1.80.3            
-[17] mgcv_1.8-42                   nlme_3.1-162                 
-[19] satuRn_1.6.0                  DEXSeq_1.44.0                
-[21] BiocParallel_1.32.6           ggrepel_0.9.3                
-[23] pander_0.6.5                  msigdbr_7.5.1                
-[25] cowplot_1.1.1                 ngsReports_2.0.3             
-[27] patchwork_1.1.2               VennDiagram_1.7.3            
-[29] futile.logger_1.4.3           UpSetR_1.4.0                 
-[31] fgsea_1.24.0                  GOplot_1.0.2                 
-[33] RColorBrewer_1.1-3            gridExtra_2.3                
-[35] ggdendro_0.1.23               AnnotationHub_3.6.0          
-[37] BiocFileCache_2.6.1           dbplyr_2.3.2                 
-[39] openxlsx_4.2.5.2              ggiraph_0.8.7                
-[41] wasabi_1.0.1                  sleuth_0.30.1                
-[43] DT_0.27                       VennDetail_1.14.0            
-[45] msigdb_1.6.0                  GSEABase_1.60.0              
-[47] graph_1.76.0                  annotate_1.76.0              
-[49] XML_3.99-0.14                 pheatmap_1.0.12              
-[51] ggvenn_0.1.10                 MetBrewer_0.2.0              
-[53] ggpubr_0.6.0                  venn_1.11                    
-[55] viridis_0.6.2                 viridisLite_0.4.1            
-[57] tximeta_1.16.1                tximport_1.26.1              
-[59] goseq_1.50.0                  geneLenDataBase_1.34.0       
-[61] BiasedUrn_2.0.9               org.Mm.eg.db_3.16.0          
-[63] EnsDb.Mmusculus.v79_2.99.0    ensembldb_2.22.0             
-[65] AnnotationFilter_1.22.0       GenomicFeatures_1.50.4       
-[67] AnnotationDbi_1.60.2          biomaRt_2.54.1               
-[69] edgeR_3.40.2                  limma_3.54.2                 
-[71] DESeq2_1.38.3                 SummarizedExperiment_1.28.0  
-[73] Biobase_2.58.0                MatrixGenerics_1.10.0        
-[75] matrixStats_0.63.0            GenomicRanges_1.50.2         
-[77] GenomeInfoDb_1.34.9           IRanges_2.32.0               
-[79] S4Vectors_0.36.2              BiocGenerics_0.44.0          
-[81] corrplot_0.92                 lubridate_1.9.2              
-[83] forcats_1.0.0                 purrr_1.0.1                  
-[85] readr_2.1.4                   tidyverse_2.0.0              
-[87] stringr_1.5.0                 tidyr_1.3.0                  
-[89] scales_1.2.1                  data.table_1.14.8            
-[91] readxl_1.4.2                  tibble_3.2.1                 
-[93] magrittr_2.0.3                reshape2_1.4.4               
-[95] ggplot2_3.4.2                 dplyr_1.1.1                  
-[97] workflowr_1.7.0              
+ [1] cqn_1.48.0                  quantreg_5.97              
+ [3] SparseM_1.81                preprocessCore_1.64.0      
+ [5] nor1mix_1.3-2               mclust_6.0.1               
+ [7] naniar_1.0.0                glmpca_0.2.0               
+ [9] broom_1.0.5                 glue_1.7.0                 
+[11] ggfortify_0.4.16            stargazer_5.2.3            
+[13] IsoformSwitchAnalyzeR_2.2.0 pfamAnalyzeR_1.2.0         
+[15] sva_3.50.0                  genefilter_1.84.0          
+[17] mgcv_1.9-1                  nlme_3.1-164               
+[19] satuRn_1.10.0               DEXSeq_1.48.0              
+[21] BiocParallel_1.36.0         ggrepel_0.9.5              
+[23] pander_0.6.5                msigdbr_7.5.1              
+[25] cowplot_1.1.2               ngsReports_2.4.0           
+[27] patchwork_1.2.0             VennDiagram_1.7.3          
+[29] futile.logger_1.4.3         UpSetR_1.4.0               
+[31] fgsea_1.28.0                GOplot_1.0.2               
+[33] RColorBrewer_1.1-3          gridExtra_2.3              
+[35] ggdendro_0.1.23             AnnotationHub_3.10.0       
+[37] BiocFileCache_2.10.1        dbplyr_2.4.0               
+[39] openxlsx_4.2.5.2            ggiraph_0.8.8              
+[41] wasabi_1.0.1                sleuth_0.30.1              
+[43] DT_0.31                     VennDetail_1.18.0          
+[45] msigdb_1.10.0               GSEABase_1.64.0            
+[47] graph_1.80.0                annotate_1.80.0            
+[49] XML_3.99-0.16               pheatmap_1.0.12            
+[51] ggvenn_0.1.10               MetBrewer_0.2.0            
+[53] ggpubr_0.6.0                venn_1.12                  
+[55] viridis_0.6.4               viridisLite_0.4.2          
+[57] tximeta_1.20.2              tximport_1.30.0            
+[59] goseq_1.54.0                geneLenDataBase_1.38.0     
+[61] BiasedUrn_2.0.11            org.Mm.eg.db_3.18.0        
+[63] EnsDb.Mmusculus.v79_2.99.0  ensembldb_2.26.0           
+[65] AnnotationFilter_1.26.0     GenomicFeatures_1.54.1     
+[67] AnnotationDbi_1.64.1        biomaRt_2.58.0             
+[69] edgeR_4.0.11                limma_3.58.1               
+[71] DESeq2_1.42.0               SummarizedExperiment_1.32.0
+[73] Biobase_2.62.0              MatrixGenerics_1.14.0      
+[75] matrixStats_1.2.0           GenomicRanges_1.54.1       
+[77] GenomeInfoDb_1.38.5         IRanges_2.36.0             
+[79] S4Vectors_0.40.2            BiocGenerics_0.48.1        
+[81] corrplot_0.92               lubridate_1.9.3            
+[83] forcats_1.0.0               purrr_1.0.2                
+[85] readr_2.1.5                 tidyverse_2.0.0            
+[87] stringr_1.5.1               tidyr_1.3.0                
+[89] scales_1.3.0                data.table_1.14.10         
+[91] readxl_1.4.3                tibble_3.2.1               
+[93] magrittr_2.0.3              reshape2_1.4.4             
+[95] ggplot2_3.4.4               dplyr_1.1.4                
 
 loaded via a namespace (and not attached):
-  [1] rappdirs_0.3.3                rtracklayer_1.58.0           
-  [3] visdat_0.6.0                  bit64_4.0.5                  
-  [5] knitr_1.42                    DelayedArray_0.24.0          
-  [7] hwriter_1.3.2.1               KEGGREST_1.38.0              
-  [9] RCurl_1.98-1.12               generics_0.1.3               
- [11] callr_3.7.3                   lambda.r_1.2.4               
- [13] RSQLite_2.3.1                 bit_4.0.5                    
- [15] tzdb_0.3.0                    xml2_1.3.3                   
- [17] httpuv_1.6.9                  xfun_0.38                    
- [19] hms_1.1.3                     jquerylib_0.1.4              
- [21] babelgene_22.9                evaluate_0.20                
- [23] promises_1.2.0.1              fansi_1.0.4                  
- [25] restfulr_0.0.15               progress_1.2.2               
- [27] DBI_1.1.3                     geneplotter_1.76.0           
- [29] htmlwidgets_1.6.2             ellipsis_0.3.2               
- [31] crosstalk_1.2.0               backports_1.4.1              
- [33] locfdr_1.1-8                  vctrs_0.6.1                  
- [35] abind_1.4-5                   cachem_1.0.7                 
- [37] withr_2.5.0                   BSgenome_1.66.3              
- [39] vroom_1.6.1                   GenomicAlignments_1.34.1     
- [41] prettyunits_1.1.1             lazyeval_0.2.2               
- [43] crayon_1.5.2                  labeling_0.4.2               
- [45] pkgconfig_2.0.3               ProtGenerics_1.30.0          
- [47] rlang_1.1.0                   lifecycle_1.0.3              
- [49] MatrixModels_0.5-1            filelock_1.0.2               
- [51] cellranger_1.1.0              rprojroot_2.0.3              
- [53] Matrix_1.5-3                  carData_3.0-5                
- [55] boot_1.3-28.1                 Rhdf5lib_1.20.0              
- [57] zoo_1.8-11                    whisker_0.4.1                
- [59] processx_3.8.0                png_0.1-8                    
- [61] rjson_0.2.21                  bitops_1.0-7                 
- [63] getPass_0.2-2                 rhdf5filters_1.10.1          
- [65] Biostrings_2.66.0             blob_1.2.4                   
- [67] rstatix_0.7.2                 ggsignif_0.6.4               
- [69] memoise_2.0.1                 plyr_1.8.8                   
- [71] gdata_2.18.0.1                zlibbioc_1.44.0              
- [73] compiler_4.2.2                BiocIO_1.8.0                 
- [75] Rsamtools_2.14.0              cli_3.6.1                    
- [77] XVector_0.38.0                pbapply_1.7-0                
- [79] ps_1.7.4                      formatR_1.14                 
- [81] MASS_7.3-58.3                 tidyselect_1.2.0             
- [83] stringi_1.7.12                highr_0.10                   
- [85] yaml_2.3.7                    locfit_1.5-9.7               
- [87] sass_0.4.5                    fastmatch_1.1-3              
- [89] timechange_0.2.0              parallel_4.2.2               
- [91] rstudioapi_0.14               uuid_1.1-0                   
- [93] git2r_0.31.0                  farver_2.1.1                 
- [95] digest_0.6.31                 BiocManager_1.30.20          
- [97] shiny_1.7.4                   Rcpp_1.0.10                  
- [99] car_3.1-2                     BiocVersion_3.16.0           
-[101] later_1.3.0                   httr_1.4.5                   
-[103] colorspace_2.1-0              fs_1.6.1                     
-[105] statmod_1.5.0                 plotly_4.10.1                
-[107] systemfonts_1.0.4             xtable_1.8-4                 
-[109] jsonlite_1.8.4                futile.options_1.0.1         
-[111] R6_2.5.1                      pillar_1.9.0                 
-[113] htmltools_0.5.5               mime_0.12                    
-[115] fastmap_1.1.1                 interactiveDisplayBase_1.36.0
-[117] codetools_0.2-19              utf8_1.2.3                   
-[119] lattice_0.20-45               bslib_0.4.2                  
-[121] curl_5.0.0                    gtools_3.9.4                 
-[123] zip_2.2.2                     GO.db_3.16.0                 
-[125] survival_3.5-5                admisc_0.31                  
-[127] rmarkdown_2.21                munsell_0.5.0                
-[129] rhdf5_2.42.0                  GenomeInfoDbData_1.2.9       
-[131] gtable_0.3.3                 </code></pre>
+  [1] fs_1.6.3                      ProtGenerics_1.34.0          
+  [3] bitops_1.0-7                  httr_1.4.7                   
+  [5] backports_1.4.1               utf8_1.2.4                   
+  [7] R6_2.5.1                      lazyeval_0.2.2               
+  [9] rhdf5filters_1.14.1           withr_3.0.0                  
+ [11] prettyunits_1.2.0             textshaping_0.3.7            
+ [13] cli_3.6.2                     formatR_1.14                 
+ [15] labeling_0.4.3                sass_0.4.8                   
+ [17] pbapply_1.7-2                 Rsamtools_2.18.0             
+ [19] systemfonts_1.0.5             svglite_2.1.3                
+ [21] BSgenome_1.70.1               rstudioapi_0.15.0            
+ [23] RSQLite_2.3.5                 generics_0.1.3               
+ [25] BiocIO_1.12.0                 hwriter_1.3.2.1              
+ [27] crosstalk_1.2.1               gtools_3.9.5                 
+ [29] vroom_1.6.5                   car_3.1-2                    
+ [31] zip_2.3.0                     GO.db_3.18.0                 
+ [33] Matrix_1.6-5                  fansi_1.0.6                  
+ [35] abind_1.4-5                   lifecycle_1.0.4              
+ [37] whisker_0.4.1                 yaml_2.3.8                   
+ [39] carData_3.0-5                 rhdf5_2.46.1                 
+ [41] SparseArray_1.2.3             blob_1.2.4                   
+ [43] gdata_3.0.0                   promises_1.2.1               
+ [45] crayon_1.5.2                  lattice_0.22-5               
+ [47] KEGGREST_1.42.0               pillar_1.9.0                 
+ [49] knitr_1.45                    boot_1.3-28.1                
+ [51] rjson_0.2.21                  admisc_0.34                  
+ [53] codetools_0.2-19              fastmatch_1.1-4              
+ [55] vctrs_0.6.5                   png_0.1-8                    
+ [57] locfdr_1.1-8                  cellranger_1.1.0             
+ [59] gtable_0.3.4                  cachem_1.0.8                 
+ [61] xfun_0.41                     S4Arrays_1.2.0               
+ [63] mime_0.12                     survival_3.5-7               
+ [65] statmod_1.5.0                 interactiveDisplayBase_1.40.0
+ [67] ellipsis_0.3.2                bit64_4.0.5                  
+ [69] progress_1.2.3                filelock_1.0.3               
+ [71] rprojroot_2.0.4               bslib_0.6.1                  
+ [73] colorspace_2.1-0              DBI_1.2.1                    
+ [75] tidyselect_1.2.0              bit_4.0.5                    
+ [77] compiler_4.3.3                curl_5.2.0                   
+ [79] git2r_0.33.0                  xml2_1.3.6                   
+ [81] plotly_4.10.4                 DelayedArray_0.28.0          
+ [83] rtracklayer_1.62.0            rappdirs_0.3.3               
+ [85] digest_0.6.34                 rmarkdown_2.25               
+ [87] XVector_0.42.0                htmltools_0.5.7              
+ [89] pkgconfig_2.0.3               highr_0.10                   
+ [91] fastmap_1.1.1                 rlang_1.1.3                  
+ [93] htmlwidgets_1.6.4             shiny_1.8.0                  
+ [95] farver_2.1.1                  jquerylib_0.1.4              
+ [97] zoo_1.8-12                    jsonlite_1.8.8               
+ [99] RCurl_1.98-1.14               GenomeInfoDbData_1.2.11      
+[101] Rhdf5lib_1.24.1               munsell_0.5.0                
+[103] Rcpp_1.0.12                   babelgene_22.9               
+[105] visdat_0.6.0                  stringi_1.8.3                
+[107] zlibbioc_1.48.0               MASS_7.3-60.0.1              
+[109] plyr_1.8.9                    parallel_4.3.3               
+[111] Biostrings_2.70.1             hms_1.1.3                    
+[113] locfit_1.5-9.8                uuid_1.2-0                   
+[115] ggsignif_0.6.4                geneplotter_1.80.0           
+[117] futile.options_1.0.1          BiocVersion_3.18.1           
+[119] evaluate_0.23                 lambda.r_1.2.4               
+[121] BiocManager_1.30.22           tzdb_0.4.0                   
+[123] httpuv_1.6.13                 MatrixModels_0.5-3           
+[125] xtable_1.8-4                  restfulr_0.0.15              
+[127] rstatix_0.7.2                 later_1.3.2                  
+[129] ragg_1.2.7                    memoise_2.0.1                
+[131] GenomicAlignments_1.38.2      workflowr_1.7.1              
+[133] timechange_0.3.0             </code></pre>
 </div>
 </div>
 </div>
@@ -2581,11 +2456,6 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
-<script>
-$(document).ready(function () {
-  window.initializeCodeFolding("hide" === "show");
-});
-</script>
 
 <script>
 $(document).ready(function ()  {

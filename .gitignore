@@ -9,3 +9,8 @@ analysis/*png
 analysis/*html
 analysis/*_cache
 analysis/site_libs
+output/sequences
+output/EISA
+data/fastq
+data/fastqc
+tmp

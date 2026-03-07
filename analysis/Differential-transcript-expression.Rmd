@@ -1,6 +1,6 @@
 ---
-title: "Differential-transcript-expression"
-author: "unawaz1996"
+title: "Differential transcript expression analysis"
+author: "Urwah Nawaz"
 date: "2023-03-26"
 output:
   html_notebook: default
@@ -35,6 +35,7 @@ library(tidyquant)
 library(stargazer)
 library(ggfortify)
 library(glue)
+library(edgeR)
 library(cowplot)
 library(broom)
 library(glmpca)
@@ -44,19 +45,30 @@ library(bigPint)
 
 ## Set-up 
 
-```{r}
+```{r tx-setup}
 txdf = transcripts(EnsDb.Mmusculus.v79, return.type="DataFrame")
-tx2gene = as.data.frame(txdf[,c("tx_id","gene_id")])
+tx2gene = as.data.frame(txdf[,c("tx_id","gene_id", "tx_biotype")])
+
+gdf = genes(EnsDb.Mmusculus.v79, return.type="DataFrame") %>% as.data.frame()
+gene_stats = as.data.frame(gdf[,c("gene_id", "gene_biotype")])
+
+tx2gene =full_join(tx2gene,gdf, by = "gene_id") %>%
+  dplyr::select(-c("gene_biotype", "gene_seq_start",
+                   "gene_seq_end",   "seq_name",
+                   "seq_strand", "seq_coord_system",         "symbol",     "entrezid"))
+
 ```
 
-```{r}
+```{r load-res}
 load("output/limma-matrices.Rda")
 load("output/DEG-limma-results.Rda")
 load("output/DEG-list.Rda")
 
 ```
 
-```{r}
+
+
+```{r data-setup}
 md.files = "data/LTK_Sample Metafile_V3.txt"
 salmon.files = ("/home/neuro/Documents/NMD_analysis/Analysis/Results/Salmon")
 salmon = list.files(salmon.files, pattern = "transcripts$", full.names = TRUE)
@@ -77,6 +89,7 @@ group_cols <- hcl.colors(
   ) %>%
   setNames(unique(md$Group))
 ```
+
 
 
 Transcript-level counts were retrieved using the `catchSalmon()` function from the edgeR package. 
@@ -105,6 +118,7 @@ keep <- filterByExpr(dge)
 dge.scaled.filtr <- dge[keep, , keep.lib.sizes = FALSE]
 dge.scaled.filtr <- calcNormFactors(dge.scaled.filtr)
 
+dim(dge.scaled.filtr$counts)
 
 ```
 
@@ -192,6 +206,51 @@ plotMDS(dge.scaled.filtr,col=as.numeric(dge.scaled.filtr$samples$group))
 
 ```
 
+## Checking distribution of NIFs in all data 
+```{r}
+NMD_features = read.table("data/nif_output/Mus_musculus__nifs.tsv", sep = "\t", skip =1)
+
+colnames(NMD_features)[1:4] = c("EnsID", "NIF_dEJ", "NIF_uORF", "NIF_long-3'utr")
+NMD_features = NMD_features[,1:4]
+tx_NMD = NMD_features %>% 
+  mutate_at(.vars = "EnsID", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  dplyr::rename("tx_id" = "EnsID") %>% 
+  right_join(dge.scaled.filtr$counts %>% 
+               as.data.frame() %>%
+               rownames_to_column("tx_id") %>%
+               mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = ""),
+             by="tx_id") 
+
+dEJ = tx_NMD %>% 
+  dplyr::filter(NIF_dEJ == "True") %>% 
+  dplyr::select(tx_id)
+
+
+uORF = tx_NMD %>% 
+  dplyr::filter(NIF_uORF == "True") %>% 
+  dplyr::select(tx_id)
+UTR = tx_NMD %>% 
+  dplyr::filter(`NIF_long-3'utr` == "True") %>% 
+  dplyr::select(tx_id)
+
+x = list( "dEJ" = dEJ$tx_id, 
+          "uORF" = uORF$tx_id, 
+          "Long 3'UTR" = UTR$tx_id, 
+          "All transcripts" = tx_NMD$tx_id)
+
+UpSetR::upset(fromList(x), main.bar.color = c("#585A58", "#6d597a", "#eaac8b", "#fcb9b2", 
+                                              "#585A58", "#585A58", "#585A58", "#585A58"), 
+              sets.bar.color = c("#585A58", "#6d597a", "#eaac8b", "#fcb9b2"),
+                  mainbar.y.label = "Overlap of Transcripts with NMD inducing features",
+              sets.x.label = "Number of transcripts",
+                text.scale = c(1.5,1.6,1.6, 1.6, 1.6), 
+              point.size = 4.3)
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/NIF-transcriptome-2e.png"  ,  units = c("in"), height = 8, width = 14, dpi=1200)
+```
+
+
+## Differential expression analysis using edgeR
 
 ```{r fig.height=6, fig.width=6, fig.cap= "*Biological coeficcient of variation plot against the average abundance of each transcript. The plot shows the square-root estimates of the common, trended and tagwise NB dispersions.*"}
 design <-  model.matrix(~0+Group, data = md_filt) %>% 
@@ -230,7 +289,7 @@ for (i in 1:ncol(contrasts)){
   temp = glmQLFTest(fit, contrast= contrasts[,i])
   tt = topTags(temp,n = Inf)
   tt %<>% as.data.frame() %>% rownames_to_column("tx_id") %>%
-    left_join(decideTestsDGE(temp) %>%
+    left_join(decideTests(temp) %>%
                   as.data.frame() %>%
                   set_colnames(c("Results")) %>%
                   rownames_to_column("tx_id"))
@@ -244,7 +303,7 @@ for (i in 1:ncol(contrasts)){
 }
 ```
 
-## Checking normalization and QC
+### Checking normalization and QC
 
 ```{r}
 scaled_matrix <- as.data.frame(t(apply(as.matrix(dge.scaled.filtr$counts), 1, scale)))
@@ -275,7 +334,7 @@ upf3a_oe = plotSM(counts[c(1:2, 4,8,10,13,15)], dataMetrics = metrics[3], saveFi
 upf3a_oe
 ```
 
-# Distribution of results 
+### Distribution of results 
 ```{r}
 plot_hist = function(df, comparison, legend = FALSE){
   ggplot(data= df, aes(x=PValue)) + geom_histogram(fill = "grey", color="black") + theme_bw() + xlab("Pvalue") + ylab("Frequency")
@@ -289,7 +348,7 @@ plot_fc = function(df){
 }
 ```
 
-## Fold change distributions 
+### Fold change distributions 
 
 ```{r}
 a_f = plot_fc(res_dte$UPF3B_KD_Control) 
@@ -317,25 +376,79 @@ grid.arrange(a, a_f,
              e,e_f, ncol = 2, nrow=5)
 ```
 
+```{r}
+ma_plot = function(data){
+  DEColours <- c("Downregulated" = "#14213d","Upregulated" = "#ff6700",  "Not Sig" = "#e6e8e6")
+  temp = data %>% 
+    mutate(diffExpressed = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",        
+               ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig")))
+  plot = temp %>% 
+    ggplot(aes(y= logFC,
+               x = logCPM,
+               colour = as.factor(as.character(diffExpressed )))) +
+    geom_point(alpha = 0.65, size = 3) +
+    scale_colour_manual(values = DEColours) + theme_bw()+
+    theme(legend.position = "top",
+          axis.title.y = element_text(size = 12)) + geom_hline(yintercept = 0, 
+                                                               linetype = "dashed", color = "grey") +
+    # geom_ysidedensity(aes(x=after_stat(density),  
+    #                          color = nif_label, fill = nif_label),  alpha=0.2, size = 1) +
+    # scale_fill_manual(values = DEColours) + scale_size_manual(values = c("NIF+" = 3, 
+    #                                                                      "NIF-" =2,
+    #                                                                      "Not Sig"= 2)) +
+    theme(
+        axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+         strip.text.x = element_text(
+        size = 12, face = "bold.italic", family = "serif"
+        )) + labs(color = "Expression", 
+                  fill = "",
+                  size = "") + scale_alpha(guide = 'none')
+  return(plot)
+    
+}
+
+
+```
+
 
 ```{r fig.width=10, fig.height=10, fig.cap="MA plot of comprisons of KD/OE with Controls. Pink highlights significantly upregulated transcripts whereas blue highlights significantly downregulated transcripts"}
 ## Ma plot 
 
-ma_1 = ma_plot(res_dte$UPF3B_KD_Control, 0) + ggtitle("UPF3B KD vs Control")
-ma_2 = ma_plot(res_dte$UPF3A_KD_Control, 0) + ggtitle("UPF3A KD vs Control")
-ma_3 = ma_plot(res_dte$UPF3A_KD_UPF3B_KD_Control, 0) + ggtitle("UPF3 dKD vs Control")
-ma_4 = ma_plot(res_dte$UPF3A_OE_Control, 0) + ggtitle("UPF3A OE vs Control")
-ma_5 = ma_plot(res_dte$UPF3A_OE_UPF3B_KD_Control, 0) + ggtitle("UPF3A OE in UPF3B KD")
+ma_1 = ma_plot(res_dte$UPF3B_KD_Control) + ggtitle("UPF3B KD vs Control")
+ma_2 = ma_plot(res_dte$UPF3A_KD_Control) + ggtitle("UPF3A KD vs Control")
+ma_3 = ma_plot(res_dte$UPF3A_KD_UPF3B_KD_Control) + ggtitle("UPF3 dKD vs Control")
+ma_4 = ma_plot(res_dte$UPF3A_OE_Control) + ggtitle("UPF3A OE vs Control")
+ma_5 = ma_plot(res_dte$UPF3A_OE_UPF3B_KD_Control) + ggtitle("UPF3A OE in UPF3B KD")
 
-grid.arrange(ma_1, ma_2, ma_3, 
-            ma_4, ma_5, ncol=3, nrow=2)
+
+
+ggsave(plot=ma_1, filename = here::here("output/Thesis_plots/DETs/Upf3b_KD.png"), height =4, width =4, 
+       dpi = 1200)
+ggsave(plot=ma_2, filename = here::here("output/Thesis_plots/DETs/Upf3a_KD.png"), height =4, width =4, 
+       dpi = 1200)
+ggsave(plot=ma_3, filename = here::here("output/Thesis_plots/DETs/Upf3_dKD.png"), height =4, width =4, 
+       dpi = 1200)
+ggsave(plot=ma_4, filename = here::here("output/Thesis_plots/DETs/Upf3a_OE.png"), height =4, width =4, 
+       dpi = 1200)
+ggsave(plot=ma_5, filename = here::here("output/Thesis_plots/DETs/Upf3a_OE_Upf3b_KD.png"), height =4, width =4, 
+       dpi = 1200)
 ```
 
-```{r fig.height= 5, fig.width=5, fig.cap="*Ratio of up/down differentiallt expressed transcripts*"}
+
+```{r fig.height= 5, fig.width=5, fig.cap="*Ratio of up/down differentially expressed transcripts*"}
  ratios = data.frame()
  for (c in names(res_dte)){
    temp = table(res_dte[[c]]$Results) %>% 
-     melt() %>% 
+     reshape2::melt() %>% 
      dplyr::filter(Var1 != 0) 
    ratio= temp$value[2]/temp$value[1]
    ratio = data.frame(Comparisons = c, 
@@ -343,25 +456,872 @@ grid.arrange(ma_1, ma_2, ma_3,
    ratios = rbind(ratios, ratio)
    }
 
-ratios  %>%
-  ggplot(aes(x =Comparisons, y = ratio, fill = Comparisons)) + 
-  geom_bar(stat = "identity",   colour = "white", width = .75) + 
+ratios$Comparisons = factor(ratios$Comparisons, levels = c("UPF3B_KD_Control", 
+                                                           "UPF3A_KD_Control", 
+                                                           "UPF3A_KD_UPF3B_KD_Control", 
+                                                           "UPF3A_OE_Control", 
+                                                           "UPF3A_OE_UPF3B_KD_Control"))
+
+ratios_fig = ratios  %>%
+  ggplot(aes(x =Comparisons, y = ratio)) + 
+  geom_bar(stat = "identity",  colour = "white", width = .75, fill = "#e64055") + 
     theme_classic() + 
     theme(axis.text.x = element_text(angle = 70,  hjust=1, face = "bold"), 
           legend.position = "none", 
           legend.title= element_blank(), axis.title.y = element_text(size = 12), 
           axis.text.y = element_text(size = 14, face = "bold")) + 
-    scale_fill_manual(values = c("#E12F8F","#6E74B4","#EA2A5F", "#FD9675", "#2F124B")) +
-    ylab("ratio up/down") + xlab("") 
+    ylab("ratio up/down") + xlab("") + 
+   scale_x_discrete(labels=c("UPF3A_KD_UPF3B_KD_Control" = "Upf3 dKD", "UPF3A_KD_Control" = "Upf3a KD", 
+                                                            "UPF3B_KD_Control" = "Upf3b KD", "UPF3A_OE_Control" = "Upf3a OE", 
+                                                            "UPF3A_OE_UPF3B_KD_Control" = "Upf3a OE Upf3b KD"))
 
+# ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/ratio_DET.svg", plot = ratios_fig, 
+#        units = c("in"), height = 4, width = 4)
+```
+
+
+### Concordance and discordance of results 
+
+
+```{r}
+names(res_dte)
+for_upf3b = names(res_dte)[-c(1)]
+
+overlap_upf3b = list()
+for (c in for_upf3b ){
+  overlap = res_dte$UPF3B_KD_Control %>% 
+    dplyr::filter(FDR < 0.05) %>% 
+    inner_join(res_dte[[c]] %>% 
+                 dplyr::filter(FDR < 0.05), by="tx_id") %>% 
+      mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) 
+  total = table(overlap$Label) %>% as.data.frame() 
+  overlap_upf3b[[paste0(c, "_vs_Upf3b_KD")]] = total
+  
+}
+
+for_upf3a = names(res_dte)[c(3:5)]
+overlap_upf3a = list()
+for (c in for_upf3a ){
+  overlap =res_dte$UPF3A_KD_Control %>% 
+    dplyr::filter(FDR < 0.05) %>%  
+    inner_join(res_dte[[c]] %>%
+                 dplyr::filter(FDR < 0.05), by="tx_id") %>% 
+      mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) 
+  total = table(overlap$Label) %>% as.data.frame() 
+  overlap_upf3a[[paste0(c, "_vs_Upf3A_KD")]] = total
+  
+}
+
+
+for_dkDupf3 = names(res_dte)[c(3,5)]
+overlap_dkDupf3 = list()
+for (c in for_dkDupf3 ){
+  overlap = res_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+    dplyr::filter(FDR < 0.05) %>%  
+    inner_join(res_dte[[c]] %>%
+                 dplyr::filter(FDR < 0.05), by="tx_id") %>% 
+      mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) 
+  total = table(overlap$Label) %>% as.data.frame() 
+  overlap_dkDupf3 [[paste0(c, "_vs_Upf3_dKD")]] = total
+  
+}
+
+
+
+overlap_upf3b =do.call("rbind",overlap_upf3b) %>% 
+  rownames_to_column("Comparisons") %>% 
+   mutate_at(.vars = "Comparisons", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") 
+  
+
+overlap_upf3a =do.call("rbind",overlap_upf3a) %>% 
+  rownames_to_column("Comparisons") %>% 
+   mutate_at(.vars = "Comparisons", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") 
+
+
+overlap_dkDupf3  =do.call("rbind",overlap_dkDupf3 ) %>% 
+  rownames_to_column("Comparisons") %>% 
+   mutate_at(.vars = "Comparisons", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") 
+
+
+all_comparisons = rbind(overlap_upf3b,overlap_upf3a, overlap_dkDupf3) %>% 
+  mutate(Var1 = factor(Var1, levels = c("Discordant", "Concordance" )), 
+         Comparisons = factor(Comparisons, levels =
+                                c("UPF3A_OE_UPF3B_KD_Control_vs_Upf3_dKD",
+                                  "UPF3A_OE_Control_vs_Upf3_dKD",
+                                  "UPF3A_OE_UPF3B_KD_Control_vs_Upf3A_KD",
+                                  "UPF3A_OE_Control_vs_Upf3A_KD",
+                                  "UPF3A_KD_UPF3B_KD_Control_vs_Upf3A_KD",      
+                                  "UPF3A_OE_UPF3B_KD_Control_vs_Upf3b_KD",
+                                  "UPF3A_OE_Control_vs_Upf3b_KD",
+                                  "UPF3A_KD_UPF3B_KD_Control_vs_Upf3b_KD",
+                                  "UPF3A_KD_Control_vs_Upf3b_KD"
+                                                      ) )) %>%
+  ggplot(aes(x = Comparisons, y = Freq, fill = Var1)) + 
+  geom_bar(stat= "identity", alpha = 0.75, width= 0.65) + coord_flip() + scale_fill_manual(values = c( "#2E368F","#F15A2B")) +
+  theme_bw() +
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=10, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(y= "Number of Overlapping transcripts",
+                  fill = "Expression", 
+                  x= "")
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/all_overlaps-transcript.svg", plot = all_comparisons, 
+       units = c("in"), height = 7, width = 9.26)
+```
+
+Significance of overlap and lists 
+```{r}
+
+library(GeneOverlap)
+
+enrichment_DEGs_P = list()
+enrichment_DEGs_OR = list()
+
+
+test.list = list()
+test.list$UPF3B_KD_Control = res_dte$UPF3B_KD_Control$tx_id[res_dte$UPF3B_KD_Contro$FDR < 0.05]
+test.list$UPF3A_KD_Control =  res_dte$UPF3A_KD_Control$tx_id[res_dte$UPF3A_KD_Contro$FDR < 0.05]
+test.list$UPF3A_KD_UPF3B_KD_Control =  res_dte$UPF3A_KD_UPF3B_KD_Control$tx_id[res_dte$UPF3A_KD_UPF3B_KD_Control$FDR < 0.05]
+test.list$UPF3A_OE_UPF3B_KD_Control = res_dte$UPF3A_OE_UPF3B_KD_Control$tx_id[res_dte$UPF3A_OE_UPF3B_KD_Control$FDR < 0.05]
+#test.list$UPF3A_OE_Control = res_dte$UPF3A_OE_Control$tx_id[res_dte$UPF3A_OE_Control$FDR < 0.05]
+test.list$BG = res_dte$UPF3B_KD_Control$tx_id
+
+for_upf3b = names(res_dte)[-c(1)]
+
+for (c in for_upf3b ){
+  
+  go.obj <- newGeneOverlap(test.list$UPF3B_KD_Control, 
+                         test.list[[c]],
+                         genome.size=length(test.list$BG))
+  go.obj <- testGeneOverlap(go.obj)
+  enrichment_DEGs_P[[paste0("Upf3b_KD", "_", c)]] = go.obj@pval
+  enrichment_DEGs_OR[[paste0("Upf3b_KD", "_", c)]] = go.obj@odds.ratio 
+}
+  
+for_upf3a = names(res_dte)[c(3:5)]
+
+for (c in for_upf3a ){
+    go.obj <- newGeneOverlap(test.list$UPF3A_KD_Control, 
+                         test.list[[c]],
+                         genome.size=length(test.list$BG))
+  go.obj <- testGeneOverlap(go.obj)
+  enrichment_DEGs_P[[paste0("Upf3a_KD", "_", c)]] = go.obj@pval
+  enrichment_DEGs_OR[[paste0("Upf3a_KD", "_", c)]] = go.obj@odds.ratio 
+}
+
+
+for_dkDupf3 = names(res_dte)[c(4:5)]
+for (c in for_dkDupf3 ){
+      go.obj <- newGeneOverlap(test.list$UPF3A_KD_UPF3B_KD_Control, 
+                         test.list[[c]],
+                         genome.size=length(test.list$BG))
+  go.obj <- testGeneOverlap(go.obj)
+  enrichment_DEGs_P[[paste0("Upf3_dKD", "_", c)]] = go.obj@pval
+  enrichment_DEGs_OR[[paste0("Upf3_dKD", "_", c)]] = go.obj@odds.ratio 
+  
+}
+    
+odds_ratio = enrichment_DEGs_OR %>% do.call(rbind,.) %>% 
+  set_colnames("OR") %>% 
+  cbind(enrichment_DEGs_P %>% do.call(rbind,.) %>% set_colnames("pvalue")) %>% 
+  as.data.frame() %>%
+  rownames_to_column("comparisons") %>%
+  mutate(comparsions = factor(comparisons, levels = c("Upf3b_KD_UPF3A_vs_Control", 
+                                                      "Upf3b_KD_DoubleKD_vs_Control", 
+                                                      "Upf3b_KD_UPF3A_OE_UPF3B_KD_vs_Control",
+                                                      "Upf3a_KD_DoubleKD_vs_Control", 
+                                                      "Upf3a_KD_UPF3A_OE_UPF3B_KD_vs_Control", 
+                                                      "Upf3_dKD_UPF3A_OE_UPF3B_KD_vs_Control"))) %>%
+  ggplot(aes(x=OR, y = comparisons)) + geom_bar(stat = "identity", fill = "#edafb8") +
+  theme_bw() + geom_vline(xintercept = 1) + 
+   theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=12, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(x="Odds ratio")
+
+
+
+#ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/all_overlaps_enrichment.svg", #plot = odds_ratio, 
+ #      units = c("in"), height = 7, width = 9.26)
+
+```
+
+```{r}
+
+res_sig_dte = lapply(res_dte, function(x){
+  x %<>% 
+    dplyr::filter(FDR < 0.05 ) %>% 
+    as.data.frame()
+})
+
+
+upf3_cor = res_sig_dte$UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3b KD DETs (LFC)") + ylab("Upf3a KD DETs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DETs/Upf3_paralogs_cor.png", plot = upf3_cor , 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
 
 ```
 
 
-## DET statistics 
+```{r}
+
+upf3d_cor = res_sig_dte$UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3b KD DETs (LFC)") + ylab("Upf3 dKD DETs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DETs/Upf3dKD_Upf3b_cor.png", plot = upf3d_cor , 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
+
+```
+
 
 ```{r}
-NMD_features = read.table("data/nif_output/Mus_musculus__nifs.tsv", sep = "\t", skip =1)
+
+upf3a_Upf3bKD_cor = res_sig_dte$UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_OE_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3b KD DETs (LFC)") + ylab("Upf3a OE DETs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DETs/Upf3aOE_Upf3b_cor.png", plot = upf3a_Upf3bKD_cor, 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
+
+```
+
+
+```{r}
+
+upf3a_Upf3bKD_cor = res_sig_dte$UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_OE_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3b KD DETs (LFC)") + ylab("Upf3a OE Upf3b KD DETs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DETs/Upf3aOEKD_Upf3b_cor.png", plot = upf3a_Upf3bKD_cor, 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
+
+```
+
+
+```{r}
+
+upf3a_Upf3dKD_cor = res_sig_dte$UPF3A_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3a KD DETs (LFC)") + ylab("Upf3 dKD DETs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DETs/Upf3aKD_Upf3dKD_cor.png", plot = upf3a_Upf3dKD_cor, 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
+
+```
+
+
+```{r}
+
+upf3a_Upf3dKD_cor = res_sig_dte$UPF3A_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_OE_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3a KD DETs (LFC)") + ylab("Upf3a OE DETs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DETs/Upf3aKD_Upf3aOE_cor.png", plot = upf3a_Upf3dKD_cor, 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
+
+```
+
+
+```{r}
+
+upf3a_Upf3dKD_cor = res_sig_dte$UPF3A_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_OE_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3a KD DETs (LFC)") + ylab("Upf3a OE Upf3b KD DETs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DETs/Upf3aKD_Upf3aOEKD_cor.png", plot = upf3a_Upf3dKD_cor, 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
+
+```
+
+
+```{r}
+upf3a_Upf3dKD_cor = res_sig_dte$UPF3A_OE_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3a OE DETs (LFC)") + ylab("Upf3 dKD DETs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DETs/Upf3aOE_Upf3dKD_cor.png", plot = upf3a_Upf3dKD_cor, 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
+
+```
+
+
+```{r}
+upf3a_Upf3dKD_cor = res_sig_dte$UPF3A_OE_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3a OE Upf3b KD DETs (LFC)") + ylab("Upf3 dKD DETs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DETs/Upf3aOEKD_Upf3dKD_cor.png", plot = upf3a_Upf3dKD_cor, 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
+
+```
+
+
+- Overlaps with DEGs 
+
+```{r}
+load("output/DEG-list.Rda")
+
+
+upf3b_cor = res_sig_dte$UPF3B_KD_Control %>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>%
+  left_join(tx2gene, by = "tx_id") %>% 
+    inner_join(DEGenes$UPF3B_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID), by = "gene_id") %>%
+          mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3b KD DETs (LFC)") + ylab("Upf3d KD DEGs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#c9184a", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+  
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DEGs-DETs/Upf3b_cor.png", plot = upf3b_cor , 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
+
+upf3a_cor = res_sig_dte$UPF3A_KD_Control %>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  left_join(tx2gene, by = "tx_id") %>%
+    inner_join(DEGenes$UPF3A_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID), by = "gene_id") %>% 
+          mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+    ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3a KD DETs (LFC)") + ylab("Upf3a KD DEGs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#c9184a", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DEGs-DETs/Upf3a_cor.png", plot = upf3a_cor  , 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
+
+
+upf3d_KD_cor = res_sig_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  left_join(tx2gene, by = "tx_id") %>%
+    inner_join(DEGenes$DoubleKD_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID), by = "gene_id") %>% 
+          mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+    ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3 dKD DETs (LFC)") + ylab("Upf3 dKD DEGs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#c9184a", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DEGs-DETs/Upf3dKD_cor.png", plot = upf3d_KD_cor , 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
+
+
+upf3a_OE_Upf3b_KD_DEGs_DSGs = res_sig_dte$UPF3A_OE_UPF3B_KD_Control %>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  left_join(tx2gene, by = "tx_id") %>%
+    inner_join(DEGenes$UPF3A_OE_UPF3B_KD_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID), by = "gene_id") %>% 
+          mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab("Upf3a OE Upf3b KD DETs (LFC)") + ylab("Upf3a OE Upf3b DEGs (LFC)") +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#c9184a", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 13, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 13, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/overlaps/DEGs-DETs/Upf3a_Upf3b_kD_cor.png", plot = upf3a_OE_Upf3b_KD_DEGs_DSGs , 
+       units = c("in"), height = 4.65, width = 4, dpi = 1200)
+
+
+
+upf3b_KD_DEGs_DSGs = res_sig_dte$UPF3B_KD_Control%>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  left_join(tx2gene, by = "tx_id") %>%
+    inner_join(DEGenes$UPF3B_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID), by = "gene_id") %>% 
+          mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  with(table(.$Label)) %>% 
+  reshape2::melt() %>% 
+  mutate(Comparison = c("Upf3b DETs"))
+
+upf3a_KD_DEGs_DSGs = res_sig_dte$UPF3A_KD_Control%>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  left_join(tx2gene, by = "tx_id") %>%
+    inner_join(DEGenes$UPF3A_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID), by = "gene_id") %>% 
+          mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  with(table(.$Label)) %>% reshape2::melt() %>% 
+  mutate(Comparison = c("Upf3a DETs"))
+
+
+upf3d_KD_DEGs_DSGs= res_sig_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  left_join(tx2gene, by = "tx_id") %>%
+    inner_join(DEGenes$DoubleKD_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID), by = "gene_id") %>% 
+          mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  with(table(.$Label)) %>% reshape2::melt() %>% 
+  mutate(Comparison = c("Upf3d KD DETs"))
+
+upf3a_OE_Upf3b_KD_DEGs_DSGs  = res_sig_dte$UPF3A_OE_UPF3B_KD_Control %>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  left_join(tx2gene, by = "tx_id") %>%
+    inner_join(DEGenes$UPF3A_OE_UPF3B_KD_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID), by = "gene_id") %>% 
+          mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  with(table(.$Label)) %>% reshape2::melt() %>% 
+  mutate(Comparison = c("Upf3a OE Upf3b KD DETs"))
+
+DEGs_DETs =rbind(upf3b_KD_DEGs_DSGs, upf3a_KD_DEGs_DSGs, upf3d_KD_DEGs_DSGs, upf3a_OE_Upf3b_KD_DEGs_DSGs ) %>%
+   mutate(Comparison= factor(Comparison, levels = c(
+     "Upf3a OE Upf3b KD DETs",
+     "Upf3d KD DETs",
+     "Upf3a DETs",
+     "Upf3b DETs"))) %>%
+     mutate(Var1 = factor(Var1, levels = c( "Discordant", "Concordance"))) %>%
+ ggplot(aes(x = Comparison, y = value, fill = Var1)) +
+  geom_bar(stat= "identity", alpha = 0.75, width= 0.65) + coord_flip() + scale_fill_manual(values = c( "#2E368F","#F15A2B")) +
+  theme_bw() +
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=10, family = "serif"),
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"),
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(y= "Number of Overlapping transcripts",
+                  fill = "Expression",
+                  x= "")
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/all_overlaps-transcript-DEGs.svg", plot = DEGs_DETs,
+       units = c("in"), height = 7, width = 9.26)
+```
+
+
+```{r}
+ res_sig_dte$UPF3A_OE_UPF3B_KD_Control %>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  left_join(tx2gene, by = "tx_id") %>%
+    inner_join(res$UPF3A_OE_UPF3B_KD_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID, gene.FC  = logFC), by = "gene_id") %>% 
+         with(cor.test(.$logFC, .$gene.FC))
+```
+
+
+```{r}
+
+
+res_sig_dte = lapply(res_sig_dte, function(x){
+  x %<>% 
+    mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  left_join(tx2gene, by = "tx_id") 
+})
+
+
+go.obj <- newGeneOverlap(res_sig_dte$UPF3A_OE_UPF3B_KD_Control$gene_id, 
+                         DEGenes$UPF3A_OE_UPF3B_KD_vs_Control$EnsID,
+                         genome.size=length(res$UPF3B_vs_Control$EnsID))
+  go.obj <- testGeneOverlap(go.obj)
+ 
+  go.obj@pval
+ go.obj@odds.ratio 
+```
+
+## DET statistics 
+```{r}
+NMD_features = read.table("/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/data/nif_output/Mus_musculus__nifs.tsv", sep = "\t", skip =1)
 
 colnames(NMD_features) = c("tx_id",	"NIF_dEJ", "NIF_uORF",	"NIF_long_3utr", "NIF|__|GC(cds[-10:termination_codon])",	"GC_5utr",	"GC_cds",	"GC_3utr",	"GC_exons",	"GC_introns",	"LENGTH_5utr", 	"LENGTH_cds",	"LENGTH_3utr",	"LENGTH_exons", "LENGTH_introns", "EXONS_count",	"dEJs|__|penultimate-exon>=55(nts)",	"uORFs|__|count",	"uORFs|__|gc-content",	"uORFs|__|lengths", "uORFs|__|max-length")
 
@@ -369,7 +1329,12 @@ NMD_features$NIF_dEJ = ifelse(NMD_features$NIF_dEJ == "True",gsub("True", 1, NMD
 NMD_features$NIF_uORF = ifelse(NMD_features$NIF_uORF == "True",gsub("True", 1, NMD_features$NIF_uORF), 0)
 NMD_features$NIF_long_3utr = ifelse(NMD_features$NIF_long_3utr == "True",gsub("True", 1, NMD_features$NIF_long_3utr), 0)
 NMD_features %<>% mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "")
+
+NMD_features$NIF_dEJ[is.na(NMD_features$NIF_dEJ)] <- 0
+NMD_features$NIF_uORF[is.na(NMD_features$NIF_uORF)] <- 0
+NMD_features$NIF_long_3utr[is.na(NMD_features$NIF_long_3utr)] <- 0
 ```
+
 
 
 ```{r include=FALSE}
@@ -489,41 +1454,178 @@ ggarrange(down, up,  common.legend = TRUE)
 ```
 
 
+
+
+
+```{r}
+
+res_sig = list()
+res_sig$upf3b_kd = res_dte$UPF3B_KD_Control %>%  dplyr::filter(FDR < 0.05) %>%  left_join(tx2gene, by = "tx_id")
+res_sig$upf3a_kd = res_dte$UPF3A_KD_Control %>%  dplyr::filter(FDR < 0.05) %>%  left_join(tx2gene, by = "tx_id")
+res_sig$upf3_dkd = res_dte$UPF3A_KD_UPF3B_KD_Control %>%  dplyr::filter(FDR < 0.05) %>%  left_join(tx2gene, by = "tx_id")
+res_sig$upf3a_oe = res_dte$UPF3A_OE_Control %>%  dplyr::filter(FDR < 0.05) %>%  left_join(tx2gene, by = "tx_id")
+res_sig$upf3a_oe_upf3b_kd = res_dte$UPF3A_OE_UPF3B_KD_Control %>%  dplyr::filter(FDR < 0.05) %>%  left_join(tx2gene, by = "tx_id")
+write.xlsx(res_sig, file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/DET-analysis.xlsx")
+
+```
+
+
+
 ```{r fig.width=12, fig.cap= "Number of NIF features in differentially expressed transcripts per comparison"}
 nif_features = list()
-for (i in names(res_dte)){
+for (i in names(res_dte)[-3]){
   name = i
   temp = res_dte[[i]]
-  sig = temp %>%  as.data.frame() %>%  
-        dplyr::filter(FDR < 0.05) 
-  utr = table(sig$NIF_long_3utr)[2]
-  dej = table(sig$NIF_dEJ)[2]
-  uorf = table(sig$NIF_uORF)[2]
-  total_nif = rbind(utr, dej, uorf) %>% 
+  
+  message("Counting NIFs in upregulated transcripts for ", name)
+  sig_up = temp %>%  as.data.frame() %>%  
+        dplyr::filter(FDR < 0.05, logFC > log2(1)) 
+  utr = table(sig_up$NIF_long_3utr)[2]
+  dej = table(sig_up$NIF_dEJ)[2]
+  uorf = table(sig_up$NIF_uORF)[2]
+  none = table(sig_up$nif_feature)[1]
+  total_nif_up  = rbind(utr, dej, uorf, none) %>% 
     as.data.frame() %>% 
     rownames_to_column("NIF_feature") %>% 
-    mutate(Condition = name) %>% 
+    mutate(Condition = name, 
+           Expression = "Up") %>% 
     dplyr::rename("Count" = "1")
-  nif_features= rbind(nif_features, total_nif, stringsAsFactors = FALSE)
   
-    
+  message("Counting NIFs in downregulated transcripts for ", name)
+  
+  sig_down = temp %>%  as.data.frame() %>%  
+        dplyr::filter(FDR < 0.05, logFC < log2(1)) 
+  utr = table(sig_down$NIF_long_3utr)[2]
+  dej = table(sig_down$NIF_dEJ)[2]
+  uorf = table(sig_down$NIF_uORF)[2]
+   none = table(sig_down$nif_feature)[1]
+  total_nif_down  = rbind(utr, dej, uorf, none) %>% 
+    as.data.frame() %>% 
+    rownames_to_column("NIF_feature") %>% 
+    mutate(Condition = name, 
+           Expression = "Down") %>% 
+    dplyr::rename("Count" = "1")
+  
+  nif_features= rbind(nif_features, total_nif_up, total_nif_down, stringsAsFactors = FALSE)
   
 }
 
-nif_features %>%
-  ggplot(aes(x= NIF_feature, y = Count, fill = NIF_feature)) + 
-  geom_bar(stat = "identity", position = "dodge", width = .5) + coord_flip() + 
-  facet_grid(~Condition) + theme_bw() + labs(fill = "Type of NIF",
-                                              labels = c("Downstream exon junction", "Upstream ORF", 
-                                                         "Long 3'UTR"))
+OE_df = data.frame("NIF_feature" = "")
+
+### For overexprssion - up
+## 0 for long 3'UTR
+## 0 for dEJ 
+## 1 for uORF
+
+### down 
+## 3 long utr
+## 0 dej
+### 1 for uORF
+
+OE_df = data.frame("NIF_feature" = rep(c("utr", "dej", "uorf"), 2), 
+                   "Count" = c(0,0, 1,3,0, 1), 
+                   "Condition" = rep(c("UPF3A_OE_Control")),
+                   "Expression" = c(rep("Up",3), rep("Down", 3)))
+
+nif_features= rbind(nif_features, OE_df, stringsAsFactors = FALSE)
 
 
+condition.labs <- c("Upf3b KD", "Upf3a KD", "Upf3 dKD", "Upf3a OE", "Upf3a OE, Upf3b KD")
+names(condition.labs) <- c("UPF3B_KD", "UPF3A_KD", "UPF3A_KD_UPF3B_KD",
+                      "UPF3A_OE", "UPF3A_OE_UPF3B_KD") 
+nif_number = nif_features %>%
+  mutate(NIF_feature = gsub("utr", "Long 3'UTR", NIF_feature), 
+         NIF_feature = gsub("uorf", "Upstream ORF", NIF_feature), 
+         NIF_feature = gsub("dej", "dEJC", NIF_feature), 
+         Condition = gsub("_Control", "", Condition)) %>%
+  mutate(Condition = factor(Condition, levels = c("UPF3B_KD",
+                                                  "UPF3A_KD", 
+                                                  "UPF3A_KD_UPF3B_KD", 
+                                                  "UPF3A_OE",
+                                                  "UPF3A_OE_UPF3B_KD")), 
+         Expression = factor(Expression, levels = c("Down", "Up")),
+          NIF_feature = factor(NIF_feature, levels = c("none",
+                                                             
+                                                             "Upstream ORF",
+                                                             "Long 3'UTR",
+                                                       "dEJC"))) %>%
+  
+  ggplot(aes(x= NIF_feature, y = Count, fill = Expression)) + 
+  geom_bar(stat = "identity", position = "stack", width = .5) + coord_flip() + 
+  theme_bw() +
+  facet_grid(~Condition,
+             labeller = labeller(Condition = condition.labs))  +
+  xlab("") + ylab("") + scale_fill_manual(values = c("Up"= "#b23a48",
+                                                     "Down" = "grey")) + 
+   
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+         strip.text.x = element_text(
+        size = 12, face = "italic", family = "serif"
+        ))
+
+nif_number
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/Count_NIF_2f.png",
+       plot = nif_number  ,  units = c("in"), height = 5, width = 15)
+
+nif_prop =nif_features %>%
+  mutate(NIF_feature = gsub("utr", "Long 3'UTR", NIF_feature), 
+         NIF_feature = gsub("uorf", "Upstream ORF", NIF_feature), 
+         NIF_feature = gsub("dej", "Downstream exon junction", NIF_feature), 
+         Condition = gsub("_Control", "", Condition)) %>%
+  mutate(Condition = factor(Condition, levels = c("UPF3B_KD",
+                                                  "UPF3A_KD", 
+                                                  "UPF3A_KD_UPF3B_KD", 
+                                                  "UPF3A_OE",
+                                                  "UPF3A_OE_UPF3B_KD")), 
+         Expression = factor(Expression, levels = c("Down", "Up")),
+          NIF_feature = factor(NIF_feature, levels = c("none",
+                                                             
+                                                             "uorf",
+                                                             "Long 3'UTR",
+                                                       "dej"))) %>%
+  
+  ggplot(aes(x= NIF_feature, y = Count, fill = Expression)) + 
+  geom_bar(stat = "identity", position = "fill", width = .5) + coord_flip() + 
+  theme_bw() +
+  facet_grid(~Condition,
+             labeller = labeller(Condition = condition.labs))  +
+  xlab("") + ylab("") + scale_fill_manual(values = c("Up"= "#b23a48",
+                                                     "Down" = "grey")) + 
+   
+     theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+         strip.text.x = element_text(
+        size = 12, face = "bold.italic", family = "serif"
+        )) 
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/Proprotion_NIF.svg",
+       plot = nif_prop  ,  units = c("in"), height = 5, width = 14)
 ```
+
+* Enrichment analysis of NIF+ features 
 
 ```{r}
 # Calculating enrichment for this work 
 ### Ask Irina about adjusted pvalues 
-enrichment_NIF = list()
+enrichment_NIF_pvalue = list()
+enrichment_NIF_OR = list()
 for (c in names(res_dte)){
   test.list = list()
   test.list$BG = res_dte[[c]]$tx_id
@@ -537,20 +1639,58 @@ for (c in names(res_dte)){
                          test.list$NIF,
                          genome.size=length(test.list$BG))
     go.obj <- testGeneOverlap(go.obj)
-    enrichment_NIF[[paste0(c, "_", det)]] = go.obj@pval
+    enrichment_NIF_pvalue[[paste0(c, "_", det)]] = go.obj@pval
+    enrichment_NIF_OR[[paste0(c, "_", det)]] = go.obj@odds.ratio
     
   }
 }
 
-enrichment_NIF = do.call(rbind, enrichment_NIF) %>% as.data.frame()
-colnames(enrichment_NIF)[1] = c("pvalue")
-enrichment_NIF$padj = p.adjust(enrichment_NIF$pvalue, method = "BH")
-
-
+enrichment_NIF_pvalue = do.call(rbind, enrichment_NIF_pvalue) %>% as.data.frame()
+colnames(enrichment_NIF_pvalue)[1] = c("pvalue")
+enrichment_NIF_pvalue$padj = p.adjust(enrichment_NIF_pvalue$pvalue, method = "BH")
+enrichment_NIF_OR  = do.call(rbind, enrichment_NIF_OR ) %>% as.data.frame()
+colnames(enrichment_NIF_OR)[1] = c("OR")
+NIF_enrichment = cbind(enrichment_NIF_pvalue, enrichment_NIF_OR)
 ```
 
 ```{r}
-enrichment_nif_feature = list()
+# NIF_enrichment %<>% rownames_to_column("condition")
+# NIF_enrichment$Condition[grepl("UPF3B_KD_Control_", NIF_enrichment$condition)] = "UPF3B KD vs Controls"
+# NIF_enrichment$Condition[grepl("UPF3A_KD_Control_", NIF_enrichment$condition)] = "UPF3A KD vs Controls"
+# NIF_enrichment$Condition[grepl("UPF3A_OE_Control", NIF_enrichment$condition)] = "UPF3A OE vs Controls"
+# NIF_enrichment$Condition[grepl("UPF3A_KD_UPF3B_KD_Control", NIF_enrichment$condition)] = "Double KD vs Controls"
+# NIF_enrichment$Condition[grepl("UPF3A_OE_UPF3B_KD_Control", NIF_enrichment$condition)] = "UPF3A OE UPF3B KD vs Controls"
+# NIF_enrichment$expression[grepl("_up", NIF_enrichment$condition)] = "Up"
+# NIF_enrichment$expression[grepl("_down", NIF_enrichment$condition)] = "Down"
+# NIF_enrichment$expression[grepl("_sig", NIF_enrichment$condition)] = "Sig"
+# 
+# NIF_enrichment$sig = ifelse(NIF_enrichment$pvalue < 0.05, "Sig", "Not Sig")
+# 
+# NIF_enrichment_plot = NIF_enrichment %>% 
+#   mutate(Condition = factor(Condition, levels = c("UPF3B KD vs Controls", 
+#                                                   "UPF3A KD vs Controls",
+#                                                   "Double KD vs Controls", 
+#                                                   "UPF3A OE vs Controls", 
+#                                                   "UPF3A OE UPF3B KD vs Controls"))) %>%
+#   ggplot(aes(y=condition, x=OR, color = expression)) +  
+#    theme_bw()  +
+#   geom_point(size = 6, aes(shape=sig)) + facet_grid(rows = vars(Condition),  scales = "free") +
+#   theme(axis.text.y = element_blank()) + ylab("") + xlab("Odds ratio") + 
+#   scale_color_manual(values=c("#2F124B", "#F1676B",  ))
+# 
+# 
+# NIF_enrichment_plot
+# 
+# ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/All_OR.svg",
+#        plot = NIF_enrichment_plot ,  units = c("in"), height = 5.58, width = 4.69)
+
+```
+
+
+
+```{r}
+enrichment_nif_pval = list()
+enrichment_nif_OR = list()
 nifs_list = c("NIF_uORF", "NIF_dEJ", "NIF_utr")
 
 for (c in names(res_dte)){
@@ -562,28 +1702,208 @@ for (c in names(res_dte)){
   test.list$sig = res_dte[[c]]$tx_id[res_dte[[c]]$FDR < 0.05]
   test.list$up = res_dte[[c]]$tx_id[res_dte[[c]]$FDR < 0.05 & res_dte[[c]]$logFC > 0]
   test.list$down = res_dte[[c]]$tx_id[res_dte[[c]]$FDR < 0.05 & res_dte[[c]]$logFC < 0]
+  test.list$notsig = res_dte[[c]]$tx_id[res_dte[[c]]$FDR > 0.05]
   for (nif in nifs_list){
-     go.obj <- newGeneOverlap(test.list$sig,
+     go.obj <- newGeneOverlap(test.list$notsig,
                          test.list[[nif]],
                          genome.size=length(test.list$BG))
      go.obj <- testGeneOverlap(go.obj)
-     enrichment_nif_feature[[paste0(c, "_", nif)]] = go.obj@pval
+     enrichment_nif_pval[[paste0(c, "_", nif, "_notsig")]] = go.obj@pval
+     enrichment_nif_OR[[paste0(c, "_", nif, "_notsig")]] = go.obj@odds.ratio
      go.obj <- newGeneOverlap(test.list$up,
                          test.list[[nif]],
                          genome.size=length(test.list$BG))
      go.obj <- testGeneOverlap(go.obj)
-     enrichment_nif_feature[[paste0(c,"_",nif,  "_up")]] = go.obj@pval
+     enrichment_nif_pval[[paste0(c,"_",nif,  "_up")]] = go.obj@pval
+     enrichment_nif_OR[[paste0(c,"_",nif, "_up")]] = go.obj@odds.ratio
      go.obj <- newGeneOverlap(test.list$down,
                          test.list[[nif]],
                          genome.size=length(test.list$BG))
      go.obj <- testGeneOverlap(go.obj)
-     enrichment_nif_feature[[paste0(c,"_",nif, "_down")]] = go.obj@pval
-       
+     enrichment_nif_pval[[paste0(c,"_",nif, "_down")]] = go.obj@pval
+     enrichment_nif_OR[[paste0(c,"_",nif, "_down")]] = go.obj@odds.ratio
     
   }
 }
 
+
+enrichment_nif_pval = do.call(rbind, enrichment_nif_pval) %>% as.data.frame()
+colnames(enrichment_nif_pval)[1] = c("pvalue")
+enrichment_nif_pval$padj = p.adjust(enrichment_nif_pval$pvalue, method = "BH")
+enrichment_nif_OR  = do.call(rbind, enrichment_nif_OR) %>% as.data.frame()
+colnames(enrichment_nif_OR)[1] = c("OR")
+NIF_feature_enrichment = cbind(enrichment_nif_pval, enrichment_nif_OR)
 ```
+
+
+```{r}
+NIF_feature_enrichment %<>% rownames_to_column("condition")
+NIF_feature_enrichment$Condition[grepl("UPF3B_KD_Control_", NIF_feature_enrichment$condition)] = "Upf3b KD targets"
+NIF_feature_enrichment$Condition[grepl("UPF3A_KD_Control_", NIF_feature_enrichment$condition)] = "Upf3a KD targets"
+NIF_feature_enrichment$Condition[grepl("UPF3A_OE_Control", NIF_feature_enrichment$condition)] = "Upf3a OE targets"
+NIF_feature_enrichment$Condition[grepl("UPF3A_KD_UPF3B_KD_Control", NIF_feature_enrichment$condition)] = "Upf3 dKD targets"
+NIF_feature_enrichment$Condition[grepl("UPF3A_OE_UPF3B_KD_Control", NIF_feature_enrichment$condition)] = "Upf3a OE Upf3b KD targets"
+NIF_feature_enrichment$expression[grepl("_up", NIF_feature_enrichment$condition)] = "Up"
+NIF_feature_enrichment$expression[grepl("_down", NIF_feature_enrichment$condition)] = "Down"
+NIF_feature_enrichment$expression[grepl("_notsig", NIF_feature_enrichment$condition)] = "All"
+
+NIF_feature_enrichment$NIF[grepl("_utr_", NIF_feature_enrichment$condition)] = "Long 3'UTR"
+NIF_feature_enrichment$NIF[grepl("_dEJ_", NIF_feature_enrichment$condition)] = "Downstream exon junction"
+NIF_feature_enrichment$NIF[grepl("_uORF_", NIF_feature_enrichment$condition)] = "Upstream ORF"
+
+NIF_feature_enrichment$sig = ifelse(NIF_feature_enrichment$pvalue < 0.05, "Significantly associated", "Not significantly associated")
+```
+
+
+```{r}
+NIF_enrichment_F_plot = NIF_feature_enrichment %>% 
+  mutate(Condition = factor(Condition, levels = c("Upf3b KD targets", 
+                                                  "Upf3a KD targets",
+                                                  "Upf3a OE targets", 
+                                                  "Upf3 dKD targets", 
+                                                  "Upf3a OE Upf3b KD targets"))) %>%
+  ggplot(aes(y=Condition, x=OR, color = expression)) +  
+   theme_bw()  + theme(axis.text.y = element_blank()) +
+  geom_point(size = 6, aes(shape=sig)) + facet_grid(rows = vars(Condition), cols= vars(NIF), 
+                                                    scales="free") +
+  ylab("") + xlab("Odds ratio (OR)") + 
+  scale_color_manual(values=c("All" = "grey",
+                              "Up" = "#ee6c4d",
+                              "Down" = "#293241")) +
+  labs(shape = "",
+       color = "Group") +
+    theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        ))
+
+
+NIF_enrichment_F_plot
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIF_feature_OR.svg",
+       plot = NIF_enrichment_F_plot ,  units = c("in"), height = 7.87, width =7.24)
+
+```
+
+
+```{r}
+enrichment_nif_pval = list()
+enrichment_nif_OR = list()
+nifs_list = c("NIF_uORF", "NIF_dEJ", "NIF_utr")
+
+for (c in names(res_dte)){
+  test.list = list()
+  test.list$BG = res_dte[[c]]$tx_id
+  test.list$NIF_uORF = res_dte[[c]]$tx_id[res_dte[[c]]$NIF_uORF== 1 ]
+  test.list$NIF_dEJ = res_dte[[c]]$tx_id[res_dte[[c]]$NIF_dEJ== 1 ]
+  test.list$NIF_utr = res_dte[[c]]$tx_id[res_dte[[c]]$NIF_long_3utr== 1 & res_dte[[c]]$NIF_dEJ== 0 &  res_dte[[c]]$NIF_uORF== 0]
+  test.list$sig = res_dte[[c]]$tx_id[res_dte[[c]]$FDR < 0.05]
+  test.list$up = res_dte[[c]]$tx_id[res_dte[[c]]$FDR < 0.05 & res_dte[[c]]$logFC > 0]
+  test.list$down = res_dte[[c]]$tx_id[res_dte[[c]]$FDR < 0.05 & res_dte[[c]]$logFC < 0]
+  test.list$notsig = res_dte[[c]]$tx_id[res_dte[[c]]$FDR > 0.05]
+  for (nif in nifs_list){
+     go.obj <- newGeneOverlap(test.list$notsig,
+                         test.list[[nif]],
+                         genome.size=length(test.list$BG))
+     go.obj <- testGeneOverlap(go.obj)
+     enrichment_nif_pval[[paste0(c, "_", nif, "_notsig")]] = go.obj@pval
+     enrichment_nif_OR[[paste0(c, "_", nif, "_notsig")]] = go.obj@odds.ratio
+     go.obj <- newGeneOverlap(test.list$up,
+                         test.list[[nif]],
+                         genome.size=length(test.list$BG))
+     go.obj <- testGeneOverlap(go.obj)
+     enrichment_nif_pval[[paste0(c,"_",nif,  "_up")]] = go.obj@pval
+     enrichment_nif_OR[[paste0(c,"_",nif, "_up")]] = go.obj@odds.ratio
+     go.obj <- newGeneOverlap(test.list$down,
+                         test.list[[nif]],
+                         genome.size=length(test.list$BG))
+     go.obj <- testGeneOverlap(go.obj)
+     enrichment_nif_pval[[paste0(c,"_",nif, "_down")]] = go.obj@pval
+     enrichment_nif_OR[[paste0(c,"_",nif, "_down")]] = go.obj@odds.ratio
+    
+  }
+}
+
+
+enrichment_nif_pval = do.call(rbind, enrichment_nif_pval) %>% as.data.frame()
+colnames(enrichment_nif_pval)[1] = c("pvalue")
+enrichment_nif_pval$padj = p.adjust(enrichment_nif_pval$pvalue, method = "BH")
+enrichment_nif_OR  = do.call(rbind, enrichment_nif_OR) %>% as.data.frame()
+colnames(enrichment_nif_OR)[1] = c("OR")
+NIF_feature_enrichment = cbind(enrichment_nif_pval, enrichment_nif_OR)
+```
+
+
+```{r}
+NIF_feature_enrichment %<>% rownames_to_column("condition")
+NIF_feature_enrichment$Condition[grepl("UPF3B_KD_Control_", NIF_feature_enrichment$condition)] = "Upf3b KD targets"
+NIF_feature_enrichment$Condition[grepl("UPF3A_KD_Control_", NIF_feature_enrichment$condition)] = "Upf3a KD targets"
+NIF_feature_enrichment$Condition[grepl("UPF3A_OE_Control", NIF_feature_enrichment$condition)] = "Upf3a OE targets"
+NIF_feature_enrichment$Condition[grepl("UPF3A_KD_UPF3B_KD_Control", NIF_feature_enrichment$condition)] = "Upf3 dKD targets"
+NIF_feature_enrichment$Condition[grepl("UPF3A_OE_UPF3B_KD_Control", NIF_feature_enrichment$condition)] = "Upf3a OE Upf3b KD targets"
+NIF_feature_enrichment$expression[grepl("_up", NIF_feature_enrichment$condition)] = "Up"
+NIF_feature_enrichment$expression[grepl("_down", NIF_feature_enrichment$condition)] = "Down"
+NIF_feature_enrichment$expression[grepl("_notsig", NIF_feature_enrichment$condition)] = "All"
+
+NIF_feature_enrichment$NIF[grepl("_utr_", NIF_feature_enrichment$condition)] = "Long 3'UTR"
+NIF_feature_enrichment$NIF[grepl("_dEJ_", NIF_feature_enrichment$condition)] = "Downstream exon junction"
+NIF_feature_enrichment$NIF[grepl("_uORF_", NIF_feature_enrichment$condition)] = "Upstream ORF"
+
+NIF_feature_enrichment$sig = ifelse(NIF_feature_enrichment$pvalue < 0.05, "Significantly associated", "Not significantly associated")
+```
+
+
+```{r}
+NIF_enrichment_F_plot = NIF_feature_enrichment %>% 
+  mutate(Condition = factor(Condition, levels = c("Upf3b KD targets", 
+                                                  "Upf3a KD targets",
+                                                  "Upf3a OE targets", 
+                                                  "Upf3 dKD targets", 
+                                                  "Upf3a OE Upf3b KD targets"))) %>%
+  ggplot(aes(y=Condition, x=OR, color = expression)) +  
+   theme_bw()  + theme(axis.text.y = element_blank()) +
+  geom_point(size = 6, aes(shape=sig)) + facet_grid(rows = vars(Condition), cols= vars(NIF), 
+                                                    scales="free") +
+  ylab("") + xlab("Odds ratio (OR)") + 
+  scale_color_manual(values=c("All" = "grey",
+                              "Up" = "#ee6c4d",
+                              "Down" = "#293241")) +
+  labs(shape = "",
+       color = "Group") +
+    theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        ))
+
+
+NIF_enrichment_F_plot
+
+
+```
+
+
 
 ## Distribution of NIFs
 
@@ -594,597 +1914,2145 @@ NIF_dist = function(res_matrix){
     ggplot(aes(x=logFC)) +
     geom_density(data=dplyr::filter(temp,NIF_dEJ == 1, FDR < 0.05), fill="#FF2759", alpha = 0.5) +
     geom_density(data=dplyr::filter(temp, NIF_dEJ == 0, FDR < 0.05), fill="lightgray", alpha = 0.2) +
-    geom_density(data=dplyr::filter(temp, is.na(NIF_dEJ), FDR < 0.05), fill="#3A7FA4", alpha = 0.2) +  theme_bw() +
-    ylab("Filtered Density") + xlab("Log2 Fold Change") + ggtitle("Density distribution of dEJ")
+    theme_bw() +
+    ylab("Filtered Density") + xlab("Log2 Fold Change") + ggtitle("Density distribution of dEJ") + 
+    xlim(-4,4)
 
   uORF_dist  = temp %>%  as.data.frame() %>%
     ggplot(aes(x=logFC)) +
     geom_density(data=dplyr::filter(temp,NIF_uORF == 1, FDR < 0.05),
                  fill="#FF2759", alpha = 0.5) +
     geom_density(data=dplyr::filter(temp, NIF_uORF == 0, FDR < 0.05), fill="lightgray", alpha = 0.2) +
-    geom_density(data=dplyr::filter(temp, is.na(NIF_uORF), FDR < 0.05), fill="#3A7FA4", alpha = 0.2) +  theme_bw() +
-    ylab("Filtered Density") + xlab("Log2 Fold Change") + ggtitle("Density distribution of uORF")
+    theme_bw() +
+    ylab("Filtered Density") + xlab("Log2 Fold Change") + ggtitle("Density distribution of uORF") + 
+    xlim(-4,4)
 
   utr_dist = temp %>%  as.data.frame() %>%
     ggplot(aes(x=logFC)) + geom_density(data=dplyr::filter(temp, NIF_long_3utr == 1, FDR < 0.05), fill="#FF2759", alpha = 0.5) +
     geom_density(data=dplyr::filter(temp, NIF_long_3utr == 0, FDR < 0.05), fill="lightgray", alpha = 0.2) +
-    geom_density(data=dplyr::filter(temp, is.na(NIF_long_3utr), FDR < 0.05), fill="#3A7FA4", alpha = 0.2) +  theme_bw() +
+    theme_bw() +
+    ylab("Filtered Density") + xlab("Log2 Fold Change") +
+    ggtitle("Density distribution Long 3' UTRs") + 
+    xlim(-4,4)
+
+  plot = ggarrange(dEJ_dist, uORF_dist, utr_dist, nrow=3)
+  return(plot)
+}
+
+
+
+NIF_dist_hist = function(res_matrix){
+  temp = res_matrix
+  dEJ_dist = temp %>% as.data.frame() %>%
+    ggplot(aes(x=logFC)) +
+    geom_histogram(data=dplyr::filter(temp,NIF_dEJ == 1, FDR < 0.05), fill="#FF2759", alpha = 0.5) +
+    geom_histogram(data=dplyr::filter(temp, NIF_dEJ == 0, FDR < 0.05), fill="lightgray", alpha = 0.2) +
+    theme_bw() +
+    ylab("Filtered Density") + xlab("Log2 Fold Change") + ggtitle("Density distribution of dEJ")
+
+  uORF_dist  = temp %>%  as.data.frame() %>%
+    ggplot(aes(x=logFC)) +
+    geom_histogram(data=dplyr::filter(temp,NIF_uORF == 1, FDR < 0.05),
+                 fill="#FF2759", alpha = 0.5) +
+    geom_histogram(data=dplyr::filter(temp, NIF_uORF == 0, FDR < 0.05), fill="lightgray", alpha = 0.2) +
+    theme_bw() +
+    ylab("Filtered Density") + xlab("Log2 Fold Change") + ggtitle("Density distribution of uORF") 
+
+  utr_dist = temp %>%  as.data.frame() %>%
+    ggplot(aes(x=logFC)) + 
+    geom_histogram(data=dplyr::filter(temp, NIF_long_3utr == 1, FDR < 0.05), fill="#FF2759", alpha = 0.5) +
+    geom_histogram(data=dplyr::filter(temp, NIF_long_3utr == 0, FDR < 0.05), fill="lightgray", alpha = 0.2) +
+    theme_bw() +
     ylab("Filtered Density") + xlab("Log2 Fold Change") + ggtitle("Density distribution Long 3' UTRs")
 
-  plot = grid.arrange(dEJ_dist, uORF_dist, utr_dist, nrow=3)
+  plot = ggarrange(dEJ_dist, uORF_dist, utr_dist, nrow=3)
   return(plot)
 }
 
 
 ```
 
-### UPF3B KD vs controls 
+* Distribution of any NIF + transcript
+```{r}
+nif_ma_plot = function(data){
+  DEColours <- c("NIF-" = "#14213d","NIF+" = "#ff6700",  "Not Sig" = "#e6e8e6")
+  temp = data %>% 
+    mutate(nif_label = ifelse(nif_feature != "None" & FDR < 0.05, "NIF+",        
+               ifelse(nif_feature == "None" & FDR < 0.05, "NIF-", "Not Sig")))
+  plot = temp %>% 
+    ggplot(aes(y= logFC,
+               x = logCPM,
+               colour = as.factor(as.character(nif_label)),
+               size= nif_label)) +
+    geom_point(alpha = 0.5) +
+    scale_colour_manual(values = DEColours) + theme_bw()+
+    theme(legend.position = "top",
+          axis.title.y = element_text(size = 12)) + geom_hline(yintercept = 0, 
+                                                               linetype = "dashed", color = "grey") +
+    geom_ysidedensity(aes(x=after_stat(density),  
+                             color = nif_label, fill = nif_label),  alpha=0.2, size = 1) +
+    scale_fill_manual(values = DEColours) + scale_size_manual(values = c("NIF+" = 3, 
+                                                                         "NIF-" =2,
+                                                                         "Not Sig"= 2)) +
+    theme(ggside.panel.scale.y = 0.2,
+        axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+         strip.text.x = element_text(
+        size = 12, face = "bold.italic", family = "serif"
+        )) + labs(color = "Presence of NMD inducible feature", 
+                  fill = "",
+                  size = "") + scale_alpha(guide = 'none')
+  return(plot)
+    
+}
+
+
+ma_1 = nif_ma_plot(res_dte$UPF3B_KD_Control) + ggtitle("Upf3b KD DETs") +
+  theme(legend.position = "none") +
+  annotate("label", x =10, y = 4, label = "Upregulated=1860") +
+  annotate("label", x =10, y = -4, label = "Downregulated =1328")
+
+ma_2 = nif_ma_plot(res_dte$UPF3A_KD_Control) + ggtitle("Upf3a KD DETs") +
+  annotate("label", x =10, y = 4, label = "Upregulated=1504") +
+  annotate("label", x =10, y = -4, label = "Downregulated =816") 
+
+
+ma_3 = nif_ma_plot(res_dte$UPF3A_KD_UPF3B_KD_Control) + ggtitle("Upf3 dKD DETs") +
+  annotate("label", x =10, y = 4, label = "Upregulated=4249") +
+  annotate("label", x =10, y = -4, label = "Downregulated=3403") 
+
+ma_4 = nif_ma_plot(res_dte$UPF3A_OE_Control) + ggtitle("Upf3a OE DETs") + 
+    annotate("label", x =10, y = 4, label = "Upregulated=3") +
+  annotate("label", x =10, y = -4, label = "Downregulated=8") 
+ma_5 = nif_ma_plot(res_dte$UPF3A_OE_UPF3B_KD_Control) + ggtitle("Upf3a OE Upf3b KD DETs") + 
+   annotate("label", x =10, y = 4, label = "Upregulated=1246") +
+  annotate("label", x =10, y = -4, label = "Downregulated=728") 
+
+
+
+pdf(file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/transcript_det_ma.pdf", height = 10, width = 18)
+ggarrange(ma_1, ma_2, ma_3, 
+            ma_4, ma_5, ncol=3, nrow=2, common.legend = TRUE)
+dev.off()
+```
+
+
+```{r}
+res_dte$UPF3A_OE_Control %>% as.data.frame %>%
+    dplyr::filter(FDR < .05) %>% 
+   with(., 
+         table(sign.lfc=sign(logFC))) 
+```
+
+* Distribution of specific NIFs within Upf3b KD targets  
+
 ```{r fig.height=10, fig.width=8}
 upf3b = NIF_dist(res_dte$UPF3B_KD_Control)
+
+upf3b
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/UPF3B_NIF_dist.svg", 
+       width = 7.08, height =6.89, plot = upf3b, units = "in")
 ```
 
 
-### UPF3A KD vs controls 
+* Distribution of specific NIFs within Upf3a KD targets 
 ```{r fig.height=10, fig.width=8}
 upf3a = NIF_dist(res_dte$UPF3A_KD_Control) 
-
+upf3a 
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/UPF3A_NIF_dist.svg", 
+       width = 7.08, height =6.89, plot = upf3a, units = "in")
 ```
 
-### UPF3 dKD vs controls
+* Distribution of specific NIFs within Upf3 dKD targets 
+
 ```{r fig.height=10, fig.width=8}
 dkd = NIF_dist(res_dte$UPF3A_KD_UPF3B_KD_Control) 
+dkd 
 ```
 
-### UPF3A OE vs controls 
+* Distribution of specific NIFs within Upf3a OE targets 
 ```{r fig.height=10, fig.width=8}
 upf3a_oe = NIF_dist(res_dte$UPF3A_OE_Control)
+upf3a_oe 
 
 ```
 
-### UPF3A OE UPF3B KD vs controls 
+* Distribution of specific NIFs within Upf3a OE in Upf3b KD targets 
+
 ```{r fig.height=10, fig.width=8}
 upf3a_oe_b_kd =NIF_dist(res_dte$UPF3A_OE_UPF3B_KD_Control) 
+upf3a_oe_b_kd
 ```
 
 
+### Cumulative frequency of NIF
+
+* 3'UTR length 
+
+Transcripts were divided into three groups: 
+ - Upregulated  (FDR < 0.05, log2FC > 0)
+ - Downregulated (FDR < 0.05, log2FC < 0)
+ - All (FDR > 0.05)
 
 
-# UPF3B transcripts 
+### UPF3B
+
+* 3'UTR - length 
 
 ```{r}
-res_dte$UPF3B_KD_Control %>% 
-  as.data.frame() %>% 
-  dplyr::filter(Results != 0) %>%
-  dplyr::select(tx_id, Overdispersion, logFC, 
-                logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr, 
-                `NIF|__|GC(cds[-10:termination_codon])`) %>% 
-  inner_join(tx2gene, by = "tx_id") %>% 
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% 
-      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
+library(ggstatsplot)
+
+upf3b_A = res_dte$UPF3B_KD_Control %>%
+  dplyr::mutate(sig = ifelse(FDR < 0.05, "DETs", "Not Sig")) %>%
+  ggbetweenstats(
+  x     = sig,
+  y     = LENGTH_3utr,
+  p.adjust.method  = "bonferroni",
+  ggsignif.args    = list(textsize = 4, tip_length = 0.01)
+) + ylim(0,15000) + theme_bw() + ylab("3'UTR length") + xlab("") +
+  scale_color_manual(values = c("DETs"= "#b23a48", "Not Sig" = "grey")) +
+      theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        ))
+
+upf3b_b = res_dte$UPF3B_KD_Control %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>% 
+    ggbetweenstats(
+  x     = sig,
+  y     = LENGTH_3utr,
+  p.adjust.method  = "bonferroni",
+  ggsignif.args    = list(textsize = 4, tip_length = 0.01),
+) + ylim(0,15000) + theme_bw() + 
+    scale_color_manual(values = c("Upregulated" = "#d7263d",
+                               "Downregulated" = "#2e294e", 
+                               "Not Sig" = "grey")) + 
+       theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + ylab("3'UTR length") + xlab("")
+
+
+significance_testing = res_dte$UPF3B_KD_Control %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) 
+pairwise.t.test(significance_testing$LENGTH_3utr, significance_testing$sig, p.adjust.method = "bonferroni")
+
+ggsave(upf3b_A , filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3b_KD_utr_length.svg", height = 7, width = 8, units = "in")
+ggsave(upf3b_b , filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3b_KD_utr_length_DET.svg", height = 7, width = 8, units = "in")
+
 ```
-
-## UPF3B transcripts with NMD features 
-
-```{r fig.cap= "*NIF in upregulated transcripts in UPF3B*"}
-sig_res= res_dte$UPF3B_KD_Control  %>% 
-  dplyr::filter(FDR < 0.05, abs(logFC) > log2(1))
-
-
-dEJ = sig_res %>% 
-  dplyr::filter(NIF_dEJ == 1) %>% 
-  dplyr::select(tx_id)
-
-uORF = sig_res %>% 
-  dplyr::filter(NIF_uORF == 1) %>% 
-  dplyr::select(tx_id)
-
-UTR = sig_res %>% 
-  dplyr::filter(NIF_long_3utr == 1) %>% 
-  dplyr::select(tx_id)
-
-x = list( "dEJ" = dEJ$tx_id, 
-          "uORF" = uORF$tx_id, 
-          "Long 3'UTR" = UTR$tx_id, 
-          "All transcript" = sig_res$tx_id)
-
-upset(fromList(x))
-
-```
-
-
-## Comparison of DEGs with DETs for UPF3B KD 
 
 ```{r}
-res_dte$UPF3B_KD_Control %>%
+ upf3a_a = res_dte$UPF3A_KD_Control %>%
+  dplyr::mutate(sig = ifelse(FDR < 0.05, "DETs", "Not Sig")) %>%
+  ggbetweenstats(
+  x     = sig,
+  y     = LENGTH_3utr,
+  p.adjust.method  = "bonferroni",
+  ggsignif.args    = list(textsize = 4, tip_length = 0.01),
+) +   ylim(0,15000) + theme_bw() + ylab("3'UTR length") + xlab("") +
+  scale_color_manual(values = c("DETs"= "#b23a48", "Not Sig" = "grey")) +
+      theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        ))
+
+upf3a_b  = res_dte$UPF3A_KD_Control %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>% 
+    ggbetweenstats(
+  x     = sig,
+  y     = LENGTH_3utr,
+  p.adjust.method  = "bonferroni",
+  ggsignif.args    = list(textsize = 4, tip_length = 0.01),
+  title = "Distribution of sepal length across Iris species"
+) +  ylim(0,15000) + theme_bw() + 
+    scale_color_manual(values = c("Upregulated" = "#d7263d",
+                               "Downregulated" = "#2e294e", 
+                               "Not Sig" = "grey")) + 
+       theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + ylab("3'UTR length") + xlab("")
+
+
+significance_testing = res_dte$UPF3A_KD_Control %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig")))
+
+
+pairwise.t.test(significance_testing$LENGTH_3utr, significance_testing$sig, p.adjust.method = "bonferroni")
+
+
+ggsave(upf3a_a , filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3a_KD_utr_length.svg", height = 7, width = 8, units = "in")
+ggsave(upf3a_b , filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3a_KD_utr_length_DET.svg", height = 7, width = 8, units = "in")
+```
+
+
+
+
+```{r}
+ upf3dKD_a = res_dte$UPF3A_KD_UPF3B_KD_Control %>%
+  dplyr::mutate(sig = ifelse(FDR < 0.05, "DETs", "Not Sig")) %>%
+  ggbetweenstats(
+  x     = sig,
+  y     = LENGTH_3utr,
+  p.adjust.method  = "bonferroni",
+  ggsignif.args    = list(textsize = 4, tip_length = 0.01),
+) +   ylim(0,15000) + theme_bw() + ylab("3'UTR length") + xlab("") +
+  scale_color_manual(values = c("DETs"= "#b23a48", "Not Sig" = "grey")) +
+      theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        ))
+
+ upf3dKD_b =res_dte$UPF3A_KD_UPF3B_KD_Control %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>% 
+    ggbetweenstats(
+  x     = sig,
+  y     = LENGTH_3utr,
+  p.adjust.method  = "bonferroni",
+  ggsignif.args    = list(textsize = 4, tip_length = 0.01),
+  title = "Distribution of sepal length across Iris species"
+) +  ylim(0,15000) + theme_bw() + 
+    scale_color_manual(values = c("Upregulated" = "#d7263d",
+                               "Downregulated" = "#2e294e", 
+                               "Not Sig" = "grey")) + 
+       theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + ylab("3'UTR length") + xlab("")
+
+ 
+ significance_testing = res_dte$UPF3A_KD_UPF3B_KD_Control %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig")))
+
+
+pairwise.t.test(significance_testing$LENGTH_3utr, significance_testing$sig, p.adjust.method = "bonferroni")
+
+
+
+ggsave(upf3dKD_a , filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3_dKD_utr_length.svg", height = 7, width = 8, units = "in")
+ggsave(upf3dKD_b , filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3_dKD_utr_length_DET.svg", height = 7, width = 8, units = "in")
+
+```
+
+
+
+```{r}
+ upf3aOE_a = res_dte$UPF3A_OE_Control %>%
+  dplyr::mutate(sig = ifelse(FDR < 0.05, "DETs", "Not Sig")) %>%
+  ggbetweenstats(
+  x     = sig,
+  y     = LENGTH_3utr,
+  p.adjust.method  = "bonferroni",
+  ggsignif.args    = list(textsize = 4, tip_length = 0.01),
+) +   ylim(0,15000) + theme_bw() + ylab("3'UTR length") + xlab("") +
+  scale_color_manual(values = c("DETs"= "#b23a48", "Not Sig" = "grey")) +
+      theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        ))
+
+ upf3aOE_b =res_dte$UPF3A_OE_Control %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>% 
+    ggbetweenstats(
+  x     = sig,
+  y     = LENGTH_3utr,
+  p.adjust.method  = "bonferroni",
+  ggsignif.args    = list(textsize = 4, tip_length = 0.01),
+  title = "Distribution of sepal length across Iris species"
+) +  ylim(0,15000) + theme_bw() + 
+    scale_color_manual(values = c("Upregulated" = "#d7263d",
+                               "Downregulated" = "#2e294e", 
+                               "Not Sig" = "grey")) + 
+       theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + ylab("3'UTR length") + xlab("")
+
+
+```
+
+```{r}
+upf3aOE_upf3bkD_a = res_dte$UPF3A_OE_UPF3B_KD_Control %>%
+  dplyr::mutate(sig = ifelse(FDR < 0.05, "DETs", "Not Sig")) %>%
+  ggbetweenstats(
+  x     = sig,
+  y     = LENGTH_3utr,
+  p.adjust.method  = "bonferroni",
+  ggsignif.args    = list(textsize = 4, tip_length = 0.01),
+) +   ylim(0,15000) + theme_bw() + ylab("3'UTR length") + xlab("") +
+  scale_color_manual(values = c("DETs"= "#b23a48", "Not Sig" = "grey")) +
+      theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        ))
+
+upf3aOE_upf3bkD_b = res_dte$UPF3A_OE_UPF3B_KD_Control %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>% 
+    ggbetweenstats(
+  x     = sig,
+  y     = LENGTH_3utr,
+  p.adjust.method  = "bonferroni",
+  ggsignif.args    = list(textsize = 4, tip_length = 0.01),
+  title = "Distribution of sepal length across Iris species"
+) +  ylim(0,15000) + theme_bw() + 
+    scale_color_manual(values = c("Upregulated" = "#d7263d",
+                               "Downregulated" = "#2e294e", 
+                               "Not Sig" = "grey")) + 
+       theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + ylab("3'UTR length") + xlab("")
+
+
+ significance_testing = res_dte$UPF3A_OE_UPF3B_KD_Control %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig")))
+
+pairwise.t.test(significance_testing$LENGTH_3utr, significance_testing$sig, p.adjust.method = "bonferroni")
+
+
+ggsave(upf3aOE_upf3bkD_a , filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3a_OE_upf3b_KD_utr_length.svg", height = 7, width = 8, units = "in")
+ggsave(upf3aOE_upf3bkD_b  , filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3a_OE_upf3b_KD_utr_length_DET.svg", height = 7, width = 8, units = "in")
+
+```
+
+
+
+```{r}
+upf3b_utr = res_dte$UPF3B_KD_Control %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>%
+  mutate(normalized_3utr = LENGTH_3utr/Length ) %>%
+  ggplot(aes(x=normalized_3utr, color = sig)) + stat_ecdf(geom = "point", size=0.8) +
+  scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") + theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("Normalized 3'UTR length")
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3b_3utr.svg", plot = upf3b_utr,
+       units = c("in"), height = 5.83, width = 7.52)
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+plot.ecdf.3utr.normalized = function(df) {
+  plot = df %>% 
+    mutate(sig = ifelse(logFC > 0 & FDR < 0.05, 
+                        "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05,
+                             "Downregulaated", "Not Sig"))) %>%
+  mutate(normalized_3utr = LENGTH_3utr/Length ) %>%
+  ggplot(aes(x=normalized_3utr, color = sig)) + stat_ecdf(geom = "point", size=0.8) +
+  scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") + theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("Normalized 3'UTR length")
+  return(plot)
+}
+
+plot.ecdf.3utr = function(df, nif) {
+  plot = df %>% 
+    mutate(sig = ifelse(logFC > 0 & FDR < 0.05, 
+                        "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05,
+                             "Downregulaated", "Not Sig"))) %>%
+  mutate(normalized_3utr = LENGTH_3utr/Length ) %>%
+  ggplot(aes(x=LENGTH_3utr, color = sig)) + stat_ecdf(geom = "point", size=0.8) +
+  scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") + theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("3'UTR length")
+  return(plot)
+}
+```
+
+
+
+
+```{r}
+upf3b_utr = plot.ecdf.3utr(res_dte$UPF3B_KD_Control)
+upf3a_utr = plot.ecdf.3utr(res_dte$UPF3A_KD_Control)
+upf3dKD_utr = plot.ecdf.3utr(res_dte$UPF3A_KD_UPF3B_KD_Control)
+upf3aOE_utr = plot.ecdf.3utr(res_dte$UPF3A_OE_Control)
+upf3aOEbKD_utr = plot.ecdf.3utr(res_dte$UPF3A_OE_UPF3B_KD_Control)
+
+grid.arrange(upf3b_utr, upf3a_utr, upf3dKD_utr, 
+            upf3aOE_utr, upf3aOEbKD_utr, ncol=3, nrow=2)
+```
+
+
+```{r}
+upf3b_utr = plot.ecdf.3utr.normalized(res_dte$UPF3B_KD_Control)
+upf3a_utr = plot.ecdf.3utr.normalized(res_dte$UPF3A_KD_Control)
+upf3dKD_utr = plot.ecdf.3utr.normalized(res_dte$UPF3A_KD_UPF3B_KD_Control)
+upf3aOE_utr = plot.ecdf.3utr.normalized(res_dte$UPF3A_OE_Control)
+upf3aOEbKD_utr = plot.ecdf.3utr.normalized(res_dte$UPF3A_OE_UPF3B_KD_Control)
+
+grid.arrange(upf3b_utr, upf3a_utr, upf3dKD_utr, 
+            upf3aOE_utr, upf3aOEbKD_utr, ncol=3, nrow=2)
+```
+
+* GC content in 3'UTR
+
+```{r}
+plot.ecdf.3GC = function(df) {
+  plot = df %>% 
+    mutate(sig = ifelse(logFC > 0 & FDR < 0.05, 
+                        "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05,
+                             "Downregulaated", "Not Sig"))) %>%
+  ggplot(aes(x=GC_3utr, color = sig)) + stat_ecdf(geom = "point", size=0.8) +
+  scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") + theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("GC content of 3'UTR")
+  return(plot)
+}
+```
+
+
+```{r}
+upf3b_utr = plot.ecdf.3GC(res_dte$UPF3B_KD_Control)
+upf3a_utr = plot.ecdf.3GC(res_dte$UPF3A_KD_Control)
+upf3dKD_utr = plot.ecdf.3GC(res_dte$UPF3A_KD_UPF3B_KD_Control)
+upf3aOE_utr = plot.ecdf.3GC(res_dte$UPF3A_OE_Control)
+upf3aOEbKD_utr = plot.ecdf.3GC(res_dte$UPF3A_OE_UPF3B_KD_Control)
+
+grid.arrange(upf3b_utr, upf3a_utr, upf3dKD_utr, 
+            upf3aOE_utr, upf3aOEbKD_utr, ncol=3, nrow=2)
+```
+
+
+* 5' UTR length
+```{r}
+
+plot.ecdf.5utr.normalized = function(df) {
+  plot = df %>% 
+    mutate(sig = ifelse(logFC > 0 & FDR < 0.05, 
+                        "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05,
+                             "Downregulaated", "Not Sig"))) %>%
+  mutate(normalized_5utr = LENGTH_5utr/Length ) %>%
+  ggplot(aes(x=normalized_5utr, color = sig)) + stat_ecdf(geom = "point", size=0.8) +
+  scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") + theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("Normalized 3'UTR length")
+  return(plot)
+}
+
+plot.ecdf.5utr = function(df) {
+  plot = df %>% 
+    mutate(sig = ifelse(logFC > 0 & FDR < 0.05, 
+                        "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05,
+                             "Downregulaated", "Not Sig"))) %>%
+  ggplot(aes(x=LENGTH_5utr, color = sig)) + stat_ecdf(geom = "point", size=0.8) +
+  scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") + theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("3'UTR length")
+  return(plot)
+}
+```
+
+```{r}
+upf3b_utr = plot.ecdf.5utr(res_dte$UPF3B_KD_Control)
+upf3a_utr = plot.ecdf.5utr(res_dte$UPF3A_KD_Control)
+upf3dKD_utr = plot.ecdf.5utr(res_dte$UPF3A_KD_UPF3B_KD_Control)
+upf3aOE_utr = plot.ecdf.5utr(res_dte$UPF3A_OE_Control)
+upf3aOEbKD_utr = plot.ecdf.5utr(res_dte$UPF3A_OE_UPF3B_KD_Control)
+
+grid.arrange(upf3b_utr, upf3a_utr, upf3dKD_utr, 
+            upf3aOE_utr, upf3aOEbKD_utr, ncol=3, nrow=2)
+```
+
+
+```{r}
+upf3b_utr = plot.ecdf.5utr.normalized(res_dte$UPF3B_KD_Control)
+upf3a_utr = plot.ecdf.5utr.normalized(res_dte$UPF3A_KD_Control)
+upf3dKD_utr = plot.ecdf.5utr.normalized(res_dte$UPF3A_KD_UPF3B_KD_Control)
+upf3aOE_utr = plot.ecdf.5utr.normalized(res_dte$UPF3A_OE_Control)
+upf3aOEbKD_utr = plot.ecdf.5utr.normalized(res_dte$UPF3A_OE_UPF3B_KD_Control)
+
+grid.arrange(upf3b_utr, upf3a_utr, upf3dKD_utr, 
+            upf3aOE_utr, upf3aOEbKD_utr, ncol=3, nrow=2)
+```
+
+
+* uORFs 
+
+```{r}
+uorfs_upf3a = res_dte$UPF3A_KD_Control %>%
+  mutate(count_uORF = `uORFs|__|count`) %>%
+  mutate(uORF_count_bins = case_when(count_uORF == 0 ~ "0",
+                                     between(count_uORF, 1, 2) ~"1-2",
+                                     between(count_uORF, 3,4 ) ~ "3-4",
+                                     count_uORF > 5 ~ ">5")) %>%
+  drop_na(uORF_count_bins) %>%
+  mutate(uORF_count_bins = factor(uORF_count_bins, levels = c("0",
+                                                  "1-2",
+                                                  "3-4",
+                                                  ">5"))) %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>%
+  ggplot(aes(x=uORF_count_bins, fill = sig)) + geom_bar(stat="count", position = "fill", color = "white") +
+  theme_bw() + scale_fill_manual(values = c("#2F124B", "#FD9675", "#EA2A5F"))# + 
+  theme(legend.position = "none")
+
+uorfs_upf3a 
+```
+
+
+
+
+<!-- # UPF3B transcripts  -->
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3B_KD_Control %>%  -->
+<!--   as.data.frame() %>%  -->
+<!--   dplyr::filter(Results != 0) %>% -->
+<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
+<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
+<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%  -->
+<!--       DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+<!--             options = list(scrollX = TRUE,  -->
+<!--                            scrollCollapse = TRUE,  -->
+<!--                            pageLength = 5, autoWidth = TRUE,  -->
+<!--                            dom = 'Blfrtip', -->
+<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+<!--                            lengthMenu = list(c(10,25,50,-1), -->
+<!--                                              c(10,25,50,"All")))) -->
+<!-- ``` -->
+
+<!-- ## UPF3B transcripts with NMD features  -->
+
+<!-- ```{r fig.cap= "*NIF in upregulated transcripts in UPF3B*"} -->
+<!-- sig_res= res_dte$UPF3B_KD_Control  %>%  -->
+<!--   dplyr::filter(FDR < 0.05, abs(logFC) > log2(1)) -->
+
+
+<!-- dEJ = sig_res %>%  -->
+<!--   dplyr::filter(NIF_dEJ == 1) %>%  -->
+<!--   dplyr::select(tx_id) -->
+
+<!-- uORF = sig_res %>%  -->
+<!--   dplyr::filter(NIF_uORF == 1) %>%  -->
+<!--   dplyr::select(tx_id) -->
+
+<!-- UTR = sig_res %>%  -->
+<!--   dplyr::filter(NIF_long_3utr == 1) %>%  -->
+<!--   dplyr::select(tx_id) -->
+
+<!-- x = list( "dEJ" = dEJ$tx_id,  -->
+<!--           "uORF" = uORF$tx_id,  -->
+<!--           "Long 3'UTR" = UTR$tx_id,  -->
+<!--           "All transcript" = sig_res$tx_id) -->
+
+<!-- upset(fromList(x)) -->
+
+<!-- ``` -->
+
+
+<!-- ### Characteristics of 3'UTR -->
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05, NIF_long_3utr == 1) %>%  -->
+<!--   ggplot(aes(x=GC_3utr, y =logFC)) + geom_point() -->
+
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3B_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   mutate(Expression = ifelse(logFC > 1, "Up", "Down")) %>%  -->
+<!--   ggplot(aes(x=Expression, y =LENGTH_3utr)) + geom_boxplot() -->
+
+
+<!-- ``` -->
+<!-- ## Comparison of DEGs with DETs for UPF3B KD  -->
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3B_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
+<!--   inner_join(dplyr::rename(DEGenes$UPF3B_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
+<!--   ggscatter(y="logFC", x="Coef.UPF3B_vs_Control",  cor.coef = TRUE, add = "reg.line", color ="NIF_long_3utr", -->
+<!--               conf.int = TRUE, add.params = list(color = "blue", -->
+<!--                                                  fill = "lightgray"))  +  -->
+<!--   xlab("UPF3B KD (gene level logFC)") + ylab("UPF3B KD (transcript level logFC)") -->
+
+
+<!-- ``` -->
+
+<!-- ### Genes with NIFs -->
+<!-- ```{r} -->
+<!-- genes_nif = res_dte$UPF3B_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
+<!--   inner_join(dplyr::rename(DEGenes$UPF3B_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") -->
+
+
+<!-- dim(genes_nif) -->
+
+<!-- length(unique(genes_nif$gene.y)) -->
+
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- NIF_dist_hist(genes_nif) -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3B_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
+<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
+<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
+<!--    inner_join(tx2gene, by = "tx_id") %>% -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
+<!--   inner_join(DEGenes$UPF3B_vs_Control %>%  -->
+<!--               dplyr::rename("gene_id" = "ensembl_gene_id") %>%  -->
+<!--               dplyr::select(contains("UPF3B_vs_Control"), gene_id), by = "gene_id") %>%  -->
+<!--      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+<!--             options = list(scrollX = TRUE,  -->
+<!--                            scrollCollapse = TRUE,  -->
+<!--                            pageLength = 5, autoWidth = TRUE,  -->
+<!--                            dom = 'Blfrtip', -->
+<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+<!--                            lengthMenu = list(c(10,25,50,-1), -->
+<!--                                              c(10,25,50,"All")))) -->
+
+<!-- ``` -->
+
+<!-- # UPF3A transcripts  -->
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_KD_Control %>%  -->
+<!--   as.data.frame() %>%  -->
+<!--   dplyr::filter(Results != 0) %>% -->
+<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
+<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
+<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%  -->
+<!--       DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+<!--             options = list(scrollX = TRUE,  -->
+<!--                            scrollCollapse = TRUE,  -->
+<!--                            pageLength = 5, autoWidth = TRUE,  -->
+<!--                            dom = 'Blfrtip', -->
+<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+<!--                            lengthMenu = list(c(10,25,50,-1), -->
+<!--                                              c(10,25,50,"All")))) -->
+<!-- ``` -->
+
+<!-- ## UPF3A transcripts with NMD features  -->
+
+<!-- ```{r fig.cap= "*NIF in upregulated transcripts in UPF3B*"} -->
+<!-- sig_res= res_dte$UPF3A_KD_Control  %>%  -->
+<!--   dplyr::filter(FDR < 0.05, abs(logFC) > log2(1)) -->
+
+
+<!-- dEJ = sig_res %>%  -->
+<!--   dplyr::filter(NIF_dEJ == 1) %>%  -->
+<!--   dplyr::select(tx_id) -->
+
+<!-- uORF = sig_res %>%  -->
+<!--   dplyr::filter(NIF_uORF == 1) %>%  -->
+<!--   dplyr::select(tx_id) -->
+
+<!-- UTR = sig_res %>%  -->
+<!--   dplyr::filter(NIF_long_3utr == 1) %>%  -->
+<!--   dplyr::select(tx_id) -->
+
+<!-- x = list( "dEJ" = dEJ$tx_id,  -->
+<!--           "uORF" = uORF$tx_id,  -->
+<!--           "Long 3'UTR" = UTR$tx_id,  -->
+<!--           "All transcript" = sig_res$tx_id) -->
+
+<!-- upset(fromList(x)) -->
+
+<!-- ``` -->
+
+
+<!-- ### Comparison of DEGs with DETs -->
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
+<!--   inner_join(dplyr::rename(DEGenes$UPF3A_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
+<!--   ggscatter(y="logFC", x="Coef.UPF3A_vs_Control",  cor.coef = TRUE, add = "reg.line",  -->
+<!--               conf.int = TRUE, add.params = list(color = "blue", -->
+<!--                                                  fill = "lightgray"))  +  -->
+<!--   xlab("UPF3A KD (gene level logFC)") + ylab("UPF3A KD (transcript level logFC)") -->
+
+
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
+<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
+<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
+<!--    inner_join(tx2gene, by = "tx_id") %>% -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
+<!--   inner_join(DEGenes$UPF3A_vs_Control %>%  -->
+<!--               dplyr::rename("gene_id" = "ensembl_gene_id") %>%  -->
+<!--               dplyr::select(contains("UPF3A_vs_Control"), gene_id), by = "gene_id") %>%  -->
+<!--      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+<!--             options = list(scrollX = TRUE,  -->
+<!--                            scrollCollapse = TRUE,  -->
+<!--                            pageLength = 5, autoWidth = TRUE,  -->
+<!--                            dom = 'Blfrtip', -->
+<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+<!--                            lengthMenu = list(c(10,25,50,-1), -->
+<!--                                              c(10,25,50,"All")))) -->
+<!-- ``` -->
+
+
+
+<!-- # UPF3 dKD -->
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_KD_UPF3B_KD_Control %>%  -->
+<!--   as.data.frame() %>%  -->
+<!--   dplyr::filter(Results != 0) %>% -->
+<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
+<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
+<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%  -->
+<!--       DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+<!--             options = list(scrollX = TRUE,  -->
+<!--                            scrollCollapse = TRUE,  -->
+<!--                            pageLength = 5, autoWidth = TRUE,  -->
+<!--                            dom = 'Blfrtip', -->
+<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+<!--                            lengthMenu = list(c(10,25,50,-1), -->
+<!--                                              c(10,25,50,"All")))) -->
+<!-- ``` -->
+
+
+<!-- ### Comparison of DEGs with DETs -->
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_KD_UPF3B_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
+<!--   inner_join(dplyr::rename(DEGenes$DoubleKD_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
+<!--   ggscatter(y="logFC", x="Coef.DoubleKD_vs_Control",  cor.coef = TRUE, add = "reg.line",  -->
+<!--               conf.int = TRUE, add.params = list(color = "blue", -->
+<!--                                                  fill = "lightgray")) +  -->
+<!--   xlab("UPF3 dKD (gene level logFC)") + ylab("UPF3 dKD (transcript level logFC)") -->
+
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_KD_UPF3B_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
+<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
+<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
+<!--    inner_join(tx2gene, by = "tx_id") %>% -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
+<!--   inner_join(DEGenes$DoubleKD_vs_Control %>%  -->
+<!--               dplyr::rename("gene_id" = "ensembl_gene_id") %>%  -->
+<!--               dplyr::select(contains("DoubleKD_vs_Control"), gene_id), by = "gene_id") %>%  -->
+<!--      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+<!--             options = list(scrollX = TRUE,  -->
+<!--                            scrollCollapse = TRUE,  -->
+<!--                            pageLength = 5, autoWidth = TRUE,  -->
+<!--                            dom = 'Blfrtip', -->
+<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+<!--                            lengthMenu = list(c(10,25,50,-1), -->
+<!--                                              c(10,25,50,"All")))) -->
+<!-- ``` -->
+
+
+
+
+<!-- ## Transcripts with NIFs -->
+
+<!-- ```{r fig.cap= "*NIF in upregulated transcripts in UPF3B*"} -->
+<!-- sig_res= res_dte$UPF3A_KD_UPF3B_KD_Control  %>%  -->
+<!--   dplyr::filter(FDR < 0.05, abs(logFC) > log2(1)) -->
+
+
+<!-- dEJ = sig_res %>%  -->
+<!--   dplyr::filter(NIF_dEJ == 1) %>%  -->
+<!--   dplyr::select(tx_id) -->
+
+<!-- uORF = sig_res %>%  -->
+<!--   dplyr::filter(NIF_uORF == 1) %>%  -->
+<!--   dplyr::select(tx_id) -->
+
+<!-- UTR = sig_res %>%  -->
+<!--   dplyr::filter(NIF_long_3utr == 1) %>%  -->
+<!--   dplyr::select(tx_id) -->
+
+<!-- x = list( "dEJ" = dEJ$tx_id,  -->
+<!--           "uORF" = uORF$tx_id,  -->
+<!--           "Long 3'UTR" = UTR$tx_id,  -->
+<!--           "All transcript" = sig_res$tx_id) -->
+
+<!-- upset(fromList(x)) -->
+
+<!-- ``` -->
+
+<!-- # UPF3A OE  -->
+
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_OE_Control %>%  -->
+<!--   as.data.frame() %>%  -->
+<!--   dplyr::filter(Results != 0) %>% -->
+<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
+<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
+<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%  -->
+<!--       DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+<!--             options = list(scrollX = TRUE,  -->
+<!--                            scrollCollapse = TRUE,  -->
+<!--                            pageLength = 5, autoWidth = TRUE,  -->
+<!--                            dom = 'Blfrtip', -->
+<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+<!--                            lengthMenu = list(c(10,25,50,-1), -->
+<!--                                              c(10,25,50,"All")))) -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_OE_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
+<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
+<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
+<!--    inner_join(tx2gene, by = "tx_id") %>% -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
+<!--   inner_join(DEGenes$UPF3A_OE_vs_Control %>%  -->
+<!--               dplyr::rename("gene_id" = "ensembl_gene_id") %>%  -->
+<!--               dplyr::select(contains("UPF3A_OE_vs_Control"), gene_id), by = "gene_id") %>%  -->
+<!--      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+<!--             options = list(scrollX = TRUE,  -->
+<!--                            scrollCollapse = TRUE,  -->
+<!--                            pageLength = 5, autoWidth = TRUE,  -->
+<!--                            dom = 'Blfrtip', -->
+<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+<!--                            lengthMenu = list(c(10,25,50,-1), -->
+<!--                                              c(10,25,50,"All")))) -->
+
+
+<!-- ``` -->
+
+<!-- # UPF3A OE in UPF3B KD  -->
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_OE_UPF3B_KD_Control %>%  -->
+<!--   as.data.frame() %>%  -->
+<!--   dplyr::filter(Results != 0) %>% -->
+<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
+<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
+<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%  -->
+<!--       DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+<!--             options = list(scrollX = TRUE,  -->
+<!--                            scrollCollapse = TRUE,  -->
+<!--                            pageLength = 5, autoWidth = TRUE,  -->
+<!--                            dom = 'Blfrtip', -->
+<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+<!--                            lengthMenu = list(c(10,25,50,-1), -->
+<!--                                              c(10,25,50,"All")))) -->
+
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_OE_UPF3B_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
+<!--   inner_join(dplyr::rename(DEGenes$UPF3A_OE_UPF3B_KD_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
+<!--   ggscatter(y="logFC", x="Coef.UPF3A_OE_UPF3B_KD_vs_Control",  cor.coef = TRUE, add = "reg.line",  -->
+<!--               conf.int = TRUE, add.params = list(color = "blue", -->
+<!--                                                  fill = "lightgray")) +  -->
+<!--   xlab("UPF3A OE in UPF3B KD (gene level logFC)") + ylab("UPF3A OE in UPF3B KD (transcript level logFC)") -->
+
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_OE_UPF3B_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
+<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
+<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
+<!--    inner_join(tx2gene, by = "tx_id") %>% -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
+<!--   inner_join(DEGenes$UPF3A_OE_UPF3B_KD_vs_Control %>%  -->
+<!--               dplyr::rename("gene_id" = "ensembl_gene_id") %>%  -->
+<!--               dplyr::select(contains("UPF3A_OE_UPF3B_KD_vs_Control"), gene_id), by = "gene_id") %>%  -->
+<!--      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+<!--             options = list(scrollX = TRUE,  -->
+<!--                            scrollCollapse = TRUE,  -->
+<!--                            pageLength = 5, autoWidth = TRUE,  -->
+<!--                            dom = 'Blfrtip', -->
+<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+<!--                            lengthMenu = list(c(10,25,50,-1), -->
+<!--                                              c(10,25,50,"All")))) -->
+
+
+<!-- ``` -->
+
+
+<!-- # Are DET shared between UPF3B KD and UPF3A KD?  -->
+
+<!-- ```{r} -->
+<!-- degs_b= res_dte$UPF3B_KD_Control %>% as.data.frame %>% -->
+<!--   dplyr::filter(FDR < .05) %>%  -->
+<!--   with(.,  -->
+<!--        table(sign.lfc=sign(logFC))) %>% as.data.frame() -->
+<!-- ``` -->
+
+<!-- In UPF3B KD, there are 1860 upregulated genes aand 1328 downregulated genes  -->
+
+<!-- ```{r} -->
+
+<!-- res_dte$UPF3A_KD_Control %>% as.data.frame %>% -->
+<!--   dplyr::filter(FDR < .05) %>%  -->
+<!--   with(.,  -->
+<!--        table(sign.lfc=sign(logFC))) -->
+
+<!-- ``` -->
+
+<!-- In UPF3A KD, there are 1504 upregulated genes and 816 downregulated genes  -->
+
+
+<!-- ```{r} -->
+<!-- x = list( "UPF3B KD" = res_dte$UPF3B_KD_Control$tx_id[res_dte$UPF3B_KD_Control$FDR < 0.05],   -->
+<!--     "UPF3A KD" = res_dte$UPF3A_KD_Control$tx_id[res_dte$UPF3A_KD_Control$FDR < 0.05],  -->
+<!--     "Double KD" = res_dte$UPF3A_KD_UPF3B_KD_Control$tx_id[res_dte$UPF3A_KD_UPF3B_KD_Contro$FDR < 0.05], -->
+<!--     "UPF3A OE" = res_dte$UPF3A_OE_Control$tx_id[res_dte$UPF3A_OE_Control$FDR < 0.05],  -->
+<!--     "UPF3A OE UPF3B KD" = res_dte$UPF3A_OE_UPF3B_KD_Control$tx_id[res_dte$UPF3A_OE_UPF3B_KD_Control$FDR < 0.05]) -->
+
+<!-- ggvenn(x[c(1,2)]) -->
+<!-- ``` -->
+
+<!-- ```{r fig.height=8, fig.width=15} -->
+<!-- grid.arrange((res_dte$UPF3B_KD_Control %>% as.data.frame() %>%  -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   dplyr::rename("logFC.UPF3B" = "logFC") %>%  -->
+<!--   dplyr::select(tx_id, logFC.UPF3B) %>%  -->
+<!--   inner_join(dplyr::filter(as.data.frame(res_dte$UPF3A_KD_Control), FDR < 0.05), by = "tx_id")  %>%  -->
+<!--    ggscatter(., x = "logFC.UPF3B", y = "logFC", color = "NIF_uORF", -->
+<!--               cor.coef = TRUE, add = "reg.line",  -->
+<!--               conf.int = TRUE, add.params = list(color = "blue", -->
+<!--                                                  fill = "lightgray")) +  -->
+<!--     theme_bw()  +  -->
+<!--   geom_xsidedensity(aes(у = after_stat(density), fill = NIF_uORF), alpha = 0.5,  -->
+<!--                     size = 1,position = "stack") + geom_ysidedensity(aes(x=after_stat(density),  -->
+<!--                                                                          fill = NIF_uORF),  -->
+<!--                                                                      alpha=0.5, size = 1) + -->
+<!--     xlab("UPF3B KD (log2FC)") + ylab("UPF3A KD (log2FC)")), -->
+
+<!-- (res_dte$UPF3B_KD_Control %>% as.data.frame() %>%  -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   dplyr::rename("logFC.UPF3B" = "logFC") %>%  -->
+<!--   dplyr::select(tx_id, logFC.UPF3B) %>%  -->
+<!--   inner_join(dplyr::filter(as.data.frame(res_dte$UPF3A_KD_Control), FDR < 0.05), by = "tx_id")  %>%  -->
+<!--    ggscatter(., x = "logFC.UPF3B", y = "logFC", color = "NIF_dEJ", -->
+<!--               cor.coef = TRUE, add = "reg.line",  -->
+<!--               conf.int = TRUE, add.params = list(color = "blue", -->
+<!--                                                  fill = "lightgray")) +  -->
+<!--     theme_bw()  +  -->
+<!--   geom_xsidedensity(aes(у = after_stat(density), fill = NIF_dEJ), alpha = 0.5,  -->
+<!--                     size = 1,position = "stack") + geom_ysidedensity(aes(x=after_stat(density),  -->
+<!--                                                                          fill = NIF_dEJ),  -->
+<!--                                                                      alpha=0.5, size = 1)  -->
+<!--  + xlab("UPF3B KD (log2FC)")+ ylab("UPF3A KD (log2FC)")),  -->
+
+
+<!-- (res_dte$UPF3B_KD_Control %>% as.data.frame() %>%  -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   dplyr::rename("logFC.UPF3B" = "logFC") %>%  -->
+<!--   dplyr::select(tx_id, logFC.UPF3B) %>%  -->
+<!--   inner_join(dplyr::filter(as.data.frame(res_dte$UPF3A_KD_Control), FDR < 0.05), by = "tx_id")  %>%  -->
+<!--    ggscatter(., x = "logFC.UPF3B", y = "logFC", color = "NIF_long_3utr", -->
+<!--               cor.coef = TRUE, add = "reg.line",  -->
+<!--               conf.int = TRUE, add.params = list(color = "blue", -->
+<!--                                                  fill = "lightgray")) +  -->
+<!--     theme_bw()  +  -->
+<!--   geom_xsidedensity(aes(у = after_stat(density), fill = NIF_long_3utr), alpha = 0.5,  -->
+<!--                     size = 1,position = "stack") + geom_ysidedensity(aes(x=after_stat(density),  -->
+<!--                                                                          fill = NIF_long_3utr),  -->
+<!--                                                                      alpha=0.5, size = 1) + -->
+<!--    xlab("UPF3B KD (log2FC)") + ylab("UPF3A KD (log2FC)") ),  -->
+<!-- ncol=3 -->
+
+<!-- ) -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3B_KD_Control %>% as.data.frame() %>%  -->
+<!--   dplyr::filter(Results != 0) %>%  -->
+<!--   dplyr::rename("logFC.UPF3B" = "logFC") %>%  -->
+<!--   dplyr::select(tx_id, logFC.UPF3B) %>%  -->
+<!--   left_join(dplyr::filter(as.data.frame(res_dte$UPF3A_KD_Control), Results != 0), by = "tx_id")  %>%  -->
+<!--    ggscatter(., x = "logFC.UPF3B", y = "logFC", color= "nif_feature",  -->
+<!--               cor.coef = TRUE, add = "reg.line",  -->
+<!--               conf.int = TRUE, add.params = list(color = "blue", -->
+<!--                                                  fill = "lightgray")) +  -->
+<!--     theme_bw()    -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3A_KD_Control %>% as.data.frame() %>%  -->
+<!--   dplyr::filter(Results != 0) %>%  -->
+<!--   dplyr::rename("logFC.UPF3A" = "logFC") %>%  -->
+<!--   dplyr::select(tx_id, logFC.UPF3A) %>%  -->
+<!--   left_join(dplyr::filter(as.data.frame(res_dte$UPF3B_KD_Control), Results == 0), by = "tx_id")  %>%  -->
+<!--    ggscatter(., x = "logFC.UPF3A", y = "logFC", -->
+<!--               cor.coef = TRUE, add = "reg.line",  -->
+<!--               conf.int = TRUE, add.params = list(color = "blue", -->
+<!--                                                  fill = "lightgray")) +  -->
+<!--     theme_bw()   -->
+
+<!-- ``` -->
+
+<!-- ### What is the distribution between transcripts in UPF3B KD and UPF3A OE?  -->
+
+<!-- ```{r} -->
+<!-- ggvenn(x[c(1, 4)]) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3B_KD_Control %>% as.data.frame() %>%  -->
+<!--   dplyr::filter(Results != 0) %>%  -->
+<!--   dplyr::rename("logFC.UPF3B" = "logFC") %>%  -->
+<!--   dplyr::select(tx_id, logFC.UPF3B) %>%  -->
+<!--   left_join(as.data.frame(res_dte$UPF3A_OE_Control, by = "tx_id")) %>%  -->
+<!--    ggscatter(., x = "logFC.UPF3B", y = "logFC", color = "nif_feature", -->
+<!--               cor.coef = TRUE, add = "reg.line",  -->
+<!--               conf.int = TRUE, add.params = list(color = "blue", -->
+<!--                                                  fill = "lightgray")) +  -->
+<!--     theme_bw()  + xlab("UPF3B KD") + ylab("UPF3A OE") +  -->
+<!--   geom_xsidedensity(aes(у = after_stat(density), fill = nif_feature), alpha = 0.5,  -->
+<!--                     size = 1,position = "stack") + geom_ysidedensity(aes(x=after_stat(density),  -->
+<!--                                                                          fill = nif_feature),  -->
+<!--                                                                      alpha=0.5, size = 1) + -->
+<!--   scale_color_tq()  + scale_fill_tq() + geom_hline(yintercept = 0 ) -->
+<!-- ``` -->
+
+
+
+<!-- ### Transcripts arising from a single gene  -->
+<!-- ```{r} -->
+<!-- res_dte$UPF3B_KD_Control %>% as.data.frame() %>%  -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>% -->
+<!--   dplyr::rename("logFC.UPF3B" = "logFC") %>%  -->
+<!--   dplyr::select(tx_id, logFC.UPF3B, gene_id) %>%  -->
+<!--   inner_join(res_dte$UPF3A_KD_Control %>%  -->
+<!--                dplyr::filter(FDR < 0.05) %>%  -->
+<!--                inner_join(tx2gene, by = "tx_id"),  -->
+<!--              by = "gene_id", relationship = "many-to-many")  -->
+
+
+
+<!-- overlap_single_genes = overlap[duplicated(overlap$gene_id) |  -->
+<!--                                  duplicated(overlap$gene_id, fromLast=TRUE),] %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%  -->
+<!--   dplyr::select(tx_id, logFC.UPF3B, logFC, gene_id, gene) %>%  -->
+<!--   ggscatter(., x = "logFC.UPF3B", y = "logFC", label = "gene", -->
+<!--               cor.coef = TRUE,  -->
+<!--               conf.int = TRUE) + -->
+<!--   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) -->
+
+
+<!-- my_gg = overlap_single_genes + geom_point_interactive(aes(tooltip = gene, data_id = gene), -->
+<!--                                             size = 1, hover_nearest = TRUE) -->
+
+<!-- #overlap[duplicated(overlap$gene_id),] -->
+
+
+<!-- ``` -->
+
+
+<!-- ### Overlapping transcripts that were dysregulated at gene level -->
+
+<!-- ```{r} -->
+<!-- UPF3B_trans_overlap = res_dte$UPF3B_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
+<!--   inner_join(DEGenes$UPF3B_vs_Control %>%  -->
+<!--                dplyr::filter(Res.UPF3B_vs_Control !=0, Res.UPF3A_vs_Control !=0) %>% -->
+<!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by= "gene_id") -->
+
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- UPF3A_trans_overlap = res_dte$UPF3A_KD_Control %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>%  -->
+<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
+<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
+<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
+<!--   inner_join(DEGenes$UPF3A_vs_Control %>%  -->
+<!--                dplyr::filter(Res.UPF3B_vs_Control !=0, Res.UPF3A_vs_Control !=0) %>% -->
+<!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by= "gene_id") -->
+
+
+<!-- write.csv(UPF3B_trans_overlap,  -->
+<!--           file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/UPF3B_trans_overlap.csv") -->
+
+<!-- write.csv(UPF3A_trans_overlap,  -->
+<!--           file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/UPF3A_trans_overlap.csv") -->
+
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- ggvenn(data = list("UPF3A" = UPF3A_trans_overlap$gene_id,  -->
+<!--                    "UPF3B" = UPF3B_trans_overlap$gene_id)) -->
+
+<!-- overlap_list =calculate.overlap(x=list("UPF3A" = UPF3A_trans_overlap$gene_id,  -->
+<!--                    "UPF3B" = UPF3B_trans_overlap$gene_id)) -->
+
+<!-- subset(b, !(y %in% a$x)) -->
+<!-- overlap_list$a1[!overlap_list$a1 %in% overlap_list$a3]  -->
+
+<!-- overlap_list_transcript = calculate.overlap(x=list("UPF3A" = UPF3A_trans_overlap$tx_id,  -->
+<!--                    "UPF3B" = UPF3B_trans_overlap$tx_id)) -->
+
+<!-- overlap_list_transcript$a2[!overlap_list_transcript$a2 %in% overlap_list_transcript$a3]  -->
+
+<!-- ggvenn(data = list("UPF3A" = UPF3A_trans_overlap$tx_id,  -->
+<!--                    "UPF3B" = UPF3B_trans_overlap$tx_id)) -->
+
+<!-- ``` -->
+
+
+<!-- ## Genes and transcripts correlation  -->
+
+<!-- ```{r fig.cap = " All transcripts with upregulated genes and their biotypes"} -->
+<!-- ## Upregulated genes with DETs that may be protein coding  -->
+
+<!-- ## UPF3B   -->
+<!-- res_dte$UPF3B_KD_Control %>%  -->
+<!--   left_join(tx2gene) %>%  -->
+<!--   dplyr::filter(nif_feature != "None") %>%  -->
+<!--   left_join(DEGenes$UPF3B_vs_Control %>%  -->
+<!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
+<!--   dplyr::filter(Res.UPF3B_vs_Control == 1) %>% -->
+<!--   dplyr::count(tx_biotype) %>% -->
+<!--     mutate(sum=sum(n),frac = n / sum(n)) %>%  -->
+<!--   ggplot(aes(x = as.factor(tx_biotype), y = n)) + -->
+<!--     geom_bar( stat = "identity") + -->
+<!--     coord_flip() + -->
+<!--     theme_bw() + -->
+<!--     theme(axis.text.x = element_text(angle = -90)) + -->
+<!--     labs(x = "Transcript biotype (Ensembl v75)", y = "Count") + -->
+<!-- theme(panel.spacing = unit(1, "lines")) + -->
+<!-- theme(strip.background = element_rect(fill = "black"))+ -->
+<!-- theme(strip.text = element_text(color = "white", face = "bold")) -->
+<!-- ``` -->
+
+
+<!-- ```{r fig.cap = " All transcripts with upregulated genes and their biotypes - genes only"} -->
+<!-- ## Upregulated genes with DETs that may be protein coding  -->
+
+<!-- ## UPF3B   -->
+<!-- res_dte$UPF3B_KD_Control %>%  -->
+<!--   left_join(tx2gene) %>%  -->
+<!--   dplyr::filter(nif_feature != "None") %>%  -->
+<!--   left_join(DEGenes$UPF3B_vs_Control %>%  -->
+<!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
+<!--   dplyr::filter(Res.UPF3B_vs_Control == 1) %>% -->
+<!--   distinct(gene_id, .keep_all=TRUE) %>% -->
+<!--   dplyr::count(tx_biotype) %>% -->
+<!--     mutate(sum=sum(n),frac = n / sum(n)) %>%  -->
+<!--   ggplot(aes(x = as.factor(tx_biotype), y = n)) + -->
+<!--     geom_bar( stat = "identity") + -->
+<!--     coord_flip() + -->
+<!--     theme_bw() + -->
+<!--     theme(axis.text.x = element_text(angle = -90)) + -->
+<!--     labs(x = "Transcript biotype (Ensembl v75)", y = "Count") + -->
+<!-- theme(panel.spacing = unit(1, "lines")) + -->
+<!-- theme(strip.background = element_rect(fill = "black"))+ -->
+<!-- theme(strip.text = element_text(color = "white", face = "bold")) -->
+<!-- ``` -->
+
+<!-- ### UPF3A  -->
+
+<!-- ```{r fig.cap = " All transcripts with upregulated genes and their biotypes"} -->
+<!-- ## Upregulated genes with DETs that may be protein coding  -->
+
+<!-- ## UPF3B   -->
+<!-- res_dte$UPF3A_KD_Control %>%  -->
+<!--   left_join(tx2gene) %>%  -->
+<!--   dplyr::filter(nif_feature != "None") %>%  -->
+<!--   left_join(DEGenes$UPF3A_vs_Control %>%  -->
+<!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
+<!--   dplyr::filter(Res.UPF3B_vs_Control == 1) %>% -->
+<!--   dplyr::count(tx_biotype) %>% -->
+<!--     mutate(sum=sum(n),frac = n / sum(n)) %>%  -->
+<!--   ggplot(aes(x = as.factor(tx_biotype), y = n)) + -->
+<!--     geom_bar( stat = "identity") + -->
+<!--     coord_flip() + -->
+<!--     theme_bw() + -->
+<!--     theme(axis.text.x = element_text(angle = -90)) + -->
+<!--     labs(x = "Transcript biotype (Ensembl v75)", y = "Count") + -->
+<!-- theme(panel.spacing = unit(1, "lines")) + -->
+<!-- theme(strip.background = element_rect(fill = "black"))+ -->
+<!-- theme(strip.text = element_text(color = "white", face = "bold")) -->
+<!-- ``` -->
+
+
+<!-- ```{r fig.cap = " All transcripts with upregulated genes and their biotypes - genes only"} -->
+<!-- ## Upregulated genes with DETs that may be protein coding  -->
+
+<!-- ## UPF3B   -->
+<!-- res_dte$UPF3A_KD_Control %>%  -->
+<!--   left_join(tx2gene) %>%  -->
+<!--   dplyr::filter(nif_feature != "None") %>%  -->
+<!--   left_join(DEGenes$UPF3A_vs_Control %>%  -->
+<!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
+<!--   dplyr::filter(Res.UPF3B_vs_Control == 1) %>% -->
+<!--   distinct(gene_id, .keep_all=TRUE) %>% -->
+<!--   dplyr::count(tx_biotype) %>% -->
+<!--     mutate(sum=sum(n),frac = n / sum(n)) %>%  -->
+<!--   ggplot(aes(x = as.factor(tx_biotype), y = n)) + -->
+<!--     geom_bar( stat = "identity") + -->
+<!--     coord_flip() + -->
+<!--     theme_bw() + -->
+<!--     theme(axis.text.x = element_text(angle = -90)) + -->
+<!--     labs(x = "Transcript biotype (Ensembl v75)", y = "Count") + -->
+<!-- theme(panel.spacing = unit(1, "lines")) + -->
+<!-- theme(strip.background = element_rect(fill = "black"))+ -->
+<!-- theme(strip.text = element_text(color = "white", face = "bold")) -->
+<!-- ``` -->
+
+
+<!-- * Majority of transcripts are protein coding  -->
+<!-- * Not looking at transcripts that are pseudogenes  -->
+<!-- * Gene ontology on the protein coding genes - with transcripts  -->
+<!-- ** All conditions - transcript and gene level comparison  -->
+
+<!-- ** Capacity to do genes with isoforms with different NIFs - try in UPF3B  -->
+
+<!-- ** Is NMD a cell-type specific thing? --? Maybe UPF1 work with brain coexp networks  -->
+
+
+<!-- Any transcript that is expression - 40k  -->
+<!-- transcripts that have multiple transcripts and have a look at the CPM - Just do it in UPF3B - average of the three samples -->
+
+<!-- ## Data export  -->
+
+
+<!-- ```{r} -->
+<!-- save(res_dte, file=here::here("output/DET-list.Rda")) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r} -->
+<!--   temp = res_dte$UPF3B_KD_Control -->
+
+<!--   message("Counting NIFs in upregulated transcripts for ", name) -->
+<!--   sig_up = temp %>%  as.data.frame() %>%   -->
+<!--         dplyr::filter(FDR < 0.05, logFC > log2(1))  -->
+<!--   utr = table(sig_up$NIF_long_3utr)[2] -->
+<!--   dej = table(sig_up$NIF_dEJ)[2] -->
+<!--   uorf = table(sig_up$NIF_uORF)[2] -->
+<!--   none = table(sig_up$nif_feature)[1] -->
+<!--   total_nif_up  = rbind(utr, dej, uorf, none) %>%  -->
+<!--     as.data.frame() %>%  -->
+<!--     rownames_to_column("NIF_feature") %>%  -->
+<!--     mutate(Condition = name,  -->
+<!--            Expression = "Up") %>%  -->
+<!--     dplyr::rename("Count" = "1") -->
+
+<!--   message("Counting NIFs in downregulated transcripts for ", name) -->
+
+<!--   sig_down = temp %>%  as.data.frame() %>%   -->
+<!--         dplyr::filter(FDR < 0.05, logFC < log2(1))  -->
+<!--   utr = table(sig_down$NIF_long_3utr)[2] -->
+<!--   dej = table(sig_down$NIF_dEJ)[2] -->
+<!--   uorf = table(sig_down$NIF_uORF)[2] -->
+
+<!--   total_nif_down  = rbind(utr, dej, uorf) %>%  -->
+<!--     as.data.frame() %>%  -->
+<!--     rownames_to_column("NIF_feature") %>%  -->
+<!--     mutate(Condition = name,  -->
+<!--            Expression = "Down") %>%  -->
+<!--     dplyr::rename("Count" = "1") -->
+
+<!--   nif_features= rbind(nif_features, total_nif_up, total_nif_down, stringsAsFactors = FALSE) -->
+
+<!-- ``` -->
+
+
+
+<!-- # Plots to finalise  -->
+
+
+
+
+<!-- # Transcript types - count -->
+
+<!-- ```{r fig.cap = " All transcripts with upregulated genes and their biotypes - genes only"} -->
+<!-- transcript_types = res_dte$UPF3A_KD_Control %>%  -->
+<!--   left_join(tx2gene) %>%  -->
+<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
+<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>% -->
+<!--   dplyr::count(tx_biotype) %>% -->
+<!--     mutate(sum=sum(n),frac = n / sum(n),  -->
+<!--            label = "Upf3a targets") %>% -->
+<!--   rbind(res_dte$UPF3B_KD_Control %>%  -->
+<!--   left_join(tx2gene) %>%  -->
+<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
+<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>% -->
+<!--   dplyr::count(tx_biotype) %>% -->
+<!--     mutate(sum=sum(n),frac = n / sum(n), -->
+<!--            label = "Upf3b targets")) %>%  -->
+<!--   dplyr::filter(n > 40) %>% -->
+<!--   ggplot(aes(x = as.factor(tx_biotype), y = n, fill = label)) + -->
+<!--     geom_bar( stat = "identity", alpha = 0.6, color = "black") + -->
+<!--     coord_flip() + -->
+<!--     theme_bw() + -->
+<!--     theme(axis.text.x = element_text(angle = -90)) + -->
+<!--     labs(x = "Transcript biotype (Ensembl v79)", y = "Transcript Count") + -->
+<!-- theme(panel.spacing = unit(1, "lines")) + -->
+<!-- theme(strip.background = element_rect(fill = "black")) + -->
+<!-- theme(strip.text = element_text(color = "white", face = "bold"),  -->
+<!--       legend.position = "none") + -->
+<!--   scale_fill_manual(values= c("#EA2A5F", "#2F124B")) + -->
+<!-- geom_text(aes(label=n), hjust=-.5, size=3.5) + ylim(0, 2800) +  -->
+<!--   facet_grid(~label) -->
+
+<!-- transcript_types_up = res_dte$UPF3A_KD_Control %>%  -->
+<!--   left_join(tx2gene) %>%  -->
+<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
+<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% -->
+<!--   dplyr::filter(FDR < 0.05, logFC > 0) %>% -->
+<!--   dplyr::count(tx_biotype) %>% -->
+<!--     mutate(sum=sum(n),frac = n / sum(n),  -->
+<!--            label = "Upf3a targets") %>% -->
+<!--   rbind(res_dte$UPF3B_KD_Control %>%  -->
+<!--   left_join(tx2gene) %>%  -->
+<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
+<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% -->
+<!--   dplyr::filter(FDR < 0.05, logFC > 0) %>% -->
+<!--   dplyr::count(tx_biotype) %>% -->
+<!--     mutate(sum=sum(n),frac = n / sum(n), -->
+<!--            label = "Upf3b targets")) %>%  -->
+<!--   dplyr::filter(n > 40) %>% -->
+<!--   ggplot(aes(x = as.factor(tx_biotype), y = n, fill = label)) + -->
+<!--     geom_bar( stat = "identity", alpha = 0.6, color = "black") + -->
+<!--     coord_flip() + -->
+<!--     theme_bw() + -->
+<!--     theme(axis.text.x = element_text(angle = -90)) + -->
+<!--     labs(x = "Transcript biotype (Ensembl v79)", y = "Transcript Count") + -->
+<!-- theme(panel.spacing = unit(1, "lines")) + -->
+<!-- theme(strip.background = element_rect(fill = "black")) + -->
+<!-- theme(strip.text = element_text(color = "white", face = "bold"),  -->
+<!--       legend.position = "none") + -->
+<!--   scale_fill_manual(values= c("#EA2A5F", "#2F124B")) + -->
+<!-- geom_text(aes(label=n), hjust=-.5, size=3.5) + ylim(0, 2800) +  -->
+<!--   facet_grid(~label) -->
+
+<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/transcript_types_all.svg", plot = transcript_types,  -->
+<!--        units = c("in"), height = 5.85, width = 10.29) -->
+
+<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/transcript_types_up.svg", plot = transcript_types_up,  -->
+<!--        units = c("in"), height = 5.85, width = 10.29) -->
+<!-- ``` -->
+
+
+<!-- # Transcript types cumulative frequency  -->
+
+<!-- ## UPF3A -->
+<!-- ```{r} -->
+<!-- cf_upf3a = res_dte$UPF3A_KD_Control %>%  -->
+<!--   left_join(tx2gene) %>%  -->
+<!--   mutate(CF_types = ifelse(tx_biotype == "retained_intron", "Retained Intron",  -->
+<!--                            ifelse(tx_biotype == "protein_coding", "Protein Coding",  -->
+<!--                                   ifelse(tx_biotype == "processed_transcript", "Processed Transcript",  -->
+<!--                                          ifelse(tx_biotype == "nonsense_mediated_decay", "NMD", "All other types"))))) %>%  -->
+<!--   drop_na(CF_types) %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>% -->
+<!--   ggplot(aes(x=logFC, color = CF_types)) + stat_ecdf(geom = "step", size=1) + -->
+
+<!--   scale_color_manual(values = c("#585A58","#5800FF" ,"#F5EB13", "#EE3224", "#22B58C")) +  -->
+<!--   theme_bw() +  -->
+<!--   ylab("Cumulative Frequency") + xlab("Log FC") +  -->
+<!--   geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +  -->
+<!--   ggtitle("Transcript type")  -->
+
+<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/cf_upf3a.svg", plot = cf_upf3a,  -->
+<!--        units = c("in"), height = 5.83, width = 7.52) -->
+
+<!-- ``` -->
+
+<!-- ## UPF3B -->
+<!-- ```{r} -->
+<!-- cf_upf3b = res_dte$UPF3B_KD_Control %>%  -->
+<!--   left_join(tx2gene) %>%  -->
+<!--   mutate(CF_types = ifelse(tx_biotype == "retained_intron", "Retained Intron",  -->
+<!--                            ifelse(tx_biotype == "protein_coding", "Protein Coding",  -->
+<!--                                   ifelse(tx_biotype == "processed_transcript", "Processed Transcript",  -->
+<!--                                          ifelse(tx_biotype == "nonsense_mediated_decay", "NMD", "All other types"))))) %>%  -->
+<!--   drop_na(CF_types) %>% -->
+<!--   dplyr::filter(FDR < 0.05) %>% -->
+<!--   ggplot(aes(x=logFC, color = CF_types)) + stat_ecdf(geom = "step", size=1) + -->
+<!--   scale_color_manual(values = c("#585A58","#5800FF" ,"#F5EB13", "#EE3224", "#22B58C"))+  -->
+<!--   theme_bw() +  -->
+<!--   ylab("Cumulative Frequency") + xlab("Log FC") +  -->
+<!--   geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +  -->
+<!--   ggtitle("Transcript type")  -->
+
+<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/cf_upf3b.svg", plot = cf_upf3b,  -->
+<!--        units = c("in"), height = 5.83, width = 7.52) -->
+
+<!-- ``` -->
+
+
+
+<!-- ## Transcript length  -->
+
+<!-- ```{r} -->
+<!-- res_dte$UPF3B_KD_Control %>%  -->
+<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
+<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>%  -->
+<!--   mutate(normalized_3utr = LENGTH_3utr/Length ) %>% -->
+<!--   ggplot(aes(x=Length, color = sig)) + stat_ecdf(geom = "point", size=0.8) + -->
+<!--   scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +  -->
+<!--   ylab("Cumulative Frequency") + xlab("") + theme(legend.position = "none") +  -->
+<!--   geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") + xlim(0, 25000) +  -->
+<!--   ggtitle("Transcript length") -->
+<!-- ``` -->
+
+
+
+
+<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3b_5utr.svg", plot = upf3b_5utr,  -->
+<!--        units = c("in"), height = 5.83, width = 7.52) -->
+<!-- ``` -->
+
+
+
+
+<!-- * dEJ and logFC -->
+
+<!-- ```{r} -->
+<!--  res_dte$UPF3B_KD_Control %>%  -->
+<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
+<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% -->
+<!--     mutate_if(is.numeric, ~replace_na(., 0)) %>% -->
+<!--   drop_na(NIF_dEJ) %>% -->
+<!--   ggplot(aes(x=logFC, color = NIF_dEJ)) + stat_ecdf(geom = "step", size=0.8) + -->
+<!--   scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +  -->
+<!--   ylab("Cumulative Frequency") + xlab("") +# theme(legend.position = "none") +  -->
+<!--   geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +  -->
+<!--   ggtitle("LogfC and dEJ") -->
+
+<!-- res_dte$UPF3A_KD_Control %>%  -->
+<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
+<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% -->
+<!--     mutate_if(is.numeric, ~replace_na(., 0)) %>% -->
+<!--   drop_na(NIF_dEJ) %>% -->
+<!--   ggplot(aes(x=logFC, color = NIF_dEJ)) + stat_ecdf(geom = "step", size=0.8) + -->
+<!--   scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +  -->
+<!--   ylab("Cumulative Frequency") + xlab("") +# theme(legend.position = "none") +  -->
+<!--   geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +  -->
+<!--   ggtitle("LogfC and dEJ") -->
+
+
+
+<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3a_3utr.svg", plot= upf3a_3utr,  -->
+<!--        units = c("in"), height = 5.83, width = 7.52) -->
+<!-- ``` -->
+
+<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3a_5utr.svg", plot= upf3a_5utr,  -->
+<!--        units = c("in"), height = 5.83, width = 7.52) -->
+
+<!-- ``` -->
+
+<!-- #### GC content in the 3'UTR region  -->
+
+<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3a_3utr_gc.svg", plot= upf3a_3utr_gc,  -->
+<!--        units = c("in"), height = 5.83, width = 7.52) -->
+<!-- ``` -->
+
+<!-- ## Bins of uORFs  -->
+
+<!-- ```{r} -->
+<!-- uorfs_upf3a = res_dte$UPF3A_KD_Control %>% -->
+<!--   mutate(count_uORF = `uORFs|__|count`) %>%  -->
+<!--   mutate(uORF_count_bins = case_when(count_uORF == 0 ~ "0",  -->
+<!--                                      between(count_uORF, 1, 2) ~"1-2",  -->
+<!--                                      between(count_uORF, 3,4 ) ~ "3-4",  -->
+<!--                                      count_uORF > 5 ~ ">5")) %>%  -->
+<!--   drop_na(uORF_count_bins) %>% -->
+<!--   mutate(uORF_count_bins = factor(uORF_count_bins, levels = c("0",  -->
+<!--                                                   "1-2", -->
+<!--                                                   "3-4",  -->
+<!--                                                   ">5"))) %>% -->
+<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
+<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>%  -->
+<!--   ggplot(aes(x=uORF_count_bins, fill = sig)) + geom_bar(stat="count", position = "dodge", color = "white") +  -->
+<!--   theme_bw() + scale_fill_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) +  -->
+<!--   coord_cartesian(ylim=c(0,1200)) + theme(legend.position = "none") -->
+
+
+<!-- total = res_dte$UPF3A_KD_Control %>% -->
+<!--   mutate(count_uORF = `uORFs|__|count`) %>%  -->
+<!--   mutate(uORF_count_bins = case_when(count_uORF == 0 ~ "0",  -->
+<!--                                      between(count_uORF, 1, 2) ~"1-2",  -->
+<!--                                      between(count_uORF, 3,4 ) ~ "3-4",  -->
+<!--                                      count_uORF > 5 ~ ">5"),  -->
+<!--          sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
+<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>%  -->
+<!--   drop_na(uORF_count_bins) %>% -->
+<!--   mutate(uORF_count_bins = factor(uORF_count_bins, levels = c("0",  -->
+<!--                                                   "1-2", -->
+<!--                                                   "3-4",  -->
+<!--                                                   ">5"))) %>% -->
+<!--   ggplot(aes(x=uORF_count_bins, fill = sig)) +  -->
+<!--   geom_bar(stat="count", position = "dodge", color = "white") +  -->
+<!--   theme_bw() + scale_fill_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) +  -->
+<!--   coord_cartesian(ylim=c(4500,16000)) + theme(legend.position = "none") -->
+
+<!-- ggsave(file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3a.svg",  -->
+<!--        units = "in",  height = 5.83, width = 7.52, plot = uorfs_upf3a ) -->
+
+
+<!-- ggsave(file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3a_total.svg",  -->
+<!--        units = "in",  height = 3, width = 7.52, plot = total) -->
+<!-- ``` -->
+
+<!-- ### Upf3b  -->
+
+<!-- ```{r} -->
+<!-- uorfs_upf3b = res_dte$UPF3B_KD_Control %>% -->
+<!--   mutate(count_uORF = `uORFs|__|count`) %>%  -->
+<!--   mutate(uORF_count_bins = case_when(count_uORF == 0 ~ "0",  -->
+<!--                                      between(count_uORF, 1, 2) ~"1-2",  -->
+<!--                                      between(count_uORF, 3,4 ) ~ "3-4",  -->
+<!--                                      count_uORF > 5 ~ ">5")) %>%  -->
+<!--   drop_na(uORF_count_bins) %>% -->
+<!--   mutate(uORF_count_bins = factor(uORF_count_bins, levels = c("0",  -->
+<!--                                                   "1-2", -->
+<!--                                                   "3-4",  -->
+<!--                                                   ">5"))) %>% -->
+<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
+<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>%  -->
+<!--   ggplot(aes(x=uORF_count_bins, fill = sig)) + geom_bar(stat="count", position = "dodge", color = "white") +  -->
+<!--   theme_bw() + scale_fill_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) +  -->
+<!--   coord_cartesian(ylim=c(0,1200)) + theme(legend.position = "none") -->
+
+
+<!-- total = res_dte$UPF3B_KD_Control %>% -->
+<!--   mutate(count_uORF = `uORFs|__|count`) %>%  -->
+<!--   mutate(uORF_count_bins = case_when(count_uORF == 0 ~ "0",  -->
+<!--                                      between(count_uORF, 1, 2) ~"1-2",  -->
+<!--                                      between(count_uORF, 3,4 ) ~ "3-4",  -->
+<!--                                      count_uORF > 5 ~ ">5")) %>%  -->
+<!--   drop_na(uORF_count_bins) %>% -->
+<!--   mutate(uORF_count_bins = factor(uORF_count_bins, levels = c("0",  -->
+<!--                                                   "1-2", -->
+<!--                                                   "3-4",  -->
+<!--                                                   ">5"))) %>% -->
+<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
+<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>%  -->
+<!--   ggplot(aes(x=uORF_count_bins, fill = sig)) +  -->
+<!--   geom_bar(stat="count", position = "dodge", color = "white") +  -->
+<!--   theme_bw() + scale_fill_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) +  -->
+<!--   coord_cartesian(ylim=c(4500,16000)) + theme(legend.position = "none") -->
+
+<!-- ggsave(file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3b.svg",  -->
+<!--        units = "in",  height = 5.83, width = 7.52, plot = uorfs_upf3b) -->
+
+
+<!-- ggsave(file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3b_total.svg",  -->
+<!--        units = "in",  height = 3, width = 7.52, plot = total) -->
+<!-- ``` -->
+
+# Differences between targets of Upf3a and Upf3b KDs
+
+In this section I will perform a cumulative frequency analysis of the transcript features of Upf3a KD targets and Upf3b KD targets to better show the differences in impact. Subsequently, I will perform the KS statistic to see the significance of the difference. 
+
+- 3'UTR 
+
+One of the most prominant features in this analysis was the long 3'UTR. I want to see how the fold changes differ of the target transcripts containing the long 3'UTR, as well as the length and the GC content. 
+
+* Fold change
+```{r UTR-FC}
+utr_FC = res_dte$UPF3B_KD_Control %>%
+  dplyr::filter(NIF_long_3utr == 1 & FDR < 0.05) %>% 
+  dplyr::select(logFC) %>%
+  mutate(Targets = "Upf3b KD") %>% 
+  rbind(res_dte$UPF3A_KD_Control %>%
+          dplyr::filter(NIF_long_3utr == 1 & FDR < 0.05) %>% 
+          dplyr::select(logFC) %>% 
+          mutate(Targets = "Upf3a KD")) %>% 
+  ggplot(aes(x=logFC, color = Targets)) + stat_ecdf(geom = "point", size=0.2) +
+  scale_color_manual(values = c("#EA2A5F", "#2F124B")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") +# theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("Log fold change of target transcripts with long 3'UTR") + 
+  theme(legend.position = "none")
+
+ggsave(plot = utr_FC, filename = here::here("output/Transcript/Thesis_figures/NIF_features/3UTR_FC.svg"), 
+       height=8, width=8)
+
+upf3b_fc = res_dte$UPF3B_KD_Control %>%
+  dplyr::filter(NIF_long_3utr == 1 & FDR < 0.05) %>% 
+  dplyr::select(logFC)
+
+upf3a_fc =  res_dte$UPF3A_KD_Control %>%
+  dplyr::filter(NIF_long_3utr == 1 & FDR < 0.05) %>% 
+  dplyr::select(logFC)
+
+ks.test(upf3b_fc$logFC, upf3a_fc$logFC)
+```
+
+* Length 
+```{r}
+utr_length =res_dte$UPF3B_KD_Control %>%
   dplyr::filter(FDR < 0.05) %>% 
-  inner_join(tx2gene, by = "tx_id") %>% 
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%
-  inner_join(dplyr::rename(DEGenes$UPF3B_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") %>% 
-  ggscatter(y="logFC", x="Coef.UPF3B_vs_Control",  cor.coef = TRUE, add = "reg.line", 
-              conf.int = TRUE, add.params = list(color = "blue",
-                                                 fill = "lightgray"))  + 
-  xlab("UPF3B KD (gene level logFC)") + ylab("UPF3B KD (transcript level logFC)")
+  dplyr::select(LENGTH_3utr) %>%
+  mutate(Targets = "Upf3b KD") %>% 
+  rbind(res_dte$UPF3A_KD_Control %>%
+          dplyr::filter(FDR < 0.05) %>% 
+          dplyr::select(LENGTH_3utr) %>% 
+          mutate(Targets = "Upf3a KD")) %>% 
+  ggplot(aes(x=LENGTH_3utr, color = Targets)) + stat_ecdf(geom = "point", size=0.2) +
+  scale_color_manual(values = c("#EA2A5F", "#2F124B")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") +# theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("3'UTR length") + xlim(0,7500) +
+    theme(legend.position = "none")
 
+ggsave(plot = utr_length, filename = here::here("output/Transcript/Thesis_figures/NIF_features/3UTR_length.svg"), 
+       height=8, width=8)
 
-```
-
-```{r}
-res_dte$UPF3B_KD_Control %>%
+upf3b_length = res_dte$UPF3B_KD_Control %>%
   dplyr::filter(FDR < 0.05) %>% 
-  dplyr::select(tx_id, Overdispersion, logFC, 
-                logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr, 
-                `NIF|__|GC(cds[-10:termination_codon])`) %>% 
-   inner_join(tx2gene, by = "tx_id") %>%
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%
-  inner_join(DEGenes$UPF3B_vs_Control %>% 
-              dplyr::rename("gene_id" = "ensembl_gene_id") %>% 
-              dplyr::select(contains("UPF3B_vs_Control"), gene_id), by = "gene_id") %>% 
-     DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
+  dplyr::select(LENGTH_3utr)
 
+upf3a_length =  res_dte$UPF3A_KD_Control %>%
+  dplyr::filter(FDR < 0.05) %>% 
+  dplyr::select(LENGTH_3utr)
+
+ks.test(upf3b_length$LENGTH_3utr, upf3a_length$LENGTH_3utr)
 ```
 
-# UPF3A transcripts 
+* GC content 
 
 ```{r}
-res_dte$UPF3A_KD_Control %>% 
-  as.data.frame() %>% 
-  dplyr::filter(Results != 0) %>%
-  dplyr::select(tx_id, Overdispersion, logFC, 
-                logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr, 
-                `NIF|__|GC(cds[-10:termination_codon])`) %>% 
-  inner_join(tx2gene, by = "tx_id") %>% 
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% 
-      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
+utr_GC= res_dte$UPF3B_KD_Control %>%
+  dplyr::filter(FDR < 0.05) %>% 
+  dplyr::select(GC_3utr) %>%
+  mutate(Targets = "Upf3b KD") %>% 
+  rbind(res_dte$UPF3A_KD_Control %>%
+          dplyr::filter(FDR < 0.05) %>% 
+          dplyr::select(GC_3utr) %>% 
+          mutate(Targets = "Upf3a KD")) %>% 
+  ggplot(aes(x=GC_3utr, color = Targets)) + stat_ecdf(geom = "point", size=0.2) +
+  scale_color_manual(values = c("#EA2A5F", "#2F124B")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") +# theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("3'UTR GC content") +
+    theme(legend.position = "none")
 
-## UPF3A transcripts with NMD features 
+ggsave(plot = utr_GC, filename = here::here("output/Transcript/Thesis_figures/NIF_features/3UTR_GC.svg"), 
+       height=8, width=8)
 
-```{r fig.cap= "*NIF in upregulated transcripts in UPF3B*"}
-sig_res= res_dte$UPF3A_KD_Control  %>% 
-  dplyr::filter(FDR < 0.05, abs(logFC) > log2(1))
+upf3b_GC = res_dte$UPF3B_KD_Control %>%
+  dplyr::filter(FDR < 0.05) %>% 
+  dplyr::select(GC_3utr)
 
+upf3a_GC =  res_dte$UPF3A_KD_Control %>%
+  dplyr::filter(FDR < 0.05) %>% 
+  dplyr::select(GC_3utr)
 
-dEJ = sig_res %>% 
-  dplyr::filter(NIF_dEJ == 1) %>% 
-  dplyr::select(tx_id)
+ks.test(upf3b_GC$GC_3utr, upf3a_GC$GC_3utr)
 
-uORF = sig_res %>% 
-  dplyr::filter(NIF_uORF == 1) %>% 
-  dplyr::select(tx_id)
-
-UTR = sig_res %>% 
-  dplyr::filter(NIF_long_3utr == 1) %>% 
-  dplyr::select(tx_id)
-
-x = list( "dEJ" = dEJ$tx_id, 
-          "uORF" = uORF$tx_id, 
-          "Long 3'UTR" = UTR$tx_id, 
-          "All transcript" = sig_res$tx_id)
-
-upset(fromList(x))
 
 ```
 
+- Downstream exon junction 
 
-### Comparison of DEGs with DETs
+```{r}
+dEJ_FC = res_dte$UPF3B_KD_Control %>%
+  dplyr::filter(FDR < 0.05 & NIF_dEJ == 1) %>% 
+  dplyr::select(logFC) %>%
+  mutate(Targets = "Upf3b KD") %>% 
+  rbind(res_dte$UPF3A_KD_Control %>%
+          dplyr::filter(FDR < 0.05 & NIF_dEJ ==1) %>% 
+          dplyr::select(logFC) %>% 
+          mutate(Targets = "Upf3a KD")) %>% 
+  ggplot(aes(x=logFC, color = Targets)) + stat_ecdf(geom = "point", size=0.5) +
+  scale_color_manual(values = c("#EA2A5F", "#2F124B")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") +# theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("Log fold change of target transcripts with downstream exon junction") + 
+  xlab("Log2 fold change") +
+    theme(legend.position = "none")
 
+
+ggsave(plot = dEJ_FC, filename = here::here("output/Transcript/Thesis_figures/NIF_features/dEJ_FC.svg"), 
+       height=8, width=8)
+upf3b_dEJ = res_dte$UPF3B_KD_Control %>%
+  dplyr::filter(FDR < 0.05 & NIF_dEJ ==1) %>% 
+  dplyr::select(logFC)
+
+upf3a_dEJ =  res_dte$UPF3A_KD_Control %>%
+  dplyr::filter(FDR < 0.05 & NIF_dEJ ==1) %>% 
+  dplyr::select(logFC)
+
+ks.test(upf3b_dEJ$logFC, upf3a_dEJ$logFC)
+
+```
+
+- upstream ORF 
+
+```{r}
+uORF_FC = res_dte$UPF3B_KD_Control %>%
+  dplyr::filter(FDR < 0.05 & NIF_uORF == 1) %>% 
+  dplyr::select(logFC) %>%
+  mutate(Targets = "Upf3b KD") %>% 
+  rbind(res_dte$UPF3A_KD_Control %>%
+          dplyr::filter(FDR < 0.05 & NIF_uORF ==1) %>% 
+          dplyr::select(logFC) %>% 
+          mutate(Targets = "Upf3a KD")) %>% 
+  ggplot(aes(x=logFC, color = Targets)) + stat_ecdf(geom = "point", size=0.5) +
+  scale_color_manual(values = c("#EA2A5F", "#2F124B")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") +# theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("Log fold change of target transcripts with uORF") + 
+  xlab("Log2 fold change")
+
+
+
+ggsave(plot = uORF_FC, filename = here::here("output/Transcript/Thesis_figures/NIF_features/uORF_FC.svg"), 
+       height=8, width=8)
+upf3b_uORF = res_dte$UPF3B_KD_Control %>%
+  dplyr::filter(FDR < 0.05 & NIF_uORF ==1) %>% 
+  dplyr::select(logFC)
+
+upf3a_uORF =  res_dte$UPF3A_KD_Control %>%
+  dplyr::filter(FDR < 0.05 & NIF_uORF ==1) %>% 
+  dplyr::select(logFC)
+
+ks.test(upf3b_uORF$logFC, upf3a_uORF$logFC)
+```
+
+- Number of uORFs per comparison
 ```{r}
 res_dte$UPF3A_KD_Control %>%
-  dplyr::filter(FDR < 0.05) %>% 
-  inner_join(tx2gene, by = "tx_id") %>% 
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%
-  inner_join(dplyr::rename(DEGenes$UPF3A_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") %>% 
-  ggscatter(y="logFC", x="Coef.UPF3A_vs_Control",  cor.coef = TRUE, add = "reg.line", 
-              conf.int = TRUE, add.params = list(color = "blue",
-                                                 fill = "lightgray"))  + 
-  xlab("UPF3A KD (gene level logFC)") + ylab("UPF3A KD (transcript level logFC)")
+  mutate(count_uORF = `uORFs|__|count`) %>%
+  mutate(uORF_count_bins = case_when(count_uORF == 0 ~ "0",
+                                     between(count_uORF, 1, 2) ~"1-2",
+                                     between(count_uORF, 3,4 ) ~ "3-4",
+                                     count_uORF > 5 ~ ">5")) %>%
+  drop_na(uORF_count_bins) %>%
+  mutate(uORF_count_bins = factor(uORF_count_bins, levels = c("0",
+                                                  "1-2",
+                                                  "3-4",
+                                                  ">5"))) %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>%
+ 
+  mutate(Targets = "Upf3a targets") %>%
+  dplyr::select(sig, uORF_count_bins, Targets) %>%
+  rbind(res_dte$UPF3B_KD_Control %>%
+   mutate(count_uORF = `uORFs|__|count`) %>%
+   mutate(uORF_count_bins = case_when(count_uORF == 0 ~ "0",
+                                       between(count_uORF, 1, 2) ~"1-2",
+                                       between(count_uORF, 3,4 ) ~ "3-4",
+                                      count_uORF > 5 ~ ">5")) %>%
+    drop_na(uORF_count_bins) %>%
+    mutate(uORF_count_bins = factor(uORF_count_bins, levels = c("0",
+                                                  "1-2",
+                                                  "3-4",
+                                                  ">5"))) %>%
+  mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>%
+  mutate(sig = factor(sig, levels = c("Upregulated", "Downregulated", "Not Sig" ))) %>%
+    as.data.frame() %>%
+    mutate(Targets = "Upf3b targets") %>%
+  dplyr::select(sig, uORF_count_bins, Targets)) %>%
+  # dplyr::filter(sig != "Not Sig") %>%
+  ggplot(aes(x=uORF_count_bins, fill = sig, color = "white")) + geom_bar(stat="count", position = "fill", color = "white") +
+  theme_bw() + scale_fill_manual(values = c("Upregulated"= "#7D81BE", "Downregulated"= "#F1676B",
+                                            "Not sig" ="grey")) + facet_wrap(~Targets)
 
 
 ```
 
+- Previously annotated transcripts
+
+Using the ensembl transcript annotations, I annotated the biotypes of transcripts. For the purpose of this, transcripts labelled with NMD and intron retention for grouped into one category
 
 ```{r}
-res_dte$UPF3A_KD_Control %>%
-  dplyr::filter(FDR < 0.05) %>% 
-  dplyr::select(tx_id, Overdispersion, logFC, 
-                logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr, 
-                `NIF|__|GC(cds[-10:termination_codon])`) %>% 
-   inner_join(tx2gene, by = "tx_id") %>%
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%
-  inner_join(DEGenes$UPF3A_vs_Control %>% 
-              dplyr::rename("gene_id" = "ensembl_gene_id") %>% 
-              dplyr::select(contains("UPF3A_vs_Control"), gene_id), by = "gene_id") %>% 
-     DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
+ upf3b_tx_types = res_dte$UPF3B_KD_Control %>%  
+ left_join(tx2gene) %>% 
+  dplyr::filter(FDR < 0.05) %>%  
+  mutate(CF_types = ifelse(tx_biotype == "retained_intron" |tx_biotype ==  "nonsense_mediated_decay", "NMD target", 
+                            ifelse(tx_biotype == "protein_coding", "Protein Coding", 
+                                 ifelse(tx_biotype == "processed_transcript", "Processed Transcript", "All other types"))))
+
+upf3a_tx_types = res_dte$UPF3A_KD_Control %>%  
+ left_join(tx2gene) %>% 
+  dplyr::filter(FDR < 0.05) %>%  
+  mutate(CF_types = ifelse(tx_biotype == "retained_intron" | tx_biotype == "nonsense_mediated_decay", "NMD target", 
+                            ifelse(tx_biotype == "protein_coding", "Protein Coding", 
+                                 ifelse(tx_biotype == "processed_transcript", "Processed Transcript", "All other types"))))
+
+upf3b_tx_types %>% 
+  dplyr::filter(CF_types == "NMD target") %>% 
+  dplyr::select(logFC) %>% 
+  mutate(Target = "Upf3b") %>%
+  rbind(upf3a_tx_types %>% 
+          dplyr::filter(CF_types== "NMD target") %>% 
+          dplyr::select(logFC) %>% 
+          mutate(Target = "Upf3a")) %>% 
+  ggplot(aes(x=logFC, color = Target)) + stat_ecdf(geom = "point", size=0.5) +
+  scale_color_manual(values = c("#EA2A5F", "#2F124B")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") +# theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("Log fold change of target transcripts with uORF") + 
+  xlab("Log2 fold change") +
+    theme(legend.position = "none")
+
+upf3b_NMD =upf3b_tx_types %>% 
+  dplyr::filter(CF_types == "NMD target") %>% 
+  dplyr::select(logFC)
+
+upf3a_NMD =upf3a_tx_types %>% 
+  dplyr::filter(CF_types == "NMD target") %>% 
+  dplyr::select(logFC)
+
+ks.test(upf3b_NMD$logFC, upf3a_NMD$logFC)
 ```
 
-
-
-# UPF3 dKD
+# Variable importance
 
 ```{r}
-res_dte$UPF3A_KD_UPF3B_KD_Control %>% 
-  as.data.frame() %>% 
-  dplyr::filter(Results != 0) %>%
-  dplyr::select(tx_id, Overdispersion, logFC, 
-                logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr, 
-                `NIF|__|GC(cds[-10:termination_codon])`) %>% 
-  inner_join(tx2gene, by = "tx_id") %>% 
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% 
-      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
+library(party)
 
 
-### Comparison of DEGs with DETs
+upf3b_tx = res_dte$UPF3B_KD_Control %>%
+  dplyr::filter(FDR < 0.05, logFC > 0)
 
-```{r}
-res_dte$UPF3A_KD_UPF3B_KD_Control %>%
-  dplyr::filter(FDR < 0.05) %>% 
-  inner_join(tx2gene, by = "tx_id") %>% 
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%
-  inner_join(dplyr::rename(DEGenes$DoubleKD_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") %>% 
-  ggscatter(y="logFC", x="Coef.DoubleKD_vs_Control",  cor.coef = TRUE, add = "reg.line", 
-              conf.int = TRUE, add.params = list(color = "blue",
-                                                 fill = "lightgray")) + 
-  xlab("UPF3 dKD (gene level logFC)") + ylab("UPF3 dKD (transcript level logFC)")
-
-```
-
-
-```{r}
-res_dte$UPF3A_KD_UPF3B_KD_Control %>%
-  dplyr::filter(FDR < 0.05) %>% 
-  dplyr::select(tx_id, Overdispersion, logFC, 
-                logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr, 
-                `NIF|__|GC(cds[-10:termination_codon])`) %>% 
-   inner_join(tx2gene, by = "tx_id") %>%
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%
-  inner_join(DEGenes$DoubleKD_vs_Control %>% 
-              dplyr::rename("gene_id" = "ensembl_gene_id") %>% 
-              dplyr::select(contains("DoubleKD_vs_Control"), gene_id), by = "gene_id") %>% 
-     DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
+upf3b_rf = upf3b_tx %>% dplyr::select(tx_id,logFC,  GC_3utr, GC_5utr,  GC_cds, LENGTH_3utr,
+                           LENGTH_5utr, LENGTH_cds, "uORFs|__|count", Length,
+                           `dEJs|__|penultimate-exon>=55(nts)`) %>%
+  column_to_rownames("tx_id")
 
 
 
+cf1 <- cforest(logFC ~ . , data=upf3b_rf, control=cforest_unbiased(mtry=2,ntree=50))
 
-## Transcripts with NIFs
-
-```{r fig.cap= "*NIF in upregulated transcripts in UPF3B*"}
-sig_res= res_dte$UPF3A_KD_UPF3B_KD_Control  %>% 
-  dplyr::filter(FDR < 0.05, abs(logFC) > log2(1))
+imp_upf3b = varimp(cf1) %>% reshape2::melt() %>%
+  rownames_to_column("Variable")
 
 
-dEJ = sig_res %>% 
-  dplyr::filter(NIF_dEJ == 1) %>% 
-  dplyr::select(tx_id)
-
-uORF = sig_res %>% 
-  dplyr::filter(NIF_uORF == 1) %>% 
-  dplyr::select(tx_id)
-
-UTR = sig_res %>% 
-  dplyr::filter(NIF_long_3utr == 1) %>% 
-  dplyr::select(tx_id)
-
-x = list( "dEJ" = dEJ$tx_id, 
-          "uORF" = uORF$tx_id, 
-          "Long 3'UTR" = UTR$tx_id, 
-          "All transcript" = sig_res$tx_id)
-
-upset(fromList(x))
-
-```
-
-# UPF3A OE 
+imp_upf3b %>%
+  ggplot(aes(x=value, y = Variable)) + geom_bar(stat ="identity")
 
 
-```{r}
-res_dte$UPF3A_OE_Control %>% 
-  as.data.frame() %>% 
-  dplyr::filter(Results != 0) %>%
-  dplyr::select(tx_id, Overdispersion, logFC, 
-                logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr, 
-                `NIF|__|GC(cds[-10:termination_codon])`) %>% 
-  inner_join(tx2gene, by = "tx_id") %>% 
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% 
-      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
+### Upf3a
+
+upf3a_tx = res_dte$UPF3A_KD_Control %>%
+  dplyr::filter(FDR < 0.05, logFC >0)
 
 
-```{r}
-res_dte$UPF3A_OE_Control %>%
-  dplyr::filter(FDR < 0.05) %>% 
-  dplyr::select(tx_id, Overdispersion, logFC, 
-                logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr, 
-                `NIF|__|GC(cds[-10:termination_codon])`) %>% 
-   inner_join(tx2gene, by = "tx_id") %>%
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%
-  inner_join(DEGenes$UPF3A_OE_vs_Control %>% 
-              dplyr::rename("gene_id" = "ensembl_gene_id") %>% 
-              dplyr::select(contains("UPF3A_OE_vs_Control"), gene_id), by = "gene_id") %>% 
-     DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
+upf3a_rf = upf3a_tx %>% dplyr::select(tx_id,logFC,  GC_3utr, GC_5utr,  GC_cds, LENGTH_3utr,
+                                      LENGTH_5utr, LENGTH_cds, "uORFs|__|count", Length,
+                                      `dEJs|__|penultimate-exon>=55(nts)`) %>%
+  column_to_rownames("tx_id")
+
+
+cf1 <- cforest(logFC ~ . , data=upf3a_rf, control=cforest_unbiased(mtry=2,ntree=50))
+cf1
+imp_upf3a = varimp(cf1) %>% reshape2::melt() %>%
+  rownames_to_column("Variable")
+
+
+imp_upf3a %>%
+  ggplot(aes(x=value, y = Variable)) + geom_bar(stat ="identity")
+
+
 
 
 ```
-
-# UPF3A OE in UPF3B KD 
-
-```{r}
-res_dte$UPF3A_OE_UPF3B_KD_Control %>% 
-  as.data.frame() %>% 
-  dplyr::filter(Results != 0) %>%
-  dplyr::select(tx_id, Overdispersion, logFC, 
-                logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr, 
-                `NIF|__|GC(cds[-10:termination_codon])`) %>% 
-  inner_join(tx2gene, by = "tx_id") %>% 
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% 
-      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-
-```
-
-
-```{r}
-res_dte$UPF3A_OE_UPF3B_KD_Control %>%
-  dplyr::filter(FDR < 0.05) %>% 
-  inner_join(tx2gene, by = "tx_id") %>% 
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%
-  inner_join(dplyr::rename(DEGenes$UPF3A_OE_UPF3B_KD_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") %>% 
-  ggscatter(y="logFC", x="Coef.UPF3A_OE_UPF3B_KD_vs_Control",  cor.coef = TRUE, add = "reg.line", 
-              conf.int = TRUE, add.params = list(color = "blue",
-                                                 fill = "lightgray")) + 
-  xlab("UPF3A OE in UPF3B KD (gene level logFC)") + ylab("UPF3A OE in UPF3B KD (transcript level logFC)")
-
-```
-
-```{r}
-res_dte$UPF3A_OE_UPF3B_KD_Control %>%
-  dplyr::filter(FDR < 0.05) %>% 
-  dplyr::select(tx_id, Overdispersion, logFC, 
-                logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr, 
-                `NIF|__|GC(cds[-10:termination_codon])`) %>% 
-   inner_join(tx2gene, by = "tx_id") %>%
-  mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id, 
-                       column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%
-  inner_join(DEGenes$UPF3A_OE_UPF3B_KD_vs_Control %>% 
-              dplyr::rename("gene_id" = "ensembl_gene_id") %>% 
-              dplyr::select(contains("UPF3A_OE_UPF3B_KD_vs_Control"), gene_id), by = "gene_id") %>% 
-     DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-
-
-```
-
-
-# Are DET shared between UPF3B KD and UPF3A KD? 
-
-```{r}
-degs_b= res_dte$UPF3B_KD_Control %>% as.data.frame %>%
-  dplyr::filter(FDR < .05) %>% 
-  with(., 
-       table(sign.lfc=sign(logFC))) %>% as.data.frame()
-```
-
-In UPF3B KD, there are 1860 upregulated genes aand 1328 downregulated genes 
-
-```{r}
-
-res_dte$UPF3A_KD_Control %>% as.data.frame %>%
-  dplyr::filter(FDR < .05) %>% 
-  with(., 
-       table(sign.lfc=sign(logFC)))
-
-```
-
-In UPF3B KD, there are 1504 upregulated genes and 816 downregulated genes 
-
-
-```{r}
-x = list( "UPF3B KD" = res_dte$UPF3B_KD_Control$tx_id[res_dte$UPF3B_KD_Control$FDR < 0.05],  
-    "UPF3A KD" = res_dte$UPF3A_KD_Control$tx_id[res_dte$UPF3A_KD_Control$FDR < 0.05], 
-    "Double KD" = res_dte$UPF3A_KD_UPF3B_KD_Control$tx_id[res_dte$UPF3A_KD_UPF3B_KD_Contro$FDR < 0.05],
-    "UPF3A OE" = res_dte$UPF3A_OE_Control$tx_id[res_dte$UPF3A_OE_Control$FDR < 0.05], 
-    "UPF3A OE UPF3B KD" = res_dte$UPF3A_OE_UPF3B_KD_Control$tx_id[res_dte$UPF3A_OE_UPF3B_KD_Control$FDR < 0.05])
-
-ggvenn(x[c(1,2)])
-```
-
-```{r fig.height=8, fig.width=15}
-grid.arrange((res_dte$UPF3B_KD_Control %>% as.data.frame() %>% 
-  dplyr::filter(FDR < 0.05) %>% 
-  dplyr::rename("logFC.UPF3B" = "logFC") %>% 
-  dplyr::select(tx_id, logFC.UPF3B) %>% 
-  inner_join(dplyr::filter(as.data.frame(res_dte$UPF3A_KD_Control), FDR < 0.05), by = "tx_id")  %>% 
-   ggscatter(., x = "logFC.UPF3B", y = "logFC", color = "NIF_uORF",
-              cor.coef = TRUE, add = "reg.line", 
-              conf.int = TRUE, add.params = list(color = "blue",
-                                                 fill = "lightgray")) + 
-    theme_bw()  + 
-  geom_xsidedensity(aes(у = after_stat(density), fill = NIF_uORF), alpha = 0.5, 
-                    size = 1,position = "stack") + geom_ysidedensity(aes(x=after_stat(density), 
-                                                                         fill = NIF_uORF), 
-                                                                     alpha=0.5, size = 1) +
-    xlab("UPF3B KD (log2FC)") + ylab("UPF3A KD (log2FC)")),
-
-(res_dte$UPF3B_KD_Control %>% as.data.frame() %>% 
-  dplyr::filter(FDR < 0.05) %>% 
-  dplyr::rename("logFC.UPF3B" = "logFC") %>% 
-  dplyr::select(tx_id, logFC.UPF3B) %>% 
-  inner_join(dplyr::filter(as.data.frame(res_dte$UPF3A_KD_Control), FDR < 0.05), by = "tx_id")  %>% 
-   ggscatter(., x = "logFC.UPF3B", y = "logFC", color = "NIF_dEJ",
-              cor.coef = TRUE, add = "reg.line", 
-              conf.int = TRUE, add.params = list(color = "blue",
-                                                 fill = "lightgray")) + 
-    theme_bw()  + 
-  geom_xsidedensity(aes(у = after_stat(density), fill = NIF_dEJ), alpha = 0.5, 
-                    size = 1,position = "stack") + geom_ysidedensity(aes(x=after_stat(density), 
-                                                                         fill = NIF_dEJ), 
-                                                                     alpha=0.5, size = 1) 
- + xlab("UPF3B KD (log2FC)")+ ylab("UPF3A KD (log2FC)")), 
-
-
-(res_dte$UPF3B_KD_Control %>% as.data.frame() %>% 
-  dplyr::filter(FDR < 0.05) %>% 
-  dplyr::rename("logFC.UPF3B" = "logFC") %>% 
-  dplyr::select(tx_id, logFC.UPF3B) %>% 
-  inner_join(dplyr::filter(as.data.frame(res_dte$UPF3A_KD_Control), FDR < 0.05), by = "tx_id")  %>% 
-   ggscatter(., x = "logFC.UPF3B", y = "logFC", color = "NIF_long_3utr",
-              cor.coef = TRUE, add = "reg.line", 
-              conf.int = TRUE, add.params = list(color = "blue",
-                                                 fill = "lightgray")) + 
-    theme_bw()  + 
-  geom_xsidedensity(aes(у = after_stat(density), fill = NIF_long_3utr), alpha = 0.5, 
-                    size = 1,position = "stack") + geom_ysidedensity(aes(x=after_stat(density), 
-                                                                         fill = NIF_long_3utr), 
-                                                                     alpha=0.5, size = 1) +
-   xlab("UPF3B KD (log2FC)") + ylab("UPF3A KD (log2FC)") ), 
-ncol=3
-
-)
-```
-
-
-```{r}
-res_dte$UPF3B_KD_Control %>% as.data.frame() %>% 
-  dplyr::filter(Results != 0) %>% 
-  dplyr::rename("logFC.UPF3B" = "logFC") %>% 
-  dplyr::select(tx_id, logFC.UPF3B) %>% 
-  left_join(dplyr::filter(as.data.frame(res_dte$UPF3A_KD_Control), Results == 0), by = "tx_id")  %>% 
-   ggscatter(., x = "logFC.UPF3B", y = "logFC", color= "nif_feature", 
-              cor.coef = TRUE, add = "reg.line", 
-              conf.int = TRUE, add.params = list(color = "blue",
-                                                 fill = "lightgray")) + 
-    theme_bw()   
-```
-
-
-```{r}
-res_dte$UPF3A_KD_Control %>% as.data.frame() %>% 
-  dplyr::filter(Results != 0) %>% 
-  dplyr::rename("logFC.UPF3A" = "logFC") %>% 
-  dplyr::select(tx_id, logFC.UPF3A) %>% 
-  left_join(dplyr::filter(as.data.frame(res_dte$UPF3B_KD_Control), Results == 0), by = "tx_id")  %>% 
-   ggscatter(., x = "logFC.UPF3A", y = "logFC",
-              cor.coef = TRUE, add = "reg.line", 
-              conf.int = TRUE, add.params = list(color = "blue",
-                                                 fill = "lightgray")) + 
-    theme_bw()  
-
-```
-
-### What is the distribution between transcripts in UPF3B KD and UPF3A OE? 
-
-```{r}
-ggvenn(x[c(1, 4)])
-```
-
-```{r}
-res_dte$UPF3B_KD_Control %>% as.data.frame() %>% 
-  dplyr::filter(Results != 0) %>% 
-  dplyr::rename("logFC.UPF3B" = "logFC") %>% 
-  dplyr::select(tx_id, logFC.UPF3B) %>% 
-  left_join(as.data.frame(res_dte$UPF3A_OE_Control, by = "tx_id")) %>% 
-   ggscatter(., x = "logFC.UPF3B", y = "logFC", color = "nif_feature",
-              cor.coef = TRUE, add = "reg.line", 
-              conf.int = TRUE, add.params = list(color = "blue",
-                                                 fill = "lightgray")) + 
-    theme_bw()  + xlab("UPF3B KD") + ylab("UPF3A OE") + 
-  geom_xsidedensity(aes(у = after_stat(density), fill = nif_feature), alpha = 0.5, 
-                    size = 1,position = "stack") + geom_ysidedensity(aes(x=after_stat(density), 
-                                                                         fill = nif_feature), 
-                                                                     alpha=0.5, size = 1) +
-  scale_color_tq()  + scale_fill_tq() + geom_hline(yintercept = 0 )
-```
-
-
-
-** All conditions - transcript and gene level comparison 
-
-** Capacity to do genes with isoforms with different NIFs - try in UPF3B 
-
-** Is NMD a cell-type specific thing? --? Maybe UPF1 work with brain coexp networks 
-
-
-Any transcript that is expression - 40k 
-transcripts that have multiple transcripts and have a look at the CPM - Just do it in UPF3B - average of the three samples

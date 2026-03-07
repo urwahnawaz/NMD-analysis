@@ -1,0 +1,1010 @@
+
+
+
+
+
+
+<!-- ### Comparison with DEG results -->
+
+  <!-- ```{r} -->
+  <!-- x= list( "DEG" = DEGenes$UPF3B_vs_Control$ensembl_gene_id,  -->
+                  <!--     "Differential stability" = res$ensembl_gene_id) -->
+
+    <!-- ggvenn(x[c(1,2)]) -->
+    <!-- ``` -->
+
+
+
+
+    <!-- ```{r fig.cap="Distribution"} -->
+    <!-- res_sig = res[res$ensembl_gene_id %in% DEGenes$UPF3B_vs_Control$ensembl_gene_id,] -->
+
+      <!-- res_sig%>%  -->
+      <!--   dplyr::select(ensembl_gene_id, log2FoldChange) %>%  -->
+      <!--   left_join(DEGenes$UPF3B_vs_Control, by="ensembl_gene_id") %>%  -->
+      <!--   mutate(Res.UPF3B_vs_Control = as.character(Res.UPF3B_vs_Control)) %>% -->
+      <!--   ggscatter(.,x="Coef.UPF3B_vs_Control", y ="log2FoldChange", cor.coef = TRUE, add = "reg.line", -->
+                         <!--             color = "Res.UPF3B_vs_Control", -->
+                         <!--               conf.int = TRUE, add.params = list(color = "blue", -->
+                                                                                 <!--                                                  fill = "lightgray")) +  -->
+      <!--     theme_bw() + xlab("UPF3B KD vs Controls (DEGlog2FC)") + -->
+      <!--   ylab("UPF3B KD vs Control RNA stability (log2FC)") + -->
+      <!--   scale_color_manual(values=c("#2F124B", "#EA2A5F"))  -->
+      <!-- ``` -->
+
+      <!-- ```{r fig.cap="Distribution of log fold changes of RNA-stability results. The genes that were significantly destabilised/stabilised were overlaapped with DEGs from UPF3B to Controls comparison and their distribution was plotted."} -->
+      <!-- res_sig %>% -->
+      <!--    ggplot(aes(x=log2FoldChange)) + -->
+      <!--     geom_histogram(data=dplyr::filter(res_sig,padj < 0.05), -->
+                                <!--                  fill="#FF2759", alpha = 0.5)  + xlab("RNA stability (log2FC)") + theme_bw() -->
+      <!-- ``` -->
+
+      <!-- ```{r fig.cap="Distribution of pvalue of RNA-stability results. The genes that were significantly destabilised/stabilised were overlaapped with DEGs from UPF3B to Controls comparison and their pvalues were plotted to ensure significance of results"} -->
+      <!-- hist(res_sig$pvalue) -->
+      <!-- ``` -->
+
+      <!-- ```{r} -->
+      <!-- res_sig %>%  -->
+      <!--    left_join(DEGenes$UPF3B_vs_Control %>%  -->
+                          <!--                dplyr::select(contains("UPF3B_vs_Control"), "ensembl_gene_id") -->
+                          <!--              , by="ensembl_gene_id") %>%  -->
+      <!--   dplyr::select("ensembl_gene_id","gene","log2FoldChange", "pvalue", "padj",  -->
+                             <!--                 "Coef.UPF3B_vs_Control", "p.value.UPF3B_vs_Control",  -->
+                             <!--                 "p.value.adj.UPF3B_vs_Control") %>% -->
+      <!--   dplyr::rename("RNA stability (log2FC)" = "log2FoldChange",  -->
+                             <!--                 "RNA stability pvalue" = "pvalue",  -->
+                             <!--                 "RNA stability adjp" = "padj",  -->
+                             <!--                 "DEG (log2FC)" = "Coef.UPF3B_vs_Control",  -->
+                             <!--                 "DEG (pvalue)" = "p.value.UPF3B_vs_Control",  -->
+                             <!--                 "DEG (adjp)" = "p.value.adj.UPF3B_vs_Control") %>% -->
+      <!--    DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+                              <!--             options = list(scrollX = TRUE,  -->
+                                                                <!--                            scrollCollapse = TRUE,  -->
+                                                                <!--                            pageLength = 5, autoWidth = TRUE,  -->
+                                                                <!--                            dom = 'Blfrtip', -->
+                                                                <!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+                                                                <!--                            lengthMenu = list(c(10,25,50,-1), -->
+                                                                                                                    <!--                                              c(10,25,50,"All")))) -->
+
+      <!-- ``` -->
+
+      <!-- ```{r} -->
+      <!-- bf_UPF3B = res_dte$UPF3B_KD_Control %>%  -->
+        <!--   left_join(tx2gene) %>%  -->
+        <!--   right_join(res_sig %>%  -->
+                            <!--                dplyr::rename("gene_id" = "ensembl_gene_id"), by="gene_id") %>%  -->
+        <!--   dplyr::filter(nif_feature != "None") %>%  -->
+        <!--   left_join(DEGenes$UPF3B_vs_Control %>%  -->
+                           <!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
+        <!--   dplyr::filter(Res.UPF3B_vs_Control == 1) -->
+        <!-- ``` -->
+
+        <!-- ```{r} -->
+        <!-- bf_UPF3B %>%  -->
+        <!--   dplyr::select("Gene" = "gene.y", "Gene ID" = "gene_id", -->
+                               <!--                 "Adjusted P-value (Gene)" = "p.value.adj.UPF3B_vs_Control",  -->
+                               <!--                 "Log2FoldChange (Gene)" ="Coef.UPF3B_vs_Control", -->
+                               <!--                 "Transcript ID" = "tx_id", "Adjusted P-value (Transcript)" = "FDR", -->
+                               <!--                  "Log2FoldChange (Transcript)" = "logFC", "NIF_dEJ",  -->
+                               <!--                 "NIF_uORF","GC_3utr","LENGTH_3utr") %>%  -->
+        <!--   mutate(NIF_uORF = ifelse(NIF_uORF == 1, "Yes", "No"),  -->
+                        <!--          NIF_dEJ = ifelse(NIF_dEJ  == 1, "Yes", "No")) %>% -->
+        <!--   dplyr::arrange(Gene) %>% -->
+        <!--   stargazer(title="High confident UPF3B-dependent targets in mouse L-cells",  summary=FALSE, rownames = FALSE, out = "output/Stability/Thesis_tables/UPF3B_targets.tex") -->
+        <!-- ``` -->
+
+        <!-- ```{r} -->
+        <!-- rg <- bf_UPF3B  %>%  -->
+          <!--   dplyr::select(contains("Coef."),  gene.y) %>%  -->
+          <!--   distinct( gene.y, .keep_all = TRUE) %>% -->
+          <!--   column_to_rownames("gene.y") %>% -->
+          <!--   max(abs(.)) -->
+
+          <!-- bf_UPF3B  %>%  -->
+          <!--   dplyr::select(contains("Coef."),  gene.y) %>%  -->
+          <!--   distinct(gene.y, .keep_all = TRUE) %>% -->
+          <!--   column_to_rownames("gene.y") %>% t() %>% -->
+          <!--   pheatmap(,   -->
+                            <!--         scale="none",  -->
+                            <!--         cluster_cols = FALSE, -->
+                            <!--         cluster_rows = FALSE, -->
+                            <!--         breaks = seq(-rg, rg, length.out = 100), -->
+                            <!--         clustering_distance_rows = "euclidean",  -->
+                            <!--         border_color = "white",  -->
+                            <!--         treeheight_row = 0, -->
+                            <!--         fontsize = 6, -->
+                            <!--         color = colorRampPalette(c("#2F124B", "#6E74B4","#F9F9F9", "#FD9675", "#EA2A5F"))(100), -->
+                            <!--         labels_row = row.names(.),  -->
+                            <!--         cellwidth = 8, -->
+                            <!--         cellheight = 8) -->
+
+          <!-- ``` -->
+
+          <!-- ```{r} -->
+          <!-- bf_UPF3B %>% -->
+          <!--   dplyr::filter(NIF_long_3utr == 1) %>% dim() -->
+          <!-- ``` -->
+
+          <!-- ` -->
+
+          <!-- ### Comparison with DEGs -->
+
+          <!-- ```{r} -->
+          <!-- x= list( "DEG" = DEGenes$UPF3A_vs_Control$ensembl_gene_id,  -->
+                          <!--     "Differential stability" = res$ensembl_gene_id) -->
+
+            <!-- ggvenn(x[c(1,2)]) -->
+            <!-- ``` -->
+
+            <!-- ```{r} -->
+            <!-- res_sig = res[res$ensembl_gene_id %in% DEGenes$UPF3A_vs_Control$ensembl_gene_id,] -->
+
+              <!-- res_sig %>%  -->
+              <!--   dplyr::select(ensembl_gene_id, log2FoldChange) %>%  -->
+              <!--   left_join(DEGenes$UPF3A_vs_Control, by="ensembl_gene_id") %>%  -->
+              <!--   ggscatter(.,x="Coef.UPF3A_vs_Control", y ="log2FoldChange", cor.coef = TRUE, add = "reg.line",  -->
+                                 <!--               conf.int = TRUE, add.params = list(color = "blue", -->
+                                                                                         <!--                                                  fill = "lightgray")) +  -->
+              <!--     theme_bw() + xlab("UPF3A KD vs Controls (DEG log2FC)") + ylab("UPF3A KD vs Control RNA stability (log2FC)") -->
+
+              <!-- ``` -->
+
+
+              <!-- ```{r fig.cap="Distribution of log fold changes of RNA-stability results. The genes that were significantly destabilised/stabilised were overlaapped with DEGs from UPF3A to Controls comparison and their distribution was plotted."} -->
+              <!-- res_sig %>% -->
+              <!--    ggplot(aes(x=log2FoldChange)) + -->
+              <!--     geom_histogram(data=dplyr::filter(res_sig,padj < 0.05), -->
+                                        <!--                  fill="#FF2759", alpha = 0.5)  + xlab("RNA stability (log2FC)") -->
+              <!-- ``` -->
+
+              <!-- ```{r fig.cap="Distribution of pvalue of RNA-stability results. The genes that were significantly destabilised/stabilised were overlaapped with DEGs from UPF3A to Controls comparison and their pvalues were plotted to ensure significance of results"} -->
+              <!-- hist(res_sig$pvalue) -->
+              <!-- ``` -->
+
+              <!-- ```{r} -->
+              <!-- res_sig %>%  -->
+              <!--    left_join(DEGenes$UPF3A_vs_Control %>%  -->
+                                  <!--                dplyr::select(contains("UPF3A_vs_Control"), "ensembl_gene_id") -->
+                                  <!--              , by="ensembl_gene_id") %>%  -->
+              <!--   dplyr::select("ensembl_gene_id","gene","log2FoldChange", "pvalue", "padj",  -->
+                                     <!--                 "Coef.UPF3A_vs_Control", "p.value.UPF3A_vs_Control",  -->
+                                     <!--                 "p.value.adj.UPF3A_vs_Control") %>% -->
+              <!--   dplyr::rename("RNA stability (log2FC)" = "log2FoldChange",  -->
+                                     <!--                 "RNA stability pvalue" = "pvalue",  -->
+                                     <!--                 "RNA stability adjp" = "padj",  -->
+                                     <!--                 "DEG (log2FC)" = "Coef.UPF3A_vs_Control",  -->
+                                     <!--                 "DEG (pvalue)" = "p.value.UPF3A_vs_Control",  -->
+                                     <!--                 "DEG (adjp)" = "p.value.adj.UPF3A_vs_Control") %>% -->
+              <!--    DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+                                      <!--             options = list(scrollX = TRUE,  -->
+                                                                        <!--                            scrollCollapse = TRUE,  -->
+                                                                        <!--                            pageLength = 5, autoWidth = TRUE,  -->
+                                                                        <!--                            dom = 'Blfrtip', -->
+                                                                        <!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+                                                                        <!--                            lengthMenu = list(c(10,25,50,-1), -->
+                                                                                                                            <!--                                              c(10,25,50,"All")))) -->
+
+              <!-- ``` -->
+
+              <!-- #### Bone fide NMD targets  -->
+
+              <!-- ```{r} -->
+              <!-- bf_UPF3A = res_dte$UPF3A_KD_Control %>%  -->
+                <!--   left_join(tx2gene) %>%  -->
+                <!--   right_join(res_sig %>%  -->
+                                    <!--                dplyr::rename("gene_id" = "ensembl_gene_id"), by="gene_id") %>%  -->
+                <!--   dplyr::filter(nif_feature != "None") %>%  -->
+                <!--   left_join(DEGenes$UPF3A_vs_Control %>%  -->
+                                   <!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
+                <!--   dplyr::filter(Res.UPF3A_vs_Control == 1) -->
+                <!-- ``` -->
+
+                <!-- ```{r} -->
+                <!-- overlapping_transcript_properties = res_dte$UPF3A_KD_Control %>%  -->
+                  <!--   left_join(tx2gene) %>%  -->
+                  <!--   right_join(res_sig %>%  -->
+                                      <!--                dplyr::rename("gene_id" = "ensembl_gene_id"), by="gene_id") %>%  -->
+                  <!--   dplyr::filter(nif_feature != "None") %>%  -->
+                  <!--   left_join(DEGenes$UPF3A_vs_Control %>%  -->
+                                     <!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
+                  <!--   dplyr::filter(Res.UPF3A_vs_Control != 0) -->
+                  <!-- ``` -->
+
+
+                  <!-- ```{r} -->
+                  <!-- bf_UPF3B %>%  -->
+                  <!--   mutate(condition = "UPF3B bone fide targets") %>%  -->
+                  <!--   dplyr::select(LENGTH_3utr, condition) %>%  -->
+                  <!--   melt() %>%  -->
+                  <!--   rbind(bf_UPF3A %>% -->
+                                 <!--           mutate(condition = "UPF3A bone fide targets") %>%  -->
+                                 <!--           dplyr::select(LENGTH_3utr, condition) %>%  -->
+                                 <!--           melt()) %>%  -->
+                  <!--   ggplot(aes(x=condition, y = value, fill= condition)) + geom_boxplot() -->
+                  <!-- ``` -->
+
+                  <!-- ```{r} -->
+                  <!--  ggvenn(data= list("UPF3B targets" = bf_UPF3B$gene_id,  -->
+                                            <!--                    "UPF3A targets" = bf_UPF3A$gene_id)) -->
+                  <!-- ``` -->
+
+                  <!-- ### Targets overlapping between UPF3A and UPF3B  -->
+
+                  <!-- ```{r} -->
+                  <!-- overlap_list =calculate.overlap(x=list("UPF3B" = unique(bf_UPF3B$gene_id),  -->
+                                                                <!--                    "UPF3A" = unique(bf_UPF3A$gene_id))) -->
+
+                    <!-- UPF3B_only = overlap_list$a1[!overlap_list$a1 %in% overlap_list$a3]  -->
+                      <!-- ``` -->
+
+                      <!-- ```{r} -->
+                      <!-- rg <- limma_results %>%  -->
+                        <!--   dplyr::select(contains("Coef."), ensembl_gene_id) %>%  -->
+                        <!--   dplyr::filter(ensembl_gene_id %in% bf_UPF3B$gene_id) %>%  -->
+                        <!--   column_to_rownames("ensembl_gene_id") %>% max(abs(.)) -->
+
+                        <!-- UPF3B_targets = limma_results %>%  -->
+                          <!--   dplyr::select(contains("Coef."), ensembl_gene_id, gene) %>%  -->
+                          <!--   dplyr::filter(ensembl_gene_id %in% UPF3B_only) %>%  -->
+                          <!--   dplyr::select(-ensembl_gene_id ) %>% -->
+                          <!--   column_to_rownames("gene") %>% t() %>% -->
+                          <!--   pheatmap(,   -->
+                                            <!--         scale="none",  -->
+                                            <!--         cluster_cols = FALSE, -->
+                                            <!--         cluster_rows=FALSE, -->
+                                            <!--         breaks = seq(-rg, rg, length.out = 100), -->
+                                            <!--         clustering_distance_rows = "euclidean",  -->
+                                            <!--         border_color = "white",  -->
+                                            <!--         treeheight_row = 0, -->
+                                            <!--         fontsize = 6, -->
+                                            <!--         color = colorRampPalette(c("#2F124B", "#6E74B4","#F9F9F9", "#FD9675", "#EA2A5F"))(100), -->
+                                            <!--         labels_row = row.names(.),  -->
+                                            <!--         cellwidth = 8, -->
+                                            <!--         cellheight = 8) -->
+
+                          <!-- ggsave(filename="/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Stability/Thesis_figures/UPF3B_targets_overlap_v2.svg",  -->
+                                        <!--        plot = UPF3B_targets, width =11.05, height = 6.89, units = "in") -->
+                          <!-- ``` -->
+
+                          <!-- ```{r} -->
+                          <!-- UPF3A_only = overlap_list$a2[!overlap_list$a2 %in% overlap_list$a3]  -->
+                            <!-- ``` -->
+
+                            <!-- ```{r} -->
+                            <!-- rg <- limma_results %>%  -->
+                              <!--   dplyr::select(contains("Coef."), ensembl_gene_id) %>%  -->
+                              <!--   dplyr::filter(ensembl_gene_id %in% UPF3A_only) %>%  -->
+                              <!--   column_to_rownames("ensembl_gene_id") %>% max(abs(.)) -->
+
+                              <!-- UPF3A_targets = limma_results %>%  -->
+                                <!--   dplyr::select(contains("Coef."), ensembl_gene_id, gene) %>%  -->
+                                <!--   dplyr::filter(ensembl_gene_id %in% UPF3A_only) %>%  -->
+                                <!--   dplyr::select(-ensembl_gene_id ) %>% -->
+                                <!--   column_to_rownames("gene") %>% t() %>% -->
+                                <!--   pheatmap(,   -->
+                                                  <!--         scale="none",  -->
+                                                  <!--         cluster_cols = FALSE, -->
+                                                  <!--         cluster_rows=FALSE, -->
+                                                  <!--         breaks = seq(-rg, rg, length.out = 100), -->
+                                                  <!--         clustering_distance_rows = "euclidean",  -->
+                                                  <!--         border_color = "white",  -->
+                                                  <!--         treeheight_row = 0, -->
+                                                  <!--         fontsize = 6, -->
+                                                  <!--         color = colorRampPalette(c("#2F124B", "#6E74B4","#F9F9F9", "#FD9675", "#EA2A5F"))(100), -->
+                                                  <!--         labels_row = row.names(.),  -->
+                                                  <!--         cellwidth = 8, -->
+                                                  <!--         cellheight = 8) -->
+
+                                <!-- ggsave(filename="/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Stability/Thesis_figures/UPF3A_targets_overlap.svg",  -->
+                                              <!--        plot = UPF3A_targets, width =11.05, height = 6.89, units = "in") -->
+                                <!-- ``` -->
+
+                                <!-- ```{r} -->
+                                <!-- rg <- limma_results %>%  -->
+                                  <!--   dplyr::select(contains("Coef."), ensembl_gene_id) %>%  -->
+                                  <!--   dplyr::filter(ensembl_gene_id %in% overlap_list$a3) %>%  -->
+                                  <!--   column_to_rownames("ensembl_gene_id") %>% max(abs(.)) -->
+
+                                  <!-- overlap_targets = limma_results %>%  -->
+                                    <!--   dplyr::select(contains("Coef."), ensembl_gene_id, gene) %>%  -->
+                                    <!--   dplyr::filter(ensembl_gene_id %in% overlap_list$a3) %>%  -->
+                                    <!--   dplyr::select(-ensembl_gene_id ) %>% -->
+                                    <!--   column_to_rownames("gene") %>% t() %>% -->
+                                    <!--   pheatmap(,   -->
+                                                      <!--         scale="none",  -->
+                                                      <!--         cluster_cols = FALSE, -->
+                                                      <!--         cluster_rows=FALSE, -->
+                                                      <!--         breaks = seq(-rg, rg, length.out = 100), -->
+                                                      <!--         clustering_distance_rows = "euclidean",  -->
+                                                      <!--         border_color = "white",  -->
+                                                      <!--         treeheight_row = 0, -->
+                                                      <!--         fontsize = 6, -->
+                                                      <!--         color = colorRampPalette(c("#2F124B", "#6E74B4","#F9F9F9", "#FD9675", "#EA2A5F"))(100), -->
+                                                      <!--         labels_row = row.names(.),  -->
+                                                      <!--         cellwidth = 8, -->
+                                                      <!--         cellheight = 8) -->
+
+
+                                    <!-- ggsave(filename="/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Stability/Thesis_figures/heatmap_targets_overlap.svg",  -->
+                                                  <!--        plot = overlap_targets, width =11.05, height = 6.89, units = "in") -->
+                                    <!-- ``` -->
+
+
+
+                                    <!-- ## UPF3 dKD  -->
+
+                                    <!-- ```{r} -->
+                                    <!-- res <- as.data.frame(results(diffrac_res$dds,name = "GroupUPF3A_KD_UPF3B_KD.Ratio")) -->
+                                      <!-- res = res %>% dplyr::filter(padj < 0.05) -->
+                                        <!-- res %<>% -->
+                                        <!--   rownames_to_column("ensembl_gene_id") %>%  -->
+                                        <!--     mutate(gene = mapIds(org.Mm.eg.db, keys=ensembl_gene_id,  column="SYMBOL",keytype="ENSEMBL", multiVals="first"),  -->
+                                                          <!--            entrez = mapIds(org.Mm.eg.db, keys=ensembl_gene_id,  column="ENTREZID",keytype="ENSEMBL", multiVals="first")) %>% drop_na(entrez) -->
+                                        <!-- ``` -->
+
+
+                                        <!-- ```{r} -->
+                                        <!-- res %>%  -->
+                                        <!--   ggplot(aes(x=log2FoldChange)) + -->
+                                        <!--     geom_histogram(data=dplyr::filter(res,padj < 0.05), -->
+                                                                  <!--                  fill="#FF2759", alpha = 0.5)  -->
+
+                                        <!-- ``` -->
+
+                                        <!-- ```{r} -->
+                                        <!-- DEColours <- c("-1" = "#2F124B","1" = "#EA2A5F",  "0" = "#D3D5E3") -->
+                                          <!-- volc= as.data.frame(results(diffrac_res$dds,name =  -->
+                                                                             <!--                         "GroupUPF3A_KD_UPF3B_KD.Ratio")) %>% -->
+                                            <!--   mutate(res= ifelse(padj < 0.05 & log2FoldChange > 0, 1,  -->
+                                                                        <!--                      ifelse(padj < 0.05 & log2FoldChange < 0, -1, 0))) %>% -->
+                                            <!--   rownames_to_column("ensembl_gene_id") %>%  -->
+                                            <!--     mutate(gene = mapIds(org.Mm.eg.db, keys=ensembl_gene_id,  column="SYMBOL",keytype="ENSEMBL", multiVals="first"),  -->
+                                                              <!--            entrez = mapIds(org.Mm.eg.db, keys=ensembl_gene_id,  column="ENTREZID",keytype="ENSEMBL", multiVals="first")) %>% -->
+                                            <!--     ggplot(aes(x = log2FoldChange,  -->
+                                                                  <!--                y = -log10(padj),  -->
+                                                                  <!--                colour = as.factor(as.character(res)))) + -->
+                                            <!--     geom_point(alpha = 0.8, size =1.5) + -->
+                                            <!--     scale_colour_manual(values = DEColours) + theme_classic() +  -->
+                                            <!--     theme(legend.position = "none",  -->
+                                                             <!--           axis.title.y = element_text(size = 12)) + -->
+                                            <!--     geom_hline(yintercept = -log10(0.05), color = "grey60", size = 0.5, lty = "dashed") + -->
+                                            <!--     #geom_hline(yintercept = -log10(limma_results %>%  -->
+                                            <!--      #                                  dplyr::filter(Res.UPF3B_vs_Control != 0) %>%  -->
+                                            <!--       #                                 use_series(p.value.adj.UPF3B_vs_Control) %>% max),  -->
+                                            <!--        #        color = "black") + -->
+                                            <!--     labs(x = "Differential mRNA stability(log2 FoldChange)", y = "-log10 adj p-value") + -->
+                                            <!--     ggtitle("UPF3 dKD vs. Control")  -->
+                                            <!-- ``` -->
+
+
+                                            <!-- ```{r} -->
+                                            <!-- my_gg = volc + geom_point_interactive(aes(tooltip = gene, data_id = gene),  -->
+                                                                                         <!--     size = 1, hover_nearest = TRUE) -->
+                                              <!-- girafe(ggobj = my_gg) -->
+                                              <!-- ``` -->
+
+                                              <!-- ### Comparison with DEGs  -->
+
+
+                                              <!-- ```{r} -->
+                                              <!-- x= list( "DEG" = DEGenes$DoubleKD_vs_Control$ensembl_gene_id,  -->
+                                                              <!--     "Differential stability" = res$ensembl_gene_id) -->
+
+                                                <!-- ggvenn(x[c(1,2)]) -->
+                                                <!-- ``` -->
+
+                                                <!-- ```{r} -->
+                                                <!-- res_sig = res[res$ensembl_gene_id %in% DEGenes$DoubleKD_vs_Control$ensembl_gene_id,] -->
+
+                                                  <!-- res_sig %>%  -->
+                                                  <!--   dplyr::select(ensembl_gene_id, log2FoldChange) %>%  -->
+                                                  <!--   left_join(DEGenes$DoubleKD_vs_Control, by="ensembl_gene_id") %>%  -->
+                                                  <!--   ggscatter(.,x="Coef.DoubleKD_vs_Control", y ="log2FoldChange", cor.coef = TRUE, add = "reg.line",  -->
+                                                                     <!--               conf.int = TRUE, add.params = list(color = "blue", -->
+                                                                                                                             <!--                                                  fill = "lightgray")) +  -->
+                                                  <!--     theme_bw() + xlab("UPF3 dKD vs Controls (DEG log2FC)") + ylab("UPF3 dKD vs Control RNA stability (log2FC)") -->
+
+                                                  <!-- ``` -->
+
+
+                                                  <!-- ```{r fig.cap="Distribution of log fold changes of RNA-stability results. The genes that were significantly destabilised/stabilised were overlaapped with DEGs from UPF3 dKD to Controls comparison and their distribution was plotted."} -->
+                                                  <!-- res_sig %>% -->
+                                                  <!--    ggplot(aes(x=log2FoldChange)) + -->
+                                                  <!--     geom_histogram(data=dplyr::filter(res_sig,padj < 0.05), -->
+                                                                            <!--                  fill="#FF2759", alpha = 0.5)  + xlab("RNA stability (log2FC)") -->
+                                                  <!-- ``` -->
+
+                                                  <!-- ```{r fig.cap="Distribution of pvalue of RNA-stability results. The genes that were significantly destabilised/stabilised were overlaapped with DEGs from UPF3 dKD to Controls comparison and their pvalues were plotted to ensure significance of results"} -->
+                                                  <!-- hist(res_sig$pvalue) -->
+                                                  <!-- ``` -->
+
+                                                  <!-- ```{r} -->
+                                                  <!-- res_sig %>%  -->
+                                                  <!--    left_join(DEGenes$DoubleKD_vs_Control %>%  -->
+                                                                      <!--                dplyr::select(contains("DoubleKD_vs_Control"), "ensembl_gene_id") -->
+                                                                      <!--              , by="ensembl_gene_id") %>%  -->
+                                                  <!--   dplyr::select("ensembl_gene_id","gene","log2FoldChange", "pvalue", "padj",  -->
+                                                                         <!--                 "Coef.DoubleKD_vs_Control", "p.value.DoubleKD_vs_Control",  -->
+                                                                         <!--                 "p.value.adj.DoubleKD_vs_Control") %>% -->
+                                                  <!--   dplyr::rename("RNA stability (log2FC)" = "log2FoldChange",  -->
+                                                                         <!--                 "RNA stability pvalue" = "pvalue",  -->
+                                                                         <!--                 "RNA stability adjp" = "padj",  -->
+                                                                         <!--                 "DEG (log2FC)" = "Coef.DoubleKD_vs_Control",  -->
+                                                                         <!--                 "DEG (pvalue)" = "p.value.DoubleKD_vs_Control",  -->
+                                                                         <!--                 "DEG (adjp)" = "p.value.adj.DoubleKD_vs_Control") %>% -->
+                                                  <!--    DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+                                                                          <!--             options = list(scrollX = TRUE,  -->
+                                                                                                            <!--                            scrollCollapse = TRUE,  -->
+                                                                                                            <!--                            pageLength = 5, autoWidth = TRUE,  -->
+                                                                                                            <!--                            dom = 'Blfrtip', -->
+                                                                                                            <!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+                                                                                                            <!--                            lengthMenu = list(c(10,25,50,-1), -->
+                                                                                                                                                                <!--                                              c(10,25,50,"All")))) -->
+
+                                                  <!-- ``` -->
+
+
+                                                  <!-- ## UPF3A OE  -->
+
+                                                  <!-- ```{r} -->
+                                                  <!-- res <- as.data.frame(results(diffrac_res$dds,name = "GroupUPF3A_OE.Ratio")) -->
+                                                    <!-- res = res %>% dplyr::filter(padj < 0.05) -->
+                                                      <!-- res %<>% -->
+                                                      <!--   rownames_to_column("ensembl_gene_id") %>%  -->
+                                                      <!--     mutate(gene = mapIds(org.Mm.eg.db, keys=ensembl_gene_id,  column="SYMBOL",keytype="ENSEMBL", multiVals="first"),  -->
+                                                                        <!--            entrez = mapIds(org.Mm.eg.db, keys=ensembl_gene_id,  column="ENTREZID",keytype="ENSEMBL", multiVals="first")) %>% drop_na(entrez) -->
+                                                      <!-- ``` -->
+
+
+                                                      <!-- ```{r} -->
+                                                      <!-- res %>%  -->
+                                                      <!--   ggplot(aes(x=log2FoldChange)) + -->
+                                                      <!--     geom_histogram(data=dplyr::filter(res,padj < 0.05), -->
+                                                                                <!--                  fill="#FF2759", alpha = 0.5)  -->
+
+                                                      <!-- ``` -->
+
+
+                                                      <!-- ```{r} -->
+                                                      <!-- DEColours <- c("-1" = "#2F124B","1" = "#EA2A5F",  "0" = "#D3D5E3") -->
+                                                        <!-- volc= as.data.frame(results(diffrac_res$dds,name =  -->
+                                                                                           <!--                         "GroupUPF3A_OE.Ratio")) %>% -->
+                                                          <!--   mutate(res= ifelse(padj < 0.05 & log2FoldChange > 0, 1,  -->
+                                                                                      <!--                      ifelse(padj < 0.05 & log2FoldChange < 0, -1, 0))) %>% -->
+                                                          <!--   rownames_to_column("ensembl_gene_id") %>%  -->
+                                                          <!--     mutate(gene = mapIds(org.Mm.eg.db, keys=ensembl_gene_id,  column="SYMBOL",keytype="ENSEMBL", multiVals="first"),  -->
+                                                                            <!--            entrez = mapIds(org.Mm.eg.db, keys=ensembl_gene_id,  column="ENTREZID",keytype="ENSEMBL", multiVals="first")) %>% -->
+                                                          <!--     ggplot(aes(x = log2FoldChange,  -->
+                                                                                <!--                y = -log10(padj),  -->
+                                                                                <!--                colour = as.factor(as.character(res)))) + -->
+                                                          <!--     geom_point(alpha = 0.8, size =1.5) + -->
+                                                          <!--     scale_colour_manual(values = DEColours) + theme_classic() +  -->
+                                                          <!--     theme(legend.position = "none",  -->
+                                                                           <!--           axis.title.y = element_text(size = 12)) + -->
+                                                          <!--     geom_hline(yintercept = -log10(0.05), color = "grey60", size = 0.5, lty = "dashed") + -->
+                                                          <!--     #geom_hline(yintercept = -log10(limma_results %>%  -->
+                                                          <!--      #                                  dplyr::filter(Res.UPF3B_vs_Control != 0) %>%  -->
+                                                          <!--       #                                 use_series(p.value.adj.UPF3B_vs_Control) %>% max),  -->
+                                                          <!--        #        color = "black") + -->
+                                                          <!--     labs(x = "Differential mRNA stability(log2 FoldChange)", y = "-log10 adj p-value") + -->
+                                                          <!--     ggtitle("UPF3A OE vs. Control")  -->
+                                                          <!-- ``` -->
+
+
+                                                          <!-- ```{r} -->
+                                                          <!-- my_gg = volc + geom_point_interactive(aes(tooltip = gene, data_id = gene),  -->
+                                                                                                       <!--     size = 1, hover_nearest = TRUE) -->
+                                                            <!-- girafe(ggobj = my_gg) -->
+                                                            <!-- ``` -->
+
+                                                            <!-- ## UPF3A OE UPF3B KD  -->
+
+                                                            <!-- ```{r} -->
+                                                            <!-- res <- as.data.frame(results(diffrac_res$dds,name = "GroupUPF3A_OE_UPF3B_KD.Ratio")) -->
+                                                              <!-- res = res %>% dplyr::filter(padj < 0.05) -->
+                                                                <!-- res %<>% -->
+                                                                <!--   rownames_to_column("ensembl_gene_id") %>%  -->
+                                                                <!--     mutate(gene = mapIds(org.Mm.eg.db, keys=ensembl_gene_id,  column="SYMBOL",keytype="ENSEMBL", multiVals="first"),  -->
+                                                                                  <!--            entrez = mapIds(org.Mm.eg.db, keys=ensembl_gene_id,  column="ENTREZID",keytype="ENSEMBL", multiVals="first")) %>% drop_na(entrez) -->
+
+                                                                <!-- ``` -->
+
+
+                                                                <!-- ```{r} -->
+                                                                <!-- res %>%  -->
+                                                                <!--   ggplot(aes(x=log2FoldChange)) + -->
+                                                                <!--     geom_histogram(data=dplyr::filter(res,padj < 0.05), -->
+                                                                                          <!--                  fill="#FF2759", alpha = 0.5)  -->
+
+                                                                <!-- ``` -->
+
+
+                                                                <!-- ```{r} -->
+                                                                <!-- DEColours <- c("-1" = "#2F124B","1" = "#EA2A5F",  "0" = "#D3D5E3") -->
+                                                                  <!-- volc= as.data.frame(results(diffrac_res$dds,name =  -->
+                                                                                                     <!--                         "GroupUPF3A_OE_UPF3B_KD.Ratio")) %>% -->
+                                                                    <!--   mutate(res= ifelse(padj < 0.05 & log2FoldChange > 0, 1,  -->
+                                                                                                <!--                      ifelse(padj < 0.05 & log2FoldChange < 0, -1, 0))) %>% -->
+                                                                    <!--   rownames_to_column("ensembl_gene_id") %>%  -->
+                                                                    <!--     mutate(gene = mapIds(org.Mm.eg.db, keys=ensembl_gene_id,  column="SYMBOL",keytype="ENSEMBL", multiVals="first"),  -->
+                                                                                      <!--            entrez = mapIds(org.Mm.eg.db, keys=ensembl_gene_id,  column="ENTREZID",keytype="ENSEMBL", multiVals="first")) %>% -->
+                                                                    <!--     ggplot(aes(x = log2FoldChange,  -->
+                                                                                          <!--                y = -log10(padj),  -->
+                                                                                          <!--                colour = as.factor(as.character(res)))) + -->
+                                                                    <!--     geom_point(alpha = 0.8, size =1.5) + -->
+                                                                    <!--     scale_colour_manual(values = DEColours) + theme_classic() +  -->
+                                                                    <!--     theme(legend.position = "none",  -->
+                                                                                     <!--           axis.title.y = element_text(size = 12)) + -->
+                                                                    <!--     geom_hline(yintercept = -log10(0.05), color = "grey60", size = 0.5, lty = "dashed") + -->
+                                                                    <!--     #geom_hline(yintercept = -log10(limma_results %>%  -->
+                                                                    <!--      #                                  dplyr::filter(Res.UPF3B_vs_Control != 0) %>%  -->
+                                                                    <!--       #                                 use_series(p.value.adj.UPF3B_vs_Control) %>% max),  -->
+                                                                    <!--        #        color = "black") + -->
+                                                                    <!--     labs(x = "Differential mRNA stability(log2 FoldChange)", y = "-log10 adj p-value") + -->
+                                                                    <!--     ggtitle("UPF3A OE vs. Control")  -->
+                                                                    <!-- ``` -->
+
+
+                                                                    <!-- ```{r} -->
+                                                                    <!-- my_gg = volc + geom_point_interactive(aes(tooltip = gene, data_id = gene),  -->
+                                                                                                                 <!--     size = 1, hover_nearest = TRUE) -->
+                                                                      <!-- girafe(ggobj = my_gg) -->
+                                                                      <!-- ``` -->
+
+                                                                      <!-- ### Comparison with DEGs -->
+
+                                                                      <!-- ```{r} -->
+                                                                      <!-- x= list( "DEG" = DEGenes$UPF3A_OE_UPF3B_KD_vs_Control$ensembl_gene_id,  -->
+                                                                                      <!--     "Differential stability" = res$ensembl_gene_id) -->
+
+                                                                        <!-- ggvenn(x[c(1,2)]) -->
+                                                                        <!-- ``` -->
+
+                                                                        <!-- ```{r} -->
+                                                                        <!-- res_sig = res[res$ensembl_gene_id %in% DEGenes$UPF3A_OE_UPF3B_KD_vs_Control$ensembl_gene_id,] -->
+
+                                                                          <!-- res_sig %>%  -->
+                                                                          <!--   dplyr::select(ensembl_gene_id, log2FoldChange) %>%  -->
+                                                                          <!--   left_join(DEGenes$UPF3A_OE_UPF3B_KD_vs_Control, by="ensembl_gene_id") %>%  -->
+                                                                          <!--   ggscatter(.,x="Coef.DoubleKD_vs_Control", y ="log2FoldChange", cor.coef = TRUE, add = "reg.line",  -->
+                                                                                             <!--               conf.int = TRUE, add.params = list(color = "blue", -->
+                                                                                                                                                     <!--                                                  fill = "lightgray")) +  -->
+                                                                          <!--     theme_bw() + xlab("UPF3 dKD vs Controls (DEG log2FC)") + ylab("UPF3 dKD vs Control RNA stability (log2FC)") -->
+
+                                                                          <!-- ``` -->
+
+
+                                                                          <!-- ```{r fig.cap="Distribution of log fold changes of RNA-stability results. The genes that were significantly destabilised/stabilised were overlaapped with DEGs from UPF3 dKD to Controls comparison and their distribution was plotted."} -->
+                                                                          <!-- res_sig %>% -->
+                                                                          <!--    ggplot(aes(x=log2FoldChange)) + -->
+                                                                          <!--     geom_histogram(data=dplyr::filter(res_sig,padj < 0.05), -->
+                                                                                                    <!--                  fill="#FF2759", alpha = 0.5)  + xlab("RNA stability (log2FC)") -->
+                                                                          <!-- ``` -->
+
+                                                                          <!-- ```{r fig.cap="Distribution of pvalue of RNA-stability results. The genes that were significantly destabilised/stabilised were overlaapped with DEGs from UPF3 dKD to Controls comparison and their pvalues were plotted to ensure significance of results"} -->
+                                                                          <!-- hist(res_sig$pvalue) -->
+                                                                          <!-- ``` -->
+
+                                                                          <!-- ```{r} -->
+                                                                          <!-- res_sig %>%  -->
+                                                                          <!--    left_join(DEGenes$DoubleKD_vs_Control %>%  -->
+                                                                                              <!--                dplyr::select(contains("UPF3A_OE_UPF3B_KD_vs_Control"), "ensembl_gene_id") -->
+                                                                                              <!--              , by="ensembl_gene_id") %>%  -->
+                                                                          <!--   dplyr::select("ensembl_gene_id","gene","log2FoldChange", "pvalue", "padj",  -->
+                                                                                                 <!--                 "Coef.UPF3A_OE_UPF3B_KD_vs_Control", "p.value.UPF3A_OE_UPF3B_KD_vs_Control",  -->
+                                                                                                 <!--                 "p.value.adj.UPF3A_OE_UPF3B_KD_vs_Control") %>% -->
+                                                                          <!--   dplyr::rename("RNA stability (log2FC)" = "log2FoldChange",  -->
+                                                                                                 <!--                 "RNA stability pvalue" = "pvalue",  -->
+                                                                                                 <!--                 "RNA stability adjp" = "padj",  -->
+                                                                                                 <!--                 "DEG (log2FC)" = "Coef.UPF3A_OE_UPF3B_KD_vs_Control",  -->
+                                                                                                 <!--                 "DEG (pvalue)" = "p.value.UPF3A_OE_UPF3B_KD_vs_Control",  -->
+                                                                                                 <!--                 "DEG (adjp)" = "p.value.adj.UPF3A_OE_UPF3B_KD_vs_Control") %>% -->
+                                                                          <!--    DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
+                                                                                                  <!--             options = list(scrollX = TRUE,  -->
+                                                                                                                                    <!--                            scrollCollapse = TRUE,  -->
+                                                                                                                                    <!--                            pageLength = 5, autoWidth = TRUE,  -->
+                                                                                                                                    <!--                            dom = 'Blfrtip', -->
+                                                                                                                                    <!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
+                                                                                                                                    <!--                            lengthMenu = list(c(10,25,50,-1), -->
+                                                                                                                                                                                        <!--                                              c(10,25,50,"All")))) -->
+
+                                                                          <!-- ``` -->
+
+
+
+
+
+
+                                                                          <!-- # ```{r} -->
+                                                                          <!-- # dim(linear.models.coef.table) -->
+                                                                          <!-- #  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # match = linear.models.coef.table[linear.models.coef.table$GeneID %in%DEGenes$UPF3B_vs_Control$ensembl_gene_id,] -->
+                                                                          <!-- #  -->
+                                                                          <!-- # match %>%  -->
+                                                                          <!-- #   dplyr::select(GeneID, Estimate) %>%  -->
+                                                                          <!-- #   dplyr::rename("ensembl_gene_id" = "GeneID") %>% -->
+                                                                          <!-- #   left_join(DEGenes$UPF3B_vs_Control, by="ensembl_gene_id") %>%  -->
+                                                                          <!-- #   ggscatter(.,x="Coef.UPF3B_vs_Control", y ="Estimate", cor.coef = TRUE, add = "reg.line",  -->
+                                                                          <!-- #               conf.int = TRUE, add.params = list(color = "blue", -->
+                                                                          <!-- #                                                  fill = "lightgray")) +  -->
+                                                                          <!-- #     theme_bw()  -->
+                                                                          <!-- # ``` -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ```{r} -->
+                                                                          <!-- # match  %>% -->
+                                                                          <!-- #     ggplot(aes(x=Estimate)) + -->
+                                                                          <!-- #     geom_density( -->
+                                                                          <!-- #                  fill="#FF2759", alpha = 0.5) -->
+                                                                          <!-- # ``` -->
+                                                                          <!-- #  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ```{r} -->
+                                                                          <!-- # ## Code adapted from REMBRANDTS source code  -->
+                                                                          <!-- # jobid="NMD_analysis" -->
+                                                                          <!-- # metadata="/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/data/data2.txt" -->
+                                                                          <!-- # refdir="/home/neuro/Documents/NMD_analysis/Analysis/Results/EISA" -->
+                                                                          <!-- # stringency=0.99 -->
+                                                                          <!-- # fitMode="linear" -->
+                                                                          <!-- #  -->
+                                                                          <!-- # args <- commandArgs(trailingOnly = TRUE) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # jobID <- jobid -->
+                                                                          <!-- # tablePath <- metadata -->
+                                                                          <!-- # inputFolder <- refdir -->
+                                                                          <!-- #  -->
+                                                                          <!-- # path= getwd() -->
+                                                                          <!-- #  -->
+                                                                          <!-- # outputFolder <- file.path(path, "tmp") -->
+                                                                          <!-- #  -->
+                                                                          <!-- # sampleTable <- read.csv(tablePath, sep=",") -->
+                                                                          <!-- #  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # dir.create(outputFolder) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ``` -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ```{r} -->
+                                                                          <!-- # for( readType in c("exonic","intronic") ) -->
+                                                                          <!-- # { -->
+                                                                          <!-- # 	print( paste("Analyzing ", readType, " reads ...", sep="") ) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 	for( batch in 1:max(sampleTable$Batch) ) -->
+                                                                          <!-- # 	{ -->
+                                                                          <!-- # 		print( paste("Analyzing batch ", batch, sep="") ) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 		cds <- DESeqDataSetFromHTSeqCount( # omits special rows from htseq-count -->
+                                                                          <!-- # 		    sampleTable = sampleTable[sampleTable$Batch==batch & sampleTable$ReadType==readType,], -->
+                                                                          <!-- # 		    directory = inputFolder, -->
+                                                                          <!-- # 		    design = ~ 1 # required parameter -->
+                                                                          <!-- # 		) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 		# estimate size factors, dispersions, and perform VST -->
+                                                                          <!-- # 		vsd <- vst(object = cds, blind = T) -->
+                                                                          <!-- #  -->
+                                                                          <!-- #     normalized <- assay(vsd) -->
+                                                                          <!-- # 		normalized <- normalized[apply(normalized,1,sd)>0,] # remove genes that have zero reads all across the samples -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 		write.table( -->
+                                                                          <!-- # 			normalized, -->
+                                                                          <!-- # 			paste(outputFolder,"/vsd_normalized.",readType,".batch",batch,".mx.txt",sep=""), -->
+                                                                          <!-- # 			quote=F, sep="\t") -->
+                                                                          <!-- #  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 		if( batch == 1 ) -->
+                                                                          <!-- # 			all_normalized <- normalized -->
+                                                                          <!-- # 		else -->
+                                                                          <!-- # 			all_normalized <- cbind( all_normalized, -->
+                                                                          <!-- # 			   normalized[ match( rownames(all_normalized), rownames(normalized) ), ] ) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 		# transform the normalized values, by first centering the columns (mean=0), and then subtracting row medians -->
+                                                                          <!-- # 		centered <- t(apply(scale(normalized,scale=F), 1, function(y) y - median(y,na.rm=T) )) -->
+                                                                          <!-- # 		write.table( -->
+                                                                          <!-- # 			centered, -->
+                                                                          <!-- # 			paste(outputFolder,"/vsd_normalized.",readType,".batch",batch,".centered.mx.txt",sep=""), -->
+                                                                          <!-- # 			quote=F, sep="\t" ) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 		if( batch == 1 ) -->
+                                                                          <!-- # 			all_centered <- centered -->
+                                                                          <!-- # 		else -->
+                                                                          <!-- # 			all_centered <- cbind( all_centered, -->
+                                                                          <!-- # 			   centered[ match( rownames(all_centered), rownames(centered) ), ] ) -->
+                                                                          <!-- # 	} -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 	all_normalized <- all_normalized[ apply(all_normalized,1,function(x) (sum(is.na(x))==0) ) , ] -->
+                                                                          <!-- # 	write.table( -->
+                                                                          <!-- # 		rownames_to_column(as.data.frame(all_normalized), var = 'GeneID'), -->
+                                                                          <!-- # 		paste(outputFolder,"/vsd_normalized.",readType,".all.mx.txt",sep=""), -->
+                                                                          <!-- # 		quote=F, sep="\t", append=FALSE ) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 	all_centered <- all_centered[ apply(all_centered,1,function(x) (sum(is.na(x))==0) ) , ] -->
+                                                                          <!-- # 	write.table( -->
+                                                                          <!-- # 		rownames_to_column(as.data.frame(all_centered), var = 'GeneID'), -->
+                                                                          <!-- # 		paste(outputFolder,"/vsd_normalized.",readType,".all.centered.mx.txt",sep=""), -->
+                                                                          <!-- # 		quote=F, sep="\t", append=FALSE ) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 	mat = 1 - cor( all_centered, use="na.or.complete", method="pearson" ) -->
+                                                                          <!-- # 	width  <- ncol(mat) * 36.9 + 231 -->
+                                                                          <!-- # 	height <- nrow(mat) * 36.9 + 231 -->
+                                                                          <!-- # 	pdf(file=paste(outputFolder,"/vsd_normalized.",readType,".all.centered.correl.heatmap.pdf",sep=""), -->
+                                                                          <!-- # 		width=8,height=8) -->
+                                                                          <!-- # 	heatmap.2(mat, trace="none", margin=c(13, 13),breaks=seq(0,2,length.out=256),col=colorRampPalette(c("red","white","blue"))(255), key.title=NA, key.xlab="Pearson distance", density.info="none", key.ylab=NA) -->
+                                                                          <!-- # dev.off() -->
+                                                                          <!-- # } -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ``` -->
+                                                                          <!-- #  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ```{r} -->
+                                                                          <!-- # ########### read the exon and intron centered normalized reads, and the total read counts -->
+                                                                          <!-- #  -->
+                                                                          <!-- # exon <- read.csv(paste(outputFolder,"/vsd_normalized.exonic.all.centered.mx.txt",sep=""),sep="\t") -->
+                                                                          <!-- # nSample <- ncol(exon)-1 -->
+                                                                          <!-- # exonRawCounts <- read.csv(paste(outputFolder,"/vsd_normalized.exonic.all.mx.txt",sep=""),sep="\t") -->
+                                                                          <!-- # if( nSample != ncol(exonRawCounts)-1 ) -->
+                                                                          <!-- #   print("Error: unequal sample numbers") -->
+                                                                          <!-- # intron <- read.csv(paste(outputFolder,"/vsd_normalized.intronic.all.centered.mx.txt",sep=""),sep="\t") -->
+                                                                          <!-- # if( nSample != ncol(intron)-1 ) -->
+                                                                          <!-- #   print("Error: unequal sample numbers") -->
+                                                                          <!-- # intronRawCounts <- read.csv(paste(outputFolder,"/vsd_normalized.intronic.all.mx.txt",sep=""),sep="\t") -->
+                                                                          <!-- # if( nSample != ncol(intronRawCounts)-1 ) -->
+                                                                          <!-- #   print("Error: unequal sample numbers") -->
+                                                                          <!-- # ``` -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ```{r} -->
+                                                                          <!-- # ########### calculate the median counts, and merge all relevant data -->
+                                                                          <!-- #  -->
+                                                                          <!-- # exonRawCounts$MedianExon <- apply(exonRawCounts[,2:ncol(exonRawCounts)],1,median) -->
+                                                                          <!-- # intronRawCounts$MedianIntron <- apply(intronRawCounts[,2:ncol(intronRawCounts)],1,median) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # merged <- merge(exon,intron,by="GeneID", suffixes = c('.exon', '.intron')) -->
+                                                                          <!-- # merged <- merge( merged, exonRawCounts[,c(1,ncol(exonRawCounts))],by="GeneID") -->
+                                                                          <!-- # merged <- merge( merged, intronRawCounts[,c(1,ncol(intronRawCounts))],by="GeneID") -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ########### optimize the total read count threshold so as to maximize correlation between exon and intron fold-changes -->
+                                                                          <!-- #  -->
+                                                                          <!-- # print( paste( "Optimizing read count cutoff at stringency ", stringency, " ...", sep="" ) ) -->
+                                                                          <!-- # correl_all <- cor( -->
+                                                                          <!-- # 	unlist(merged[ , 2:(nSample+1)]), -->
+                                                                          <!-- # 	unlist(merged[ , (nSample+2):(2*nSample+1)]) ) -->
+                                                                          <!-- # print( paste( "Total correlation is ", correl_all, sep="" ) ) -->
+                                                                          <!-- # print( paste( "Total number of genes is ", nrow(merged), sep="" ) ) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # correl_max <- -10 -->
+                                                                          <!-- # cutoff_table <- data.frame(matrix(c(Inf,0,NA),nrow=1,ncol=3,dimnames=list("",c("Threshold","NumGenes","Correlation")))) -->
+                                                                          <!-- # cutoffs <- quantile( c(merged$MedianIntron, merged$MedianExon), probs = seq( 1, 0, -0.01 ) ) -->
+                                                                          <!-- # for( i in cutoffs ) -->
+                                                                          <!-- # 	if( sum(merged$MedianIntron > i & merged$MedianExon > i) > 2000 ) -->
+                                                                          <!-- # 	{ -->
+                                                                          <!-- # 		correl <- cor( -->
+                                                                          <!-- # 			unlist(merged[ merged$MedianIntron > i & merged$MedianExon > i , 2:(nSample+1)]), -->
+                                                                          <!-- # 			unlist(merged[ merged$MedianIntron > i & merged$MedianExon > i, (nSample+2):(2*nSample+1)]) ) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 		if( correl_max < correl ) -->
+                                                                          <!-- # 			correl_max <- correl -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 		if( correl >= (correl_max-correl_all)*stringency + correl_all ) -->
+                                                                          <!-- # 			threshold <- i -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 		cutoff_table <- rbind( cutoff_table, c( i, sum( merged$MedianIntron > i & merged$MedianExon > i), correl ) ); -->
+                                                                          <!-- # 	} -->
+                                                                          <!-- #  -->
+                                                                          <!-- # print( paste( "Maximum correlation is ", correl_max, sep="" ) ) -->
+                                                                          <!-- # print( paste( "Selected threshold is ", threshold, sep="" ) ) -->
+                                                                          <!-- # print( paste( "Number of remaining genes is ", sum(merged$MedianIntron > threshold & merged$MedianExon > threshold), sep="" ) ) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ########### Filter the data to include only genes that pass the read count cutoff, and create a scatterplot -->
+                                                                          <!-- #  -->
+                                                                          <!-- # # the filtered exon counts -->
+                                                                          <!-- # y <- unlist(merged[ merged$MedianIntron > threshold & merged$MedianExon > threshold, 2:(nSample+1)]) -->
+                                                                          <!-- # # the filtered intron counts -->
+                                                                          <!-- # x <- unlist(merged[ merged$MedianIntron > threshold & merged$MedianExon > threshold, (nSample+2):(2*nSample+1)]) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # pdf(file=paste(outputFolder,"/scatterplot.pdf",sep=""), -->
+                                                                          <!-- # 	width=3.00,height=3.50) -->
+                                                                          <!-- # smoothScatter( x, y, colramp=colorRampPalette(c( "white", "red", "black" ) ), nbin=400, nrpoints=0, xlab="Log2 fold-change of intronic reads", ylab="Log2 fold-change of exonic reads" ) -->
+                                                                          <!-- # lines( c(-10,+10), c(0,0), lty=3 ) -->
+                                                                          <!-- # lines( c(0,0), c(-10,+10), lty=3 ) -->
+                                                                          <!-- # dev.off() -->
+                                                                          <!-- # ########### Now perform bias removal -->
+                                                                          <!-- #  -->
+                                                                          <!-- # # The intron counts represent the effect of transcriptional changes -->
+                                                                          <!-- # # The exon counts represent the combined effect of transcriptional and post-transcriptional changes -->
+                                                                          <!-- # # Model the exon-intron counts as a function of intron counts, so that by subtracting the fitted values -->
+                                                                          <!-- # # only the effect of post-transcriptional regulation remains -->
+                                                                          <!-- #  -->
+                                                                          <!-- # # create a copy of exon counts -->
+                                                                          <!-- # exon.counts <- merged[ merged$MedianIntron > threshold & merged$MedianExon > threshold, 1:(nSample+1)] -->
+                                                                          <!-- # # plot the similarity heatmap for exon counts -->
+                                                                          <!-- # sim <- cor(as.matrix(exon.counts[,2:(nSample+1)])) -->
+                                                                          <!-- # width  <- ncol(sim) * 36.9 + 231 -->
+                                                                          <!-- # height <- nrow(sim) * 36.9 + 231 -->
+                                                                          <!-- # pdf(file=paste(outputFolder,"/exonic.filtered.correl.heatmap.pdf",sep=""), -->
+                                                                          <!-- # 	width=8,height=8) -->
+                                                                          <!-- # exonHeatmap <- heatmap.2(sim, distfun=function(x) as.dist(1-x), trace="none", margin=c(10, 10),symm=T,revC=T,breaks=seq(-1,1,length.out=256),col=colorRampPalette(c("blue","white","red"))(255), key.title=NA, key.xlab="Pearson correlation", density.info="none", key.ylab=NA, keysize=0.85) -->
+                                                                          <!-- # dev.off() -->
+                                                                          <!-- # # create a copy of intron counts -->
+                                                                          <!-- # intron.counts <- merged[ merged$MedianIntron > threshold & merged$MedianExon > threshold, c(1,(nSample+2):(2*nSample+1))] -->
+                                                                          <!-- # intron.counts.MedianIntron <- merged[ merged$MedianIntron > threshold & merged$MedianExon > threshold, 'MedianIntron'] # need this to estimate bias using neighborhood method -->
+                                                                          <!-- # # plot the similarity heatmap for intron counts -->
+                                                                          <!-- # sim <- cor(as.matrix(intron.counts[,2:(nSample+1)])) -->
+                                                                          <!-- # width  <- ncol(sim) * 36.9 + 231 -->
+                                                                          <!-- # height <- nrow(sim) * 36.9 + 231 -->
+                                                                          <!-- # pdf(file=paste(outputFolder,"/intronic.filtered.correl.heatmap.pdf",sep=""), -->
+                                                                          <!-- # 	width=8,height=8) -->
+                                                                          <!-- # heatmap.2(sim, Rowv=exonHeatmap$rowDendrogram, Colv=exonHeatmap$colDendrogram, distfun=function(x) as.dist(1-x), trace="none", margin=c(10, 10),symm=T,revC=F,breaks=seq(-1,1,length.out=256),col=colorRampPalette(c("blue","white","red"))(255), key.title=NA, key.xlab="Pearson correlation", density.info="none", key.ylab=NA, keysize=0.85) -->
+                                                                          <!-- # dev.off() -->
+                                                                          <!-- # # gene-by-gene, deconvolute the PTR effect -->
+                                                                          <!-- # intron.counts.sd <- apply(intron.counts[ , -1], 1, sd) # gene variation in transcription -->
+                                                                          <!-- # diffTxIdx <- which(intron.counts.sd > quantile(intron.counts.sd, 0.25)) # diff transcribed gene indices -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ptr <- ptr2 <- exon.counts -->
+                                                                          <!-- # colnames(ptr) <- colnames(ptr2) <- gsub('\\.exon$', '', colnames(ptr)) -->
+                                                                          <!-- # nGenes <- nrow(exon.counts) -->
+                                                                          <!-- # biast <- biast2 <- rep(NA_real_, nGenes) -->
+                                                                          <!-- # for( i in 1:nGenes ) -->
+                                                                          <!-- # { -->
+                                                                          <!-- #     # adjust bias using information from gene i -->
+                                                                          <!-- #     yi <- unlist(exon.counts[i,2:(nSample+1)] - intron.counts[i,2:(nSample+1)]) -->
+                                                                          <!-- #     xi <- unlist(intron.counts[i,2:(nSample+1)]) -->
+                                                                          <!-- #     if( fitMode == "linear" ) -->
+                                                                          <!-- #         lfit <- glm( yi ~ xi ) -->
+                                                                          <!-- #     else -->
+                                                                          <!-- #     { -->
+                                                                          <!-- #         print("ERROR: Fit mode not recognized.") -->
+                                                                          <!-- #         quit(status=1) -->
+                                                                          <!-- #     } -->
+                                                                          <!-- #  -->
+                                                                          <!-- #     ptr[i,2:(nSample+1)] = yi - fitted(lfit) -->
+                                                                          <!-- #     biast[i] <- coef(lfit)['xi'] -->
+                                                                          <!-- #  -->
+                                                                          <!-- #     # adjust bias using information from neighbourhood of gene i -->
+                                                                          <!-- #     # useful for experimental designs with less biological heterogeneity -->
+                                                                          <!-- #     # assumes most genes are not diff stabilized -->
+                                                                          <!-- #     gene.neighbours <- order( -->
+                                                                          <!-- #         abs(intron.counts.MedianIntron[i] - intron.counts.MedianIntron), -->
+                                                                          <!-- #         decreasing = F -->
+                                                                          <!-- #     ) -->
+                                                                          <!-- #  -->
+                                                                          <!-- #     gene.neighbours <- head(gene.neighbours[gene.neighbours %in% diffTxIdx], 100) # use 100 nearest genes based on median abundance -->
+                                                                          <!-- #  -->
+                                                                          <!-- #     y <- unlist(exon.counts[gene.neighbours,2:(nSample+1)] - intron.counts[gene.neighbours,2:(nSample+1)]) -->
+                                                                          <!-- #     x <- unlist(intron.counts[gene.neighbours,2:(nSample+1)]) -->
+                                                                          <!-- #     if( fitMode == "linear" ) -->
+                                                                          <!-- #         lfit <- glm( y ~ x ) -->
+                                                                          <!-- #     else -->
+                                                                          <!-- #     { -->
+                                                                          <!-- #         print("ERROR: Fit mode not recognized.") -->
+                                                                          <!-- #         quit(status=1) -->
+                                                                          <!-- #     } -->
+                                                                          <!-- #  -->
+                                                                          <!-- #     ptr2[i,2:(nSample+1)] = yi - predict(lfit, newdata = data.frame(x = xi), type = 'response') -->
+                                                                          <!-- #     biast2[i] <- coef(lfit)['x'] -->
+                                                                          <!-- #  -->
+                                                                          <!-- #     #	print(i) -->
+                                                                          <!-- # } -->
+                                                                          <!-- #  -->
+                                                                          <!-- # pdf(file=paste(outputFolder,"/perGene_bias_vs_accrossGenes_(experimental).pdf",sep=""), -->
+                                                                          <!-- #      width=300,height=350) -->
+                                                                          <!-- # smoothScatter( biast, biast2, colramp=colorRampPalette(c( "white", "red", "black" ) ), nbin=400, nrpoints=0, xlab="per gene", ylab="across genes" ) -->
+                                                                          <!-- # lines( c(-1,+1), c(0,0), lty=3 ) -->
+                                                                          <!-- # lines( c(0,0), c(-1,+1), lty=3 ) -->
+                                                                          <!-- # dev.off() -->
+                                                                          <!-- # # save.image('~/Documents/book_chapter/remb.RData') -->
+                                                                          <!-- #  -->
+                                                                          <!-- # # draw the sample-specific scatterplots -->
+                                                                          <!-- # for( i in 2:(nSample+1) ) -->
+                                                                          <!-- # { -->
+                                                                          <!-- # 	pdf(file=paste(outputFolder,"/scatterplot.",colnames(exon.counts)[i],".pdf",sep=""), -->
+                                                                          <!-- # 		width=7,height=8) -->
+                                                                          <!-- # 	par(mfrow=c(1,2)) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 	xlim <- quantile( intron.counts[,i], probs=c(0.005,0.995) ) -->
+                                                                          <!-- # 	ylim <- quantile( exon.counts[,i]-intron.counts[,i], probs=c(0.005,0.995) ) -->
+                                                                          <!-- # 	# draw the scatterplot for exon-intron vs. intron -->
+                                                                          <!-- # 	smoothScatter( intron.counts[,i], exon.counts[,i]-intron.counts[,i], nbin=400, nrpoints=0, xlim=xlim,ylim=ylim, xlab="Δintron", ylab="Δexon–Δintron" ) -->
+                                                                          <!-- # 	sorting <- order(intron.counts[,i]) -->
+                                                                          <!-- # 	lines(xlim,c(0,0),col="blue") -->
+                                                                          <!-- # 	lines(c(0,0),ylim,col="blue") -->
+                                                                          <!-- # 	lfit <- loess( exon.counts[,i]-intron.counts[,i] ~ intron.counts[,i], family="gaussian", span=1, degree=1 ) -->
+                                                                          <!-- # 	#lines(intron.counts[sorting,i],lfit$fitted[sorting],col="black") -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 	# draw the scatterplot for bias-removed ptr vs. intron -->
+                                                                          <!-- # 	smoothScatter( intron.counts[,i], ptr[,i], nbin=400, nrpoints=0, xlim=xlim,ylim=ylim, xlab="Δintron", ylab="unbiased Δexon–Δintron" ) -->
+                                                                          <!-- # 	lines(xlim,c(0,0),col="blue") -->
+                                                                          <!-- # 	lines(c(0,0),ylim,col="blue") -->
+                                                                          <!-- # 	lfit <- loess( ptr[,i] ~ intron.counts[,i], family="gaussian", span=1, degree=1 ) -->
+                                                                          <!-- # 	#lines(intron.counts[sorting,i],lfit$fitted[sorting],col="black") -->
+                                                                          <!-- #  -->
+                                                                          <!-- # 	dev.off() -->
+                                                                          <!-- # } -->
+                                                                          <!-- #  -->
+                                                                          <!-- # # plot the similarity heatmap for deconvoluted PTR matrix -->
+                                                                          <!-- # sim <- cor(as.matrix(ptr[,2:(nSample+1)])) -->
+                                                                          <!-- # width  <- ncol(sim) * 36.9 + 231 -->
+                                                                          <!-- # height <- nrow(sim) * 36.9 + 231 -->
+                                                                          <!-- # pdf(file=paste(outputFolder,"/stability.filtered.correl.heatmap.pdf",sep=""), -->
+                                                                          <!-- # 	width=8,height=8) -->
+                                                                          <!-- # heatmap.2(sim, Rowv=exonHeatmap$rowDendrogram, Colv=exonHeatmap$colDendrogram, distfun=function(x) as.dist(1-x), trace="none", margin=c(10, 10),symm=T,revC=F,breaks=seq(-1,1,length.out=256),col=colorRampPalette(c("blue","white","red"))(255), key.title=NA, key.xlab="Pearson correlation", density.info="none", key.ylab=NA, keysize=0.85) -->
+                                                                          <!-- # dev.off() -->
+                                                                          <!-- # # write the tables -->
+                                                                          <!-- # write.table(cutoff_table,paste(outputFolder,"/cutoff.txt",sep=""),sep="\t",quote=F,row.names=F) -->
+                                                                          <!-- # write.table(exon.counts,paste(outputFolder,"/exonic.filtered.mx.txt",sep=""),sep="\t",quote=F,row.names=F) -->
+                                                                          <!-- # write.table(intron.counts,paste(outputFolder,"/intronic.filtered.mx.txt",sep=""),sep="\t",quote=F,row.names=F) -->
+                                                                          <!-- # write.table(ptr,paste(outputFolder,"/stability.filtered.mx.txt",sep=""),sep="\t",quote=F,row.names=F) -->
+                                                                          <!-- # write.table(ptr2,paste(outputFolder,"/stability.filtered.mx_(experimental).txt",sep=""),sep="\t",quote=F,row.names=F) -->
+                                                                          <!-- # ``` -->
+                                                                          <!-- #  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ```{r} -->
+                                                                          <!-- # #ds = read.table("output/EISA/stability.filtered.mx.txt", header=TRUE, row.names = 1) -->
+                                                                          <!-- # rownames(ptr) = NULL -->
+                                                                          <!-- # ds = ptr %>% as.data.frame() %>%  -->
+                                                                          <!-- #   column_to_rownames("GeneID") -->
+                                                                          <!-- # colnames(ds) = c(212:229) -->
+                                                                          <!-- # md = read.table("data/LTK_Sample Metafile_V3.txt", header= TRUE)  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # str(ds, strict.width = 'cut') -->
+                                                                          <!-- #  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ``` -->
+                                                                          <!-- #  -->
+                                                                          <!-- #  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ```{r} -->
+                                                                          <!-- # ## UPF3B and controls  -->
+                                                                          <!-- # temp.md = md %>%  -->
+                                                                          <!-- #   dplyr::filter(Group == "UPF3B_KD" | Group == "Control") -->
+                                                                          <!-- #  -->
+                                                                          <!-- # levels(temp.md$Group) = droplevels(temp.md$Group) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # temp.ds = intersect(colnames(ds), temp.md$Sample) -->
+                                                                          <!-- # temp.ds= ds[,temp.ds] -->
+                                                                          <!-- #  -->
+                                                                          <!-- # all(colnames(temp.ds) == temp.md$Sample) -->
+                                                                          <!-- # ``` -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ```{r} -->
+                                                                          <!-- # linear.models = lm(formula = t(temp.ds) ~ temp.md$Group,  -->
+                                                                          <!-- #                    data = temp.ds) -->
+                                                                          <!-- # ``` -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ```{r} -->
+                                                                          <!-- # linear.models.summaries <- summary(object = linear.models)  -->
+                                                                          <!-- # linear.models.coef <- coef(object = linear.models.summaries) -->
+                                                                          <!-- # ``` -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ```{r} -->
+                                                                          <!-- # linear.models.coef.table <- lapply( X = linear.models.coef,FUN = function(x) -->
+                                                                          <!-- #   as.data.table(x['temp.md$GroupUPF3B_KD', , drop = F])) -->
+                                                                          <!-- #  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # linear.models.coef.table <- rbindlist(l = linear.models.coef.table, idcol = "GeneID") -->
+                                                                          <!-- #  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # linear.models.coef.table %<>%  -->
+                                                                          <!-- #   as.data.frame() %>%  -->
+                                                                          <!-- #   dplyr::rename('pvalue' = `Pr(>|t|)`) %>%  -->
+                                                                          <!-- #   mutate_at(.vars = "GeneID", .funs = gsub, pattern = "^Response ", replacement = "") %>% -->
+                                                                          <!-- #   mutate(FDR= p.adjust(p= pvalue, method = "fdr")) %>%  -->
+                                                                          <!-- #   mutate(gene = mapIds(org.Mm.eg.db, keys=GeneID,  column="SYMBOL",keytype="ENSEMBL", multiVals="first"),  -->
+                                                                          <!-- #            entrez = mapIds(org.Mm.eg.db, keys=GeneID,  column="ENTREZID",keytype="ENSEMBL", multiVals="first")) -->
+                                                                          <!-- #    -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ###  estimate valye > 0 indicates increased gene stability in UPF3B KD < 0 means decreased stability  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # str(linear.models.coef.table, strict.width = "cut") -->
+                                                                          <!-- # ``` -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ## Check distribution of significant changes  -->
+                                                                          <!-- # ```{r} -->
+                                                                          <!-- # linear.models.coef.table %>% -->
+                                                                          <!-- #     ggplot(aes(x=Estimate)) + -->
+                                                                          <!-- #     geom_density(data=dplyr::filter(linear.models.coef.table,FDR < 0.05), -->
+                                                                          <!-- #                  fill="#FF2759", alpha = 0.5) -->
+                                                                          <!-- #  -->
+                                                                          <!-- # linear.models.coef.table %>% -->
+                                                                          <!-- #   dplyr::filter(FDR < 0.05 & Estimate < 0)  -->
+                                                                          <!-- #  -->
+                                                                          <!-- # ``` -->
+

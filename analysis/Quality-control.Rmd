@@ -4,11 +4,6 @@ author: "unawaz1996"
 date: "2023-03-14"
 output:
   pdf_document: default
-  workflowr::wflow_html:
-    code_folding: hide
-  html_notebook: default
-editor_options:
-  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -20,9 +15,6 @@ knitr::opts_chunk$set(
 	message = FALSE
 )
 ```
-
-
-
 
 ## Set-up
 
@@ -41,7 +33,7 @@ library(naniar)
 twoCols <- c(rgb(0.8, 0.1, 0.1), rgb(0.2, 0.2, 0.8))
 ```
 
-In order to perform QC, an EnsDB object was obtained using the `AnnotationHub` package. This provided the GC content and length for each of the transcripts contained in the release. 
+In order to perform QC, an EnsDB object was obtained using the `AnnotationHub` package. This provided the GC content and length for each of the transcripts contained in the release.
 
 ```{r}
 ah <- AnnotationHub() %>%
@@ -80,7 +72,7 @@ mcols(genesGR) <- mcols(genesGR) %>%
         )
       ) %>%
       group_by(gene_id) %>%
-      summarise(
+     dplyr::summarise(
         n_tx = n(),
         longest_tx = max(tx_len),
         ave_tx_len = mean(tx_len),
@@ -119,11 +111,10 @@ txdf = transcripts(EnsDb.Mmusculus.v79, return.type="DataFrame")
 tx2gene = as.data.frame(txdf[,c("tx_id","gene_id", "tx_biotype")])
 ```
 
-
-Metadata for each fastq file was also loaded. Reads were provided as paired-end reads, with n = 3 samples for each genotype. 
+Metadata for each fastq file was also loaded. Reads were provided as paired-end reads, with n = 3 samples for each genotype.
 
 ```{r load-md}
-salmon.files = ("/home/neuro/Documents/neurogenetics/alignments/Illumina/RNAseq/mouse/LJ_LTK/Salmon/GR39m_decoy_aware")
+salmon.files = ("/home/neuro/Documents/NMD_analysis/Analysis/Results/Salmon")
 salmon = list.files(salmon.files, pattern = "transcripts$", full.names = TRUE)
 all_files = file.path(salmon, "quant.sf")
 names(all_files) <- paste(c(212:229))
@@ -134,7 +125,6 @@ comparisons = unique(md$Group)[-1]
 md$names = as.character(md$names)
 ```
 
-
 ```{r}
 group_cols <- hcl.colors(
   n = length(unique(md$Group)), 
@@ -143,8 +133,7 @@ group_cols <- hcl.colors(
   setNames(unique(md$Group))
 ```
 
-
-# FastQC summary 
+# FastQC summary
 
 ```{r load-fastqc}
 rawFqc <- list.files(
@@ -160,10 +149,7 @@ trmdFqc <- list.files(
     FastqcDataList()
 ```
 
-
-
-
-## FastQC summary 
+## FastQC summary
 
 ```{r fastq-summary, fig.height=10, fig.width=6, fig.cap="*Basic statistics summary plot. Figure (a) hsows the summary of the PASS/FAIl flags prior to base quality and adapter trimming. Figure (b) shows the summary of PASS/FAIL flags after quality trimming with trimgalore. Green: PASS; Yellow: FAIL; Red: WARN *"}
 sum_raw = plotSummary(rawFqc)
@@ -206,13 +192,11 @@ grid.arrange(raw_reads, trmd_reads, nrow=2)
 
 ```
 
-
-
-## GC content 
+## GC content
 
 In poly(A) selected RNA-seq library preparation methods, the nonuniform coverage of transcripts is a prevalent issue. As poly(A) tail only occurs at the 3' end of the mRNA, this can usually result in an over-representation of the 3' end. Bias at the 5′ end of RNA can also happen because of various factors, such as the fragmentation method (the 5′ end of RNA is more stable), reverse transcription from RNA to cDNA and strand-oriented library construction protocol.
 
-GC content allows the exploration of the sequencing coverage and can indicate issues in overrepresentation. It has been observed that either high or low GC content will result in lower depth coverage. 
+GC content allows the exploration of the sequencing coverage and can indicate issues in overrepresentation. It has been observed that either high or low GC content will result in lower depth coverage.
 
 ```{r}
 gcPlots <- list(
@@ -230,6 +214,7 @@ gcPlots <- list(
    )
 )
 lg <- get_legend(gcPlots$r2 + theme(legend.position = "bottom"))
+pdf(file ="output/QC/Thesis_figures/Transcript_GC.pdf", width = 7.52, height = 5.83)
 plot_grid(
    plot_grid(
        r1 = gcPlots$r1 +
@@ -243,10 +228,29 @@ plot_grid(
    nrow = 2,
    rel_heights = c(5,2)
 )
+dev.off
 
 ```
 
-## Trimmed data 
+### Per base sequence quality
+```{r}
+
+pbsQ_all = plotBaseQuals(rawFqc)
+pbsQ_sample = plotSeqQuals(rawFqc[[1]])
+ggsave(filename = "output/QC/Thesis_figures/pbqS_all.svg", width = 7.52, height = 5.83, 
+       units = "in", plot=pbsQ_all)
+ggsave(filename = "output/QC/Thesis_figures/pbqS_sample.svg", width = 7.52, height = 5.83, 
+       units = "in", plot=pbsQ_sample)
+```
+
+### Per base sequence content 
+
+```{r}
+plotSeqContent(rawFqc[[1]])
+plotSeqContent(rawFqc)
+plotSeqContent(rawFqc[1:2], plotType = "line", nc = 1)
+```
+## Trimmed data
 
 ```{r}
 trimStats = readTotals(rawFqc) %>%
@@ -261,7 +265,6 @@ trimStats = readTotals(rawFqc) %>%
     )
 ```
 
-
 ```{r}
 reads %>%
   as.data.frame() %>% 
@@ -275,19 +278,16 @@ reads %>%
   pander(split.tables = Inf)
 ```
 
-
-After adapter trimming, < 1% of reads were discarded. 
-
+After adapter trimming, \< 1% of reads were discarded.
 
 # Aligned data - Salmon quantifications
 
-Counts were generated using Salmon. Briefly, an index was generated using the GRCm39 build of the mouse transcript with decoys.txt. Selective alignment mode was used. The reads were also aligned to the human genome to check for genotyping and to ensure no mislabeling occurred during any part of the bench work. Counts were imported as transcript-level and gene-level using `tximport` and `tximeta` respectively. 
+Counts were generated using Salmon. Briefly, an index was generated using the GRCm39 build of the mouse transcript with decoys.txt. Selective alignment mode was used. The reads were also aligned to the human genome to check for genotyping and to ensure no mislabeling occurred during any part of the bench work. Counts were imported as transcript-level and gene-level using `tximport` and `tximeta` respectively.
 
 Annotation data was loaded as an `EnsDb` object, using Ensembl resealse 107. Transcript level gene lengths and GC content was converted to gene level values using:
 
-* GC Content: The total GC content divided by the total length of transcripts 
-* Gene Length: The mean transcript length 
-
+-   GC Content: The total GC content divided by the total length of transcripts
+-   Gene Length: The mean transcript length
 
 ```{r transcrpt}
 indexDir = file.path("/home/neuro/Documents/NMD_analysis/Analysis/Genome/for_salmon/April_2023/decoy_awaresalmon_index/")
@@ -316,18 +316,18 @@ txi_genes =  tximport(all_files, type="salmon", txOut=FALSE,
 keep.genes = (rowSums(txi_genes$abundance >= .5 ) >= 3)
 ```
 
-## Genotype checking 
-
+## Genotype checking
 
 ```{r, fig.height = 6, fig.width=10, fig.cap="All samples demonstrated the expected expression patterns, no mislabeling was detected in the dataset."}
 group.labs <- c("Control", "UPF3A KD", "UPF3A OE", "UPF3B KD", "Double KD", "UPF3A OE, UPF3B KD")
 names(group.labs) <- unique(md$Group)
 
 
+
 upf3a = txi_genes$abundance["ENSMUSG00000038398",] %>% melt() %>%
    rownames_to_column("name") %>% cbind(md) %>%
    ggplot(aes(x=as.character(names), y= value)) +
-   geom_bar(stat="identity", width = 4, color = "black", alpha = 0.9) +
+   geom_bar(stat="identity", width = 4, color = "black",  fill = "#ef476f") +
    facet_grid(~Group, labeller = labeller(Group = group.labs) ) + ylab("tpm") + theme_bw() + xlab("") +
    scale_fill_manual(labels = c("UPF3A_KD_UPF3B_KD" = "Double KD", "UPF3A_KD" = "UPF3A KD",
                                  "UPF3B_KD" = "UPF3B KD", "UPF3A_OE" = "UPF3A OE",
@@ -336,7 +336,7 @@ upf3a = txi_genes$abundance["ENSMUSG00000038398",] %>% melt() %>%
 upf3b = txi_genes$abundance["ENSMUSG00000036572",] %>% melt() %>%
    rownames_to_column("sample") %>% cbind(md) %>%
     ggplot(aes(x=as.character(names), y= value)) +
-   geom_bar(stat="identity", width = 4, color = "black", alpha = 0.9) +
+   geom_bar(stat="identity", width = 4, color = "black", fill = "#1A144B") +
    facet_grid(~Group, labeller = labeller(Group = group.labs) ) + ylab("tpm") + theme_bw() + xlab("") +
    scale_fill_manual(labels = c("UPF3A_KD_UPF3B_KD" = "Double KD", "UPF3A_KD" = "UPF3A KD",
                                  "UPF3B_KD" = "UPF3B KD", "UPF3A_OE" = "UPF3A OE",
@@ -345,9 +345,16 @@ upf3b = txi_genes$abundance["ENSMUSG00000036572",] %>% melt() %>%
 
 grid.arrange(upf3a, upf3b)
 
+ggsave(filename="/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/upf3a-check.svg", 
+       plot = upf3a, height =4.98, width=10.33, units = "in")
+
+ggsave(filename="/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/upf3b-check.svg", 
+       plot = upf3b, height =4.98, width=10.33, units = "in")
+
+
 ```
 
-## Filtering 
+## Filtering
 
 ```{r fig.height=6, fig.width=6}
 exp_den_trans = log10(se@assays@data$abundance + 0.01) %>%
@@ -398,7 +405,6 @@ grid.arrange(exp_den,exp_den_filt, exp_den_trans, exp_den_filt_trans,
              ncol=2, nrow=2)
 ```
 
-
 ```{r transcript-level}
 dge = se@assays@data$counts[keep,] %>% 
   as.data.frame %>% 
@@ -408,7 +414,7 @@ dge = se@assays@data$counts[keep,] %>%
   pivot_longer(cols = all_of(md$names), names_to = "Mm", values_to = "count") %>% 
     left_join(trans2Gene) %>%
     group_by(Mm, gene_id) %>%
-    summarise(count = sum(count)) %>% 
+    dplyr::summarise(count = sum(count)) %>% 
   pivot_wider(names_from = "Mm", values_from = "count") %>% 
     dplyr::filter(grepl("ENSMUS", gene_id)) %>%
     as.data.frame() %>% 
@@ -423,7 +429,8 @@ dge$genes <- genesGR[rownames(dge)] %>%
   mcols()
 ```
 
-## Library size 
+## Library size
+
 ```{r}
 dge$samples %>% 
   mutate(lib.size = lib.size / 1e6) %>% 
@@ -438,7 +445,7 @@ dge$samples %>%
   ) + theme(legend.position = "none")
 ```
 
-## Counts assingment rate 
+## Counts assingment rate
 
 ```{r}
 trmdFqc %>% 
@@ -454,7 +461,7 @@ trmdFqc %>%
   labs(fill = "Group")
 ```
 
-## Total detected genes 
+## Total detected genes
 
 ```{r}
 dge$counts %>%
@@ -489,7 +496,6 @@ dge$counts %>%
 
 ## Transcript level exploration of data
 
-
 ```{r}
 ## Filtering threshold
 before =  se@assays@data$abundance %>% as.data.frame() %>%
@@ -520,7 +526,6 @@ biotypeCount <- df %>% dplyr::group_by(Filter) %>%
 
 ```
 
-
 ```{r fig.height=6, fig.width=6, fig.cap= "*Log10 of the mean TPMs (transcript per million) over all samples before and after filtering out low-expressed transcripts and genes*"}
 distribution = ggplot(df, aes(x = log10(rowMeans), col = Filter)) +
     geom_histogram(aes(y = ..density.., fill = Filter), alpha = 0.4, bins = 100) +
@@ -533,8 +538,6 @@ distribution
 #ggsave(plot = dist, file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/transcript-distribution.svg", 
  #      height = 4.29, width = 8.02, units = "in")
 ```
-
-
 
 ```{r fig.height=6, fig.width=6, fig.cap="*Violin plots showing the distribution of the number of transcripts per gene (in logarithmic scale). Violin width is scaled by the total number of observations while jittered points represent actual observations.*"}
 biocount = ggplot(subset(biotypeCount, frac >= 0.001), aes(x = as.factor(tx_biotype), y = frac, fill = Filter)) +
@@ -553,7 +556,6 @@ theme(strip.text = element_text(color = "white", face = "bold"))
  #      height = 4.05, width = 7.74, units = "in")
 ```
 
-
 ```{r  fig.height=6, fig.width=6, fig.cap="*Violin plots showing the distribution of the number of transcripts per gene (in logarithmic scale). Violin width is scaled by the total number of observations while jittered points represent actual observations.*"}
 gene_info =ggplot(ntxInfo, aes(x = Filter, y = log10(ntx))) +
     geom_violin(scale = "count", aes(fill = Filter)) +
@@ -566,11 +568,16 @@ gene_info =ggplot(ntxInfo, aes(x = Filter, y = log10(ntx))) +
 gene_info
 ```
 
-
-## PCA 
-
+## PCA
 
 ```{r transcript-pca}
+
+group_cols = c("#1A144B", "#ef476f", "#6F75B3", "#6f1d1b", 
+               "#F69677", "#FCCA8A") %>% 
+  set_names(c("UPF3B_KD", "UPF3A_KD", 
+              "UPF3A_KD_UPF3B_KD", "UPF3A_OE", 
+              "UPF3A_OE_UPF3B_KD", "Control"))
+
 pca = log(assays(se)$abundance[keep,] + 0.05) %>%
   t() %>% 
   prcomp(scale = TRUE)
@@ -598,8 +605,11 @@ trans_pca =  pca %>%
     colour = "Group",
     size = "Library Size\n(millions)"
   ) + theme_bw() + ggtitle("Transcript Level")
-```
 
+ggsave(filename="/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/trans-pca.svg", 
+       plot = trans_pca, height =5.98, width=6, units = "in")
+
+```
 
 ```{r fig.height = 7, fig.width=10, fig.cap="*Principal component analysis of gene (left) and transcript (right) level data. PCA was performed on log2 transformed TPMs after filtering for each respective datatype (gene and transcript level). Gene level PCA shows that all samples are clustering closely based on condition, with no impact of library size in PC1 and PC2. Transcript level PCA shows that samples are clustering close to their conditions based on PC1, however one of the samples of the UPF3A OE in UPF3B KD cell line (sample 223), seems to deviate from its condition group and the rest of the data, so needs to be further investigated*"}
 
@@ -628,16 +638,23 @@ gene_pca = pca_genes %>%
   labs(
     x = glue("PC1 ({percent(pca_genes$sdev[[1]]^2 / sum(pca_genes$sdev^2), 0.1)})"),
     y = glue("PC2 ({percent(pca_genes$sdev[[2]]^2 / sum(pca_genes$sdev^2), 0.1)})"),
-    colour = "Group",
+    colour = "Condition",
     size = "Library Size\n(millions)"
   ) + theme_bw()  + ggtitle("Gene Level")
 
-ggarrange(gene_pca, trans_pca , ncol=2,  common.legend = TRUE, legend="right")
+pca_all = ggarrange(gene_pca, trans_pca , ncol=2,  common.legend = TRUE, legend="right")
+
+gene_pca 
+ggsave(filename="/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/QC/Thesis_figures/PCA.svg", 
+       plot = pca_all, height =4.98, width=10.33, units = "in")
 
 
+
+ggsave(filename="/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/Gene-PCA.png", 
+       plot = gene_pca, height = 5, width=6, units = "in", dpi =1200)
 ```
 
-To check if the same variation is observed at PC3 in gene level: 
+To check if the same variation is observed at PC3 in gene level:
 
 ```{r fig.height = 4, fig.width=6, fig.cap= "*Principal component analysis of gene level data showing PC2 and PC3. Sample 223 seems to cluster away from its condition group in PC3*"}
 pca_genes %>% 
@@ -662,7 +679,7 @@ pca_genes %>%
 
 ```
 
-### Investigating the differences in samples at transcript level 
+### Investigating the differences in samples at transcript level
 
 ```{r}
 exp_upf3a_oe = log2(se@assays@data$abundance[keep,]+ 10^-6) %>% 
@@ -692,7 +709,7 @@ gcDev <- gc %>%
         getGC(gcTheoretical, "Mmusculus", "Trans")) %>%
     dplyr::rename(actual = Mmusculus) %>%
     mutate(res = Freq - actual) %>%
-    summarise(ss = sum(res^2), n = n()) %>%
+    dplyr::summarise(ss = sum(res^2), n = n()) %>%
     ungroup() %>%
     mutate(sd = sqrt(ss / (n - 1)))
 
@@ -700,7 +717,7 @@ rawGC <- gc %>%
     group_by(Filename) %>% 
     mutate(Freq = Count / sum(Count)) %>%
     dplyr::filter(GC_Content > 70) %>% 
-    summarise(Freq = sum(Freq)) %>% 
+    dplyr::summarise(Freq = sum(Freq)) %>% 
     arrange(desc(Freq)) %>%
      mutate(names = gsub("\\_.*", "", Filename)) %>% 
     left_join(md, by= "names") 
@@ -773,12 +790,13 @@ pca$x %>%
         type = "lower", 
         diag = FALSE, 
         addCoef.col = 1)
-```
 
+
+```
 
 Transcripts were divided in 10 approximately equal sized bins based on increasing length, and 10 approximately equal sized bins based on increasing GC content, with the final GC/Length bins being the combination 100 bins using both sets. The contribution of each gene to PC1 and PC2 was assessed and a t-test performed on each bin.
 
-If any bin makes a contribution to PC1 the mean will be clearly non-zero, whilst if there is no contribution the mean will be near zero. In this way, the impact of gene length and GC content on variance within the dataset can be assessed. 
+If any bin makes a contribution to PC1 the mean will be clearly non-zero, whilst if there is no contribution the mean will be near zero. In this way, the impact of gene length and GC content on variance within the dataset can be assessed.
 
 ```{r fig.cap="*Contribution of each GC/Length Bin to PC1 and PC2. Fill colours indicate the t-statistic, with tranparency denoting significance as -log10(p), using Bonferroni-adjusted p-values.*"}
 mcols(transGR) %>%
@@ -811,7 +829,7 @@ mcols(transGR) %>%
     values_to = "value"
   ) %>%
   group_by(PC, bin_gc, bin_length, bin) %>%
-  summarise(
+  dplyr::summarise(
     Size = n(),
     mean = mean(value),
     sd = sd(value),
@@ -855,7 +873,6 @@ gene = rowMeans(log_gene_cor, na.rm = TRUE) %>% scale() %>% as.data.frame() %>%
   set_colnames("gene")
 ```
 
-
 ```{r}
 
 cbind(trans,gene) %>% as.data.frame() %>%
@@ -881,9 +898,6 @@ length = qplot(cor_with_attributes_log$`223`, cor_with_attributes_log$tx_len, xl
 gc = qplot(cor_with_attributes_log$`223`, cor_with_attributes_log$gc_content, xlab = "logTPM 223", ylab = "log GC content")
 grid.arrange(length, gc)
 ```
-
-
-
 
 ```{r}
 library(cqn)
@@ -950,7 +964,6 @@ plot_grid(
 
 ```
 
-
 ```{r fig.cap = "PCA on logCPM from counts post normalization with cqn. As a result of the normlization, it seems that whilst the overall variation within the dataset has reduced, sample 223 is no longer cluster with its condition group on PC1 and PC2"}
 ### PCA post-normalization
 
@@ -989,14 +1002,15 @@ pca= log(tx_df_removed[keep,] + 0.05) %>%
   t() %>% 
   prcomp(scale = TRUE)
   
-pca %>% 
+final_pca_trans= pca %>% 
   tidy() %>% 
   dplyr::rename(names = row) %>% 
-  left_join(md %>% dplyr::filter(names != "223"), by = "names") %>%
+  #left_join(md %>% dplyr::filter(names != "223"), by = "names") %>%
+  left_join(dge$samples, by = "names") %>%
    dplyr::filter(PC %in% 1:3) %>% 
   pivot_wider(names_from = "PC", names_prefix = "PC", values_from = "value") %>% 
   ggplot(
-    aes(PC1, PC2, colour = Group)
+    aes(PC1, PC2, colour = Group,  size = lib.size/1e6)
   ) +
   geom_point() +
   geom_text_repel(aes(label = names), show.legend = FALSE) +
@@ -1010,40 +1024,75 @@ pca %>%
     y = glue("PC2 ({percent(pca$sdev[[2]]^2 / sum(pca$sdev^2), 0.1)})"),
     colour = "Group",
     size = "Library Size\n(millions)"
-  ) + theme_bw() + ggtitle("Transcript Level")
+  ) + theme_bw() + ggtitle("Removal of Sample 223 (transcript level)")
 
+
+ggsave(filename="/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/trans-pca-final.svg", 
+       plot = final_pca_trans, height =5.98, width=6, units = "in")
+
+## Number of genes up or down --> pvalue threshold (small magnitude of changes) -> bona fide NMD targets 
+
+# small magnitute of small number of changes 
+# no reason to speculate one or the other
+## Genes to expect at reasonably upregulated: on targets:GADD45s, ATF4 (magnitude of change) --> meet back again 
+### Use as first past proxy - NMD genes as upregulated 
+### Underneath threshold --> could be the ones under abnormal target discrimitation 
 ```
 
-
 <!-- # ```{r} -->
+
 <!-- # ## deseq2 -->
-<!-- # ddsTxi <- DESeqDataSet(se, design = ~Group) -->
-<!-- # vsd <- vst(ddsTxi) -->
-<!-- # DESeq2::plotPCA(vsd, intgroup = "Group") -->
-<!-- #  -->
-<!-- # ``` -->
 
+<!-- # ddsTxi <- DESeqDataSet(se, design = ~Group) -->
+
+<!-- # vsd <- vst(ddsTxi) -->
+
+<!-- # DESeq2::plotPCA(vsd, intgroup = "Group") -->
+
+<!-- #  -->
+
+<!-- # ``` -->
 
 <!-- # ```{r} -->
-<!-- # library(EnsDb.Hsapiens.v86) -->
-<!-- # txdf = transcripts(EnsDb.Hsapiens.v86, return.type="DataFrame") -->
-<!-- # tx2gene = as.data.frame(txdf[,c("tx_id","gene_id", "tx_biotype")]) -->
-<!-- # salmon.files = ("/home/neuro/Documents/neurogenetics/alignments/Illumina/RNAseq/mouse/LJ_LTK/Salmon/Salmon_phoenix") -->
-<!-- # salmon = list.files(salmon.files, pattern = "transcripts$", full.names = TRUE) -->
-<!-- # all_files = file.path(salmon, "quant.sf") -->
-<!-- # names(all_files) <- paste(c(212:229)) -->
-<!-- # txi_genes_human  = tximport(all_files, type="salmon", txOut=FALSE, -->
-<!-- #                       countsFromAbundance="scaledTPM", tx2gene = tx2gene, ignoreTxVersion = TRUE, ignoreAfterBar = TRUE) -->
-<!-- #  -->
-<!-- #  -->
-<!-- # txi_genes_human$abundance["ENSG00000169062",] %>% melt() %>% -->
-<!-- #    rownames_to_column("name") %>% cbind(md) %>% -->
-<!-- #    ggplot(aes(x=as.character(names), y= value)) + -->
-<!-- #    geom_bar(stat="identity", color = "black", alpha = 0.9) + -->
-<!-- #    facet_grid(~Group, labeller = labeller(Group = group.labs), scales = "free_x") + ylab("tpm") + theme_bw() + xlab("") + -->
-<!-- #    scale_fill_manual(labels = c("UPF3A_KD_UPF3B_KD" = "Double KD", "UPF3A_KD" = "UPF3A KD", -->
-<!-- #                                  "UPF3B_KD" = "UPF3B KD", "UPF3A_OE" = "UPF3A OE", -->
-<!-- #                                  "UPF3A_OE_UPF3B_KD" = "UPF3A OE UPF3B KD")) + -->
-<!-- #    theme(legend.position = "none") + ggtitle("UPF3A expression") -->
-<!-- # ``` -->
 
+<!-- # library(EnsDb.Hsapiens.v86) -->
+
+<!-- # txdf = transcripts(EnsDb.Hsapiens.v86, return.type="DataFrame") -->
+
+<!-- # tx2gene = as.data.frame(txdf[,c("tx_id","gene_id", "tx_biotype")]) -->
+
+<!-- # salmon.files = ("/home/neuro/Documents/neurogenetics/alignments/Illumina/RNAseq/mouse/LJ_LTK/Salmon/Salmon_phoenix") -->
+
+<!-- # salmon = list.files(salmon.files, pattern = "transcripts$", full.names = TRUE) -->
+
+<!-- # all_files = file.path(salmon, "quant.sf") -->
+
+<!-- # names(all_files) <- paste(c(212:229)) -->
+
+<!-- # txi_genes_human  = tximport(all_files, type="salmon", txOut=FALSE, -->
+
+<!-- #                       countsFromAbundance="scaledTPM", tx2gene = tx2gene, ignoreTxVersion = TRUE, ignoreAfterBar = TRUE) -->
+
+<!-- #  -->
+
+<!-- #  -->
+
+<!-- # txi_genes_human$abundance["ENSG00000169062",] %>% melt() %>% -->
+
+<!-- #    rownames_to_column("name") %>% cbind(md) %>% -->
+
+<!-- #    ggplot(aes(x=as.character(names), y= value)) + -->
+
+<!-- #    geom_bar(stat="identity", color = "black", alpha = 0.9) + -->
+
+<!-- #    facet_grid(~Group, labeller = labeller(Group = group.labs), scales = "free_x") + ylab("tpm") + theme_bw() + xlab("") + -->
+
+<!-- #    scale_fill_manual(labels = c("UPF3A_KD_UPF3B_KD" = "Double KD", "UPF3A_KD" = "UPF3A KD", -->
+
+<!-- #                                  "UPF3B_KD" = "UPF3B KD", "UPF3A_OE" = "UPF3A OE", -->
+
+<!-- #                                  "UPF3A_OE_UPF3B_KD" = "UPF3A OE UPF3B KD")) + -->
+
+<!-- #    theme(legend.position = "none") + ggtitle("UPF3A expression") -->
+
+<!-- # ``` -->

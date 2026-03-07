@@ -1,0 +1,1088 @@
+---
+title: "Publication-Supplementary-Figures"
+author: "urwahnawaz"
+date: "2026-03-05"
+output:
+  html_notebook: default
+  workflowr::wflow_html:
+    code_folding: hide
+editor_options:
+  
+  chunk_output_type: console
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    autodep = TRUE,
+    eval = TRUE,
+	echo = TRUE,
+	warning = FALSE,
+	message = FALSE
+)
+```
+
+
+# Introduction
+
+```{r load}
+source("code/plots.R") 
+source("code/functions.R")
+source("code/libraries.R")
+library(biomaRt)
+library(nVennR)
+library(eulerr)
+library(ggsci)
+library(janitor)
+library(ggside)
+library(ggstatsplot)
+library(stargazer)
+library(coin)
+library(GeneOverlap)
+```
+
+```{r}
+txdf = transcripts(EnsDb.Mmusculus.v79, return.type="DataFrame")
+tx2gene = as.data.frame(txdf[,c("tx_id","gene_id", "tx_biotype")])
+```
+
+
+```{r}
+ma_plot = function(data){
+  DEColours <- c("Downregulated" = "#14213d","Upregulated" = "#ff6700",  "Not Sig" = "#e6e8e6")
+  temp = data %>% 
+    mutate(diffExpressed = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",        
+               ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig")))
+  plot = temp %>% 
+    ggplot(aes(y= logFC,
+               x = logCPM,
+               colour = as.factor(as.character(diffExpressed )))) +
+    geom_point(alpha = 0.65, size = 3) +
+    scale_colour_manual(values = DEColours) + theme_bw()+
+    theme(legend.position = "top",
+          axis.title.y = element_text(size = 12)) + geom_hline(yintercept = 0, 
+                                                               linetype = "dashed", color = "grey") +
+    # geom_ysidedensity(aes(x=after_stat(density),  
+    #                          color = nif_label, fill = nif_label),  alpha=0.2, size = 1) +
+    # scale_fill_manual(values = DEColours) + scale_size_manual(values = c("NIF+" = 3, 
+    #                                                                      "NIF-" =2,
+    #                                                                      "Not Sig"= 2)) +
+    theme(
+        axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+        axis.text.y = element_text(size = 12, family = "serif", color = "black"), 
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+         strip.text.x = element_text(
+        size = 12, face = "bold.italic", family = "serif"
+        )) + labs(color = "Expression", 
+                  fill = "",
+                  size = "") + scale_alpha(guide = 'none')
+  return(plot)
+    
+}
+```
+
+# Introduction 
+
+```{r}
+load("output/DEG-list.Rda")
+load("output/Stability/differential-stability.Rda")
+load(file=here::here("output/DET-list.Rda"))
+```
+
+## Supplementary Figure 1
+
+### Supplementary Figure 1c
+
+### Supplementary Figure 1d
+
+## Supplementary Figure 2
+
+### Supplementary Figure 2a
+
+```{r}
+res_sig_dte = lapply(res_dte, function(x){
+  x %<>% 
+    dplyr::filter(FDR < 0.05 ) %>% 
+    as.data.frame()
+})
+
+res_sig_dte$UPF3B_KD_Control %>% 
+  with(table(sign(.$logFC)))
+
+res_sig_dte$UPF3A_KD_Control %>% 
+  with(table(sign(.$logFC)))
+
+res_sig_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+  with(table(sign(.$logFC)))
+
+res_sig_dte$UPF3A_OE_Control %>% 
+  with(table(sign(.$logFC)))
+```
+
+
+```{r fig.width=10, fig.height=10, fig.cap="MA plot of comprisons of KD/OE with Controls. Pink highlights significantly upregulated transcripts whereas blue highlights significantly downregulated transcripts"}
+## Ma plot 
+
+ma_1 = ma_plot(res_dte$UPF3B_KD_Control) + ggtitle("UPF3B KD vs Control")
+ma_2 = ma_plot(res_dte$UPF3A_KD_Control) + ggtitle("UPF3A KD vs Control")
+ma_3 = ma_plot(res_dte$UPF3A_KD_UPF3B_KD_Control) + ggtitle("UPF3 dKD vs Control")
+ma_4 = ma_plot(res_dte$UPF3A_OE_Control) + ggtitle("UPF3A OE vs Control")
+ma_5 = ma_plot(res_dte$UPF3A_OE_UPF3B_KD_Control) + ggtitle("UPF3A OE in UPF3B KD")
+
+
+
+ggsave(plot=ma_1, filename = here::here("output/Thesis_plots/DETs/Upf3b_KD.png"), height =4, width =4, 
+       dpi = 1200)
+ggsave(plot=ma_2, filename = here::here("output/Thesis_plots/DETs/Upf3a_KD.png"), height =4, width =4, 
+       dpi = 1200)
+ggsave(plot=ma_3, filename = here::here("output/Thesis_plots/DETs/Upf3_dKD.png"), height =4, width =4, 
+       dpi = 1200)
+ggsave(plot=ma_4, filename = here::here("output/Thesis_plots/DETs/Upf3a_OE.png"), height =4, width =4, 
+       dpi = 1200)
+ggsave(plot=ma_5, filename = here::here("output/Thesis_plots/DETs/Upf3a_OE_Upf3b_KD.png"), height =4, width =4, 
+       dpi = 1200)
+```
+
+
+
+### Supplementary Figure 2b
+
+## Supplementary Figure 3
+
+### Supplementary Figure 3a
+
+```{r}
+res_sig_dte = lapply(res_dte, function(x){
+  x %<>% 
+    dplyr::filter(FDR < 0.05 ) %>% 
+    as.data.frame()
+})
+
+upf3_cor = res_sig_dte$UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+             cor.coeff.args = list(size = 5, family = "serif",  label.y = 6), 
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab(expression(italic(Upf3b) ~ "KD DETs (LFC)")) +
+ylab(expression(italic(Upf3a) ~ "KD DETs (LFC)")) +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+
+upf3_cor
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Figure-3/DETs/Upf3_paralogs_cor.png", plot = upf3_cor , 
+       units = c("in"), height = 4, width = 4, dpi = 1200)
+```
+
+```{r}
+
+upf3d_cor = res_sig_dte$UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+            cor.coeff.args = list(size = 5, family = "serif", label.y = 7),
+              size=5, alpha =0.75, color = "Label",
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab(expression(italic(Upf3b) ~ "KD DETs (LFC)")) + 
+ ylab(expression(italic(Upf3) ~ "dKD DETs (LFC)")) +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+upf3d_cor
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Figure-3/DETs/Upf3dKD_Upf3b_cor.png", plot = upf3d_cor , 
+       units = c("in"), height = 4, width = 4, dpi = 1200)
+
+```
+
+```{r}
+
+upf3b_Upf3aOE_cor = res_sig_dte$UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_OE_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+            cor.coeff.args = list(size = 5, family = "serif", label.y = -0.05),
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab(expression(italic(Upf3b) ~ "KD DETs (LFC)")) + ylab(expression(italic(Upf3a) ~ "OE DETs (LFC)")) +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+upf3b_Upf3aOE_cor
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Figure-3/DETs/Upf3aOE_Upf3b_cor.png", plot = upf3b_Upf3aOE_cor, 
+       units = c("in"), height = 4, width = 4, dpi = 1200)
+
+```
+
+```{r}
+
+upf3b_Upf3aOEKD_cor = res_sig_dte$UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_OE_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+             cor.coeff.args = list(size = 5, family = "serif"),
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab(expression(italic(Upf3b) ~ "KD DETs (LFC)")) + ylab(expression(atop(italic(Upf3a) ~ "OE",
+                     italic(Upf3b) ~ "KD DETs (LFC)"))) +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+upf3b_Upf3aOEKD_cor
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Figure-3/DETs/Upf3aOEKD_Upf3b_cor.png", plot = upf3b_Upf3aOEKD_cor, 
+       units = c("in"), height = 4, width = 4.45, dpi = 1200)
+
+```
+
+
+```{r}
+
+upf3a_Upf3dKD_cor = res_sig_dte$UPF3A_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+             cor.coeff.args = list(size = 5, family = "serif"),
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() + xlab(expression(italic(Upf3a) ~ "KD DETs (LFC)"))+ 
+   ylab(expression(italic(Upf3) ~ "dKD DETs (LFC)")) +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+upf3a_Upf3dKD_cor
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Figure-3/DETs/Upf3aKD_Upf3dKD_cor.png", plot = upf3a_Upf3dKD_cor, 
+       units = c("in"), height = 4, width = 4, dpi = 1200)
+
+```
+
+```{r}
+
+upf3a_Upf3aOE_cor = res_sig_dte$UPF3A_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_OE_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+            cor.coeff.args = list(size = 5, family = "serif"),
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() +
+  xlab(expression(italic(Upf3a) ~ "KD DETs (LFC)"))+ 
+   ylab(expression(italic(Upf3a) ~ "OE DETs (LFC)")) +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Figure-3/DETs/Upf3aKD_Upf3aOE_cor.png", plot = upf3a_Upf3aOE_cor, 
+       units = c("in"), height = 4, width = 4, dpi = 1200)
+
+```
+
+
+
+```{r}
+
+Upf3aKD_Upf3aOEKD_cor = res_sig_dte$UPF3A_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_OE_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+            cor.coeff.args = list(size = 5, family = "serif", label.y = 7),
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+  xlab(expression(italic(Upf3a) ~ "KD DETs (LFC)")) + ylab(expression(atop(italic(Upf3a) ~ "OE",
+                     italic(Upf3b) ~ "KD DETs (LFC)"))) +
+    theme_bw() + 
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Figure-3/DETs/Upf3aKD_Upf3aOEKD_cor.png", plot = Upf3aKD_Upf3aOEKD_cor, 
+       units = c("in"), height = 4, width = 4.45, dpi = 1200)
+
+```
+
+
+```{r}
+upf3aOE_Upf3dKD_cor = res_sig_dte$UPF3A_OE_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join(res_sig_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+            cor.coeff.args = list(size = 5, family = "serif"),
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    xlab(expression(italic(Upf3a) ~ "OE DETs (LFC)")) +   
+  ylab(expression(italic(Upf3) ~ "dKD DETs (LFC)")) +
+    theme_bw() +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output//Figures/Supplementary/Figure-3/DETs/Upf3aOE_Upf3dKD_cor.png", plot = upf3aOE_Upf3dKD_cor, 
+       units = c("in"), height = 4.2, width = 4.2, dpi = 1200)
+
+```
+
+
+```{r}
+upf3aOEKD_Upf3dKD_cor = res_sig_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC) %>% 
+  inner_join( res_sig_dte$UPF3A_OE_UPF3B_KD_Control %>% 
+  dplyr::select(tx_id, logFC), by = "tx_id") %>% 
+  mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+            cor.coeff.args = list(size = 5, family = "serif", label.y = 7),
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    xlab(expression(italic(Upf3) ~ "dKD DETs (LFC)")) + ylab(expression(atop(italic(Upf3a) ~ "OE",
+                     italic(Upf3b) ~ "KD DETs (LFC)"))) +
+    theme_bw() + 
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#3c1642", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+  
+upf3aOEKD_Upf3dKD_cor 
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Figure-3/DETs/Upf3aOEKD_Upf3dKD_cor.png", plot = upf3aOEKD_Upf3dKD_cor, 
+       units = c("in"), height = 4, width = 4.45, dpi = 1200)
+
+```
+
+```{r}
+ggarrange(upf3_cor,upf3d_cor, upf3b_Upf3aOE_cor,
+  upf3b_Upf3aOEKD_cor,upf3a_Upf3dKD_cor, upf3a_Upf3aOE_cor,
+  Upf3aKD_Upf3aOEKD_cor, upf3aOE_Upf3dKD_cor, upf3aOEKD_Upf3dKD_cor, ncol =3, nrow=3 )
+```
+
+
+### Supplementary Figure 3b
+
+
+```{r}
+
+upf3b_cor = res_sig_dte$UPF3B_KD_Control %>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>%
+  left_join(tx2gene, by = "tx_id") %>% 
+    inner_join(DEGenes$UPF3B_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID), by = "gene_id") %>%
+          mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+             cor.coeff.args = list(size = 5, family = "serif"),
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+   xlab(expression(italic(Upf3b) ~ "KD DETs (LFC)"))+ 
+   ylab(expression(italic(Upf3b) ~ "KD DEGs (LFC)")) +
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#c9184a", "#BAB8B5")) +  theme_bw() +
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+upf3b_cor
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Figure-3/DET-DEGs/Upf3b_cor.png", plot = upf3b_cor , 
+       units = c("in"), height = 4, width = 4.1, dpi = 1200)
+```
+
+```{r}
+upf3a_cor = res_sig_dte$UPF3A_KD_Control %>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  left_join(tx2gene, by = "tx_id") %>%
+    inner_join(DEGenes$UPF3A_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID), by = "gene_id") %>% 
+          mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+    ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+                cor.coeff.args = list(size = 5, family = "serif"),
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+     xlab(expression(italic(Upf3a) ~ "KD DETs (LFC)"))+ 
+   ylab(expression(italic(Upf3a) ~ "KD DEGs (LFC)")) + 
+    theme_bw() + 
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#c9184a", "#BAB8B5")) + 
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+
+upf3a_cor
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Figure-3/DET-DEGs/Upf3a_cor.png", plot = upf3a_cor  , 
+       units = c("in"), height = 4, width = 4.1, dpi = 1200)
+```
+
+```{r}
+upf3d_KD_cor = res_sig_dte$UPF3A_KD_UPF3B_KD_Control %>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  left_join(tx2gene, by = "tx_id") %>%
+    inner_join(DEGenes$DoubleKD_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID), by = "gene_id") %>% 
+          mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+    ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+              cor.coeff.args = list(size = 5, family = "serif"),
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+    theme_bw() +   xlab(expression(italic(Upf3) ~ "dKD DETs (LFC)"))+ 
+   ylab(expression(italic(Upf3) ~ "dKD DEGs (LFC)")) + 
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#c9184a", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Figure-3/DET-DEGs/Upf3dKD_cor.png", plot = upf3d_KD_cor , 
+       units = c("in"), height = 4, width = 4.1, dpi = 1200)
+```
+
+```{r}
+upf3a_OE_Upf3b_KD_DEGs_DSGs = res_sig_dte$UPF3A_OE_UPF3B_KD_Control %>% 
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% 
+  left_join(tx2gene, by = "tx_id") %>%
+    inner_join(DEGenes$UPF3A_OE_UPF3B_KD_vs_Control %>% 
+                 dplyr::rename(gene_id = EnsID), by = "gene_id") %>% 
+          mutate(Label = ifelse(logFC.x > 0 & logFC.y >0 | 
+                            logFC.x < 0 & logFC.y <0, "Concordance", "Discordant")) %>% 
+  ggscatter(., x= "logFC.x", y="logFC.y", 
+              cor.coef = TRUE, add = "reg.line", 
+              size=5, alpha =0.75, color = "Label",
+            cor.coeff.args = list(size = 5, family = "serif", label.y = 5),
+              conf.int = TRUE, add.params = list(color = "blue",
+                                                 fill = "lightgray")) + 
+  xlab(expression(atop(italic(Upf3a) ~ "OE",
+                     italic(Upf3b) ~ "KD DETs (LFC)"))) + 
+  ylab(expression(atop(italic(Upf3a) ~ "OE",
+                     italic(Upf3b) ~ "KD DEGs (LFC)"))) +
+    theme_bw() + 
+  geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  scale_color_manual(values = c("#c9184a", "#BAB8B5")) +  
+  theme(axis.text.x = element_text(size = 18, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 18, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "none",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression")
+
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Figure-3/DET-DEGs/Upf3a_Upf3b_kD_cor.png", plot = upf3a_OE_Upf3b_KD_DEGs_DSGs , 
+       units = c("in"), height = 4.45, width = 4.45, dpi = 1200)
+```
+
+
+## Supplementary Figure 5 
+
+### Supplementary Figure 5a
+
+```{r}
+upf3a_res = z[[1]]
+upf3a_res %>%
+  dplyr::filter(padj < 0.05) %>%
+  with(., table(sign(log2FoldChange)))
+
+
+DEColours <- c("Destabilized" = "#2F124B","Stabilised" = "#ee6c4d",  "Not significant" = "#D3D5E3", "NA" = "#D3D5E3")
+volc = upf3a_res %>%
+   mutate(results = ifelse(log2FoldChange> 0 & padj < 0.05, "Stabilised",
+                           ifelse(padj < 0.05 & log2FoldChange < 0, "Destabilized", "Not significant"))) %>%
+  drop_na("results") %>%
+    ggplot(aes(x = log2FoldChange,
+               y = -log10(padj),
+               colour = as.factor(as.character(results )))) +
+    geom_point(alpha = 0.8, size =3) +
+    scale_colour_manual(values = DEColours) + theme_classic() +
+    geom_hline(yintercept = -log10(0.05), color = "grey60", size = 0.5, lty = "dashed") +
+        xlab(bquote(log["2"](FC))) +
+  ylab(bquote(-log["10"]("adjusted P-value"))) +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + xlim(-3, 3) +
+  ylim(0,7.5) +theme(axis.text.x = element_text(size = 25, family = "serif", color = "black"),
+              axis.text.y = element_text(size = 25, family = "serif", color = "black"),
+        axis.title = element_text(size=25, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+         legend.text = element_text(family = "serif", size = 15), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =15),
+        legend.position = "top"
+        )  + labs(color = "") +   xlab(bquote(log["2"](FC))) +
+  ylab(bquote(-log["10"]("adjusted P-value")))
+volc
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Upf3a-stability-Supp-5a.png", plot = volc,  units = c("in"), height = 6, width = 6, dpi =1200)
+```
+
+### Supplementary Figure 5b
+
+```{r}
+upf3a_res =  z[[1]] %>% as.data.frame() %>%
+  dplyr::filter(padj < 0.05) %>%
+    mutate(gene = mapIds(org.Mm.eg.db, keys=EnsemblID,  column="SYMBOL",keytype="ENSEMBL", multiVals="first"),
+           entrez = mapIds(org.Mm.eg.db, keys=EnsemblID,  column="ENTREZID",keytype="ENSEMBL", multiVals="first")) %>% drop_na(entrez)
+
+
+x= list( "Upf3a KD DEG" = DEGenes$UPF3A_vs_Control$EnsID,
+    "Upf3a KD DSGs" = upf3a_res$EnsemblID)
+
+
+ggvenn(x[c(1,2)], fill_color = c("#ef476f", "#801D2E", "#6b3b30"),
+       set_name_color = "black", text_color = "white", text_size = 10,
+       stroke_size = 0.45, fill_alpha = 0.8,
+       stroke_color = "white", show_percentage = FALSE)
+
+ ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Upf3a-stability_overlap_fig3b.png",  units = c("in"), height = 6, width = 6, dpi =1200)
+
+```
+
+```{r}
+x = calculate.overlap(x)
+```
+
+```{r}
+go.obj <- newGeneOverlap(DEGenes$UPF3A_vs_Control$EnsID,
+                         upf3a_res$EnsemblID,
+                         genome.size=length(res$UPF3A_vs_Control$EnsID))
+go.obj <- testGeneOverlap(go.obj)
+
+message(paste("Odds ratio=", go.obj@odds.ratio))
+message(paste("p-value=", go.obj@pval))
+```
+
+### Supplementary Figure 5c 
+
+
+```{r}
+overlapping_upf3a = DEGenes$UPF3A_vs_Control %>%
+  inner_join(upf3a_res %>% 
+               dplyr::rename(EnsID = EnsemblID), by="EnsID") %>%
+    dplyr::rename("gene_id" = "EnsID") %>%
+    left_join(res_dte$UPF3A_KD_Control %>%
+               left_join(tx2gene) %>%
+               dplyr::filter(FDR < 0.05),by = "gene_id") %>%
+   mutate(nif= ifelse(nif_feature == "None" | is.na(nif_feature) ,"NIF-", "NIF+"))
+
+overlap_DSA =overlapping_upf3a %>%
+  ggscatter(.,x="logFC.x", y ="log2FoldChange", cor.coef = TRUE, add = "reg.line",
+             cor.coeff.args = list(size = 6, family = "serif"),
+              conf.int = TRUE, color = "nif", add.params = list(color = "blue",
+                                                 fill = "lightgray"), alpha =0.8, shape = "nif", size =3) +
+    theme_bw() + xlab("Upf3a KD DEG (log2FC)") +
+  ylab("Upf3a DSG (log2FC)") +   scale_color_manual(values = c("#F15A2B", "#2E368F")) +
+    geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  theme(axis.text.x = element_text(size = 14, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 14, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"),
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif", size = 12),
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression") + geom_xsideboxplot(aes(y = nif, fill= nif), orientation = "y") +
+   theme(ggside.panel.scale = .45) +
+  scale_xsidey_discrete()  + geom_ysidedensity(aes(x = after_stat(density), fill = nif), alpha = 0.5) +
+  scale_color_manual(values = c("NIF+" = "#b23a48",
+                                "NIF-" = "grey")) +  scale_fill_manual(values = c("NIF+" = "#b23a48",
+                                "NIF-" = "grey")) + scale_shape_manual(values = c(19,15)) +
+labs(  y = expression(italic(Upf3a) ~ "KD DSG (" * log[2] * "FC)"),
+  x = expression(italic(Upf3a) ~ "KD DEG (" * log[2] * "FC)"))
+
+overlap_DSA
+
+ ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Upf3a-stability-overlap_5c.png", plot = overlap_DSA,  units = c("in"), height = 7, width = 8, dpi =1200)
+
+```
+
+### Supplementary Figure 5d
+
+```{r}
+
+non_intersect = x$a1[!x$a1 %in% x$a3]
+non_overlapping_upf3a = DEGenes$UPF3A_vs_Control %>%
+  dplyr::filter(EnsID %in% non_intersect) %>%
+    dplyr::rename("gene_id" = "EnsID") %>%
+  left_join(res_dte$UPF3A_KD_Control %>%
+               left_join(tx2gene) %>%
+               dplyr::filter(FDR < 0.05),by = "gene_id") %>%
+  mutate(nif= ifelse(nif_feature == "None" | is.na(nif_feature),"NIF-", "NIF+"))
+
+nif_overlap = overlapping_upf3a %>%
+  distinct(gene_id, .keep_all = TRUE) %>%
+  dplyr::select(nif) %>%
+   mutate(group = "DEGs/DSGs\nOverlapping") %>%
+  rbind(non_overlapping_upf3a %>%
+          distinct(gene_id, .keep_all = TRUE) %>%
+         dplyr::select(nif) %>%
+          mutate(group = "Non-overlapping\nDEGs")) %>%
+
+  mutate(nif = factor(nif, levels = c("NIF+", "NIF-"))) %>%
+ggbarstats(
+  x                = nif,
+  y                = group,
+
+xlab = "",
+legend.title     = ""#,
+ # ggplot.component = list(ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(n.dodge = 2))),
+) + scale_fill_manual(values = c("NIF+" = "#b23a48","NIF-" = "grey")) + theme_bw() +
+    labs(y="Prpoportion of transcripts") +
+  theme(axis.text = element_text(color ="black", size =15),
+        axis.title = element_text(color ="black", size =15),
+         legend.box.background = element_rect(color = "black"))
+
+nif_overlap
+
+
+ ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Upf3a-bf-NIF-proportion_fig5d.png", plot = nif_overlap ,  units = c("in"), height = 6, width = 6, dpi =1200)
+```
+
+### Supplementary Figure 5e
+
+```{r}
+upf3dKD_res = z[[3]]
+upf3dKD_res %>%
+  dplyr::filter(padj < 0.05) %>%
+  with(., table(sign(log2FoldChange)))
+
+
+DEColours <- c("Destabilized" = "#2F124B","Stabilised" = "#ee6c4d",  "Not significant" = "#D3D5E3", "NA" = "#D3D5E3")
+volc = upf3dKD_res %>%
+   mutate(results = ifelse(log2FoldChange> 0 & padj < 0.05, "Stabilised",
+                           ifelse(padj < 0.05 & log2FoldChange < 0, "Destabilized", "Not significant"))) %>%
+  drop_na(results) %>%
+    ggplot(aes(x = log2FoldChange,
+               y = -log10(padj),
+               colour = as.factor(as.character(results )))) +
+    geom_point(alpha = 0.8, size =3) +
+    scale_colour_manual(values = DEColours) + theme_classic() +
+    geom_hline(yintercept = -log10(0.05), color = "grey60", size = 0.5, lty = "dashed") +
+        xlab(bquote(log["2"](FC))) +
+  ylab(bquote(-log["10"]("adjusted P-value"))) +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + xlim(-3, 3) +
+  ylim(0,7.5) +
+        theme(axis.text.x = element_text(size = 25, family = "serif", color = "black"),
+              axis.text.y = element_text(size = 25, family = "serif", color = "black"),
+        axis.title = element_text(size=25, family = "serif"),
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"),
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =15),
+        legend.position = "top"
+        )  + labs(color = "")
+volc
+
+ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Upf3dKD_stability_5e.png", plot = volc,  units = c("in"), height = 6, width = 6, dpi =1200)
+
+
+```
+
+### Supplementary Figure 5f
+
+* Correlation between DSE and DEGs
+
+```{r}
+upf3dKD_res =  z[[3]] %>% as.data.frame() %>%
+  dplyr::filter(padj < 0.05) %>%
+    mutate(gene = mapIds(org.Mm.eg.db, keys=EnsemblID,  column="SYMBOL",keytype="ENSEMBL", multiVals="first"),
+           entrez = mapIds(org.Mm.eg.db, keys=EnsemblID,  column="ENTREZID",keytype="ENSEMBL", multiVals="first")) %>% drop_na(entrez)
+
+
+x= list( "Upf3 dKD DEG" = DEGenes$DoubleKD_vs_Control$EnsID,
+    "Upf3 dKD DSG" = upf3dKD_res$EnsemblID)
+
+
+ggvenn(x, fill_color = c("#7175b3", "#801D2E", "#6b3b30"),
+       set_name_color = "black", text_color = "white", text_size = 10,
+       stroke_size = 0.45, fill_alpha = 0.8,
+       stroke_color = "white", show_percentage = FALSE)
+
+
+ ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Upf3dKD-stability_overlap_fig3b.png",  units = c("in"), height = 6, width = 6, dpi =1200)
+```
+
+```{r}
+x = calculate.overlap(x)
+```
+
+```{r}
+go.obj <- newGeneOverlap(DEGenes$DoubleKD_vs_Control$EnsID,
+                         upf3dKD_res$EnsemblID,
+                         genome.size=length(res$DoubleKD_vs_Control$EnsID))
+go.obj <- testGeneOverlap(go.obj)
+
+message(paste("Odds ratio=", go.obj@odds.ratio))
+message(paste("p-value=", go.obj@pval))
+```
+
+### Supplementary Figure 5g
+
+
+```{r}
+overlapping_upf3dKD = DEGenes$DoubleKD_vs_Control %>%
+  inner_join(upf3dKD_res %>% dplyr::rename(EnsID =EnsemblID ), by="EnsID") %>%
+    dplyr::rename("gene_id" = "EnsID") %>%
+    left_join(res_dte$UPF3A_KD_UPF3B_KD_Control %>%
+               left_join(tx2gene) %>%
+               dplyr::filter(FDR < 0.05),by = "gene_id") %>%
+   mutate(nif= ifelse(nif_feature == "None" |is.na(nif_feature),"NIF-", "NIF+"))
+
+overlap_DSA = overlapping_upf3dKD %>%
+  ggscatter(.,x="logFC.x", y ="log2FoldChange", cor.coef = TRUE, add = "reg.line",
+             cor.coeff.args = list(size = 7, family = "serif"), 
+              conf.int = TRUE, color = "nif", add.params = list(color = "blue",
+                                                 fill = "lightgray"), alpha =0.8, shape = "nif", size =3) +
+    theme_bw() +   scale_color_manual(values = c("#F15A2B", "#2E368F")) +
+    geom_hline(yintercept = 0, size = 0.5,lty = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, size = 0.5, lty = "dashed", color = "grey60") + theme(legend.position = "none") +
+  theme(axis.text.x = element_text(size = 12, family = "serif", color = "black"),
+            axis.text.y = element_text(size = 12, family = "serif", color = "black"),
+        axis.title = element_text(size=20, family = "serif"),
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif", size =12),
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top",
+        strip.text.y = element_text(
+        size = 10, face = "bold.italic", family = "serif"
+        ),
+         strip.text.x = element_text(
+        size = 10, family = "serif"
+        )) + labs(color = "Expression") + geom_xsideboxplot(aes(y = nif, fill= nif), orientation = "y") +
+   theme(ggside.panel.scale = .45) +
+  scale_xsidey_discrete()  + geom_ysidedensity(aes(x = after_stat(density), fill = nif), alpha = 0.5) +
+  scale_color_manual(values = c("NIF+" = "#b23a48",
+                                "NIF-" = "grey")) +  scale_fill_manual(values = c("NIF+" = "#b23a48",
+                                "NIF-" = "grey")) + scale_shape_manual(values = c(19,15)) +
+  labs(  y = expression(italic(Upf3) ~ "dKD DSG (" * log[2] * "FC)"),
+  x = expression(italic(Upf3) ~ "dKD DEG (" * log[2] * "FC)"))
+
+
+overlap_DSA
+
+ ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Upf3dKD-stability-overlap.png", plot = overlap_DSA,  units = c("in"), height = 7, width = 7, dpi =1200)
+
+
+
+```
+
+```{r}
+non_intersect = x$a1[!x$a1 %in% x$a3]
+non_overlapping_upf3dKD = DEGenes$DoubleKD_vs_Control %>%
+  dplyr::filter(EnsID %in% non_intersect) %>%
+    dplyr::rename("gene_id" = "EnsID") %>%
+    left_join(res_dte$UPF3A_KD_UPF3B_KD_Control %>%
+               left_join(tx2gene) %>%
+               dplyr::filter(FDR < 0.05),by = "gene_id") %>%
+  mutate(nif= ifelse(nif_feature == "None","NIF-", "NIF+"))
+```
+
+
+```{r}
+nif_overlap =overlapping_upf3dKD %>%
+  distinct(gene_id, .keep_all = TRUE) %>%
+  dplyr::select(nif) %>%
+   mutate(group = "DEGs/DSGs\nOverlapping") %>%
+  rbind(non_overlapping_upf3dKD  %>%
+          distinct(gene_id, .keep_all = TRUE) %>%
+         dplyr::select(nif) %>%
+          mutate(group = "Non-overlapping\nDEGs")) %>%
+
+  mutate(nif = factor(nif, levels = c("NIF+", "NIF-"))) %>%
+ggbarstats(
+  x                = nif,
+  y                = group,
+
+xlab = "",
+legend.title     = ""
+#  ggplot.component = list(ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(n.dodge = 2))),
+) + scale_fill_manual(values = c("NIF+" = "#b23a48","NIF-" = "grey")) + theme_bw() +
+    labs(y="Prpoportion of transcripts") +
+  theme(axis.text = element_text(color ="black", size =15),
+        axis.title = element_text(color ="black", size =15),
+         legend.box.background = element_rect(color = "black"))
+
+nif_overlap
+
+
+ ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Supplementary/Upf3d-bf-NIF-proportion_fig5d.png", plot = nif_overlap ,  units = c("in"), height = 6, width = 6, dpi =1200)
+
+
+
+
+# ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/Upf3dKD-bf-NIF-proportion.png", plot = nif_overlap ,  units = c("in"), height = 6, width = 6, dpi =1200)
+```
+
+

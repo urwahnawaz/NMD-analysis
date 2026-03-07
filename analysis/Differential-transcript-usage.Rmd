@@ -1,0 +1,411 @@
+---
+title: "Differential-transcript-usage"
+author: "unawaz1996"
+date: "2023-03-22"
+output:
+  html_notebook: default
+  workflowr::wflow_html:
+    code_folding: hide
+editor_options:
+  
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    autodep = TRUE,
+    eval = TRUE,
+	echo = FALSE,
+	warning = FALSE,
+	message = FALSE
+)
+```
+
+
+# Background 
+
+# Set-up 
+
+
+# Background
+
+- What is differential transcript usage 
+
+- Why is isoform switching and differential transcript usage important to use in NMD? 
+
+- What are some NMD features we should be looking out for - signs of escape from NMD 
+
+Identify and compare the cellular and molecular roles Upf3a through gain and loss of function approaches in mouse L-cells 
+
+ 
+# Analysis
+
+```{r}
+source("code/libraries.R")
+```
+
+
+<!-- # ```{r} -->
+<!-- # salmon.files = ("/home/neuro/Documents/NMD_analysis/Analysis/Results/Salmon") -->
+<!-- # md.files = "data/LTK_Sample Metafile_V3.txt" -->
+<!-- # ``` -->
+<!-- #  -->
+<!-- #  -->
+<!-- # ```{r} -->
+<!-- # myComparison <- data.frame( -->
+<!-- #   condition_1 = c("Control", "Control", "UPF3B_KD", "Control", "Control"), -->
+<!-- #   condition_2 = c("UPF3A_KD","UPF3B_KD", "UPF3A_KD", "UPF3A_KD_UPF3B_KD", "UPF3A_OE")) -->
+<!-- #  -->
+<!-- # ``` -->
+<!-- #  -->
+<!-- #  -->
+<!-- # ```{r} -->
+<!-- # txdf = transcripts(EnsDb.Mmusculus.v79, return.type="DataFrame") -->
+<!-- # tx2gene = as.data.frame(txdf[,c("tx_id","gene_id")]) -->
+<!-- # tab <- table(tx2gene$gene_id) -->
+<!-- # tx2gene$ntx <- tab[match(tx2gene$gene_id, names(tab))] -->
+<!-- #  -->
+<!-- #  -->
+<!-- # salmon = list.files(salmon.files, pattern = "transcripts$", full.names = TRUE) -->
+<!-- # md = read.table(md.files, header= TRUE) -->
+<!-- # md$Group = factor(md$Group) -->
+<!-- # rownames(md) = md$Sample -->
+<!-- # colnames(md)[1] = c("sample") -->
+<!-- #  -->
+<!-- # md %<>% mutate(path = salmon) -->
+<!-- # all_files = file.path(salmon, "quant.sf") -->
+<!-- # names(all_files) <- paste(c(212:229)) -->
+<!-- #  -->
+<!-- # all_files = all_files[-c(6,12,18)] -->
+<!-- #  -->
+<!-- # md.files = "data/LTK_Sample Metafile_V3.txt" -->
+<!-- # design = read.table(md.files, header= TRUE) -->
+<!-- # design %<>% dplyr::select(Sample, Group) -->
+<!-- # colnames(design) = c("sampleID", "condition") -->
+<!-- # design$sampleID = paste(design$sampleID, "L4_transcripts", sep = "_") -->
+<!-- # design$sampleID = as.character(design$sampleID) -->
+<!-- # design=design[-c(6,12, 18),] -->
+<!-- # ``` -->
+<!-- #  -->
+<!-- # ```{r} -->
+<!-- # salmonQuant <- importIsoformExpression( -->
+<!-- #     parentDir = salmon.files,  -->
+<!-- #     addIsofomIdAsColumn = TRUE -->
+<!-- # ) -->
+<!-- # ``` -->
+<!-- #  -->
+<!-- # ```{r} -->
+<!-- #  -->
+<!-- # aSwitchList <- importRdata( -->
+<!-- #   isoformCountMatrix   = salmonQuant$counts[,-c(7, 13, 19)], -->
+<!-- #   isoformRepExpression = salmonQuant$abundanc[,-c(7, 13, 19)], -->
+<!-- #   designMatrix         = design, -->
+<!-- #   addAnnotatedORFs = TRUE, -->
+<!-- #   comparisonsToMake = myComparison, -->
+<!-- #   isoformExonAnnoation = "/home/neuro/Documents/NMD_analysis/Analysis/Genome/Mus_musculus.GRCm39.107.gtf.gz", -->
+<!-- #   isoformNtFasta       = "/home/neuro/Documents/NMD_analysis/Analysis/Genome/for_salmon/Mus_musculus.GRCm39.cdna.all.fa", -->
+<!-- #   fixStringTieAnnotationProblem = TRUE, -->
+<!-- #   showProgress = FALSE -->
+<!-- # ) -->
+<!-- # ``` -->
+<!-- #  -->
+<!-- #  -->
+<!-- # ```{r} -->
+<!-- # aSwitchListFiltered = preFilter( -->
+<!-- #   switchAnalyzeRlist = aSwitchList, -->
+<!-- #   geneExpressionCutoff = .5, -->
+<!-- #   isoformExpressionCutoff = 0, -->
+<!-- #   removeSingleIsoformGenes = TRUE) -->
+<!-- #  -->
+<!-- # ``` -->
+<!-- #  -->
+<!-- # ```{r} -->
+<!-- # ASwitchListAnalyzed = isoformSwitchTestDEXSeq( -->
+<!-- #   switchAnalyzeRlist = aSwitchListFiltered, -->
+<!-- #   reduceToSwitchingGenes=TRUE, -->
+<!-- #   showProgress = TRUE) -->
+<!-- #  -->
+<!-- # ``` -->
+
+```{r}
+#new = ASwitchListAnalyzed
+
+load("output/ISAR/new_res/ISAR_results.Rda")
+summary(ASwitchListAnalyzed)
+
+```
+
+
+<!-- ```{r} -->
+<!-- exampleSwitchListAnalyzed <- extractSequence( -->
+<!--     ASwitchListAnalyzed, -->
+<!--     pathToOutput = 'output/ISAR/new_res', -->
+<!--     writeToFile=TRUE # to avoid output when running this example data -->
+<!-- ) -->
+
+<!-- ``` -->
+
+<!-- # ```{r} -->
+<!-- # ASwitchListAnalyzed = analyzeCPC2( -->
+<!-- #   switchAnalyzeRlist = ASwitchListAnalyzed,  -->
+<!-- #   pathToCPC2resultFile = "output/ISAR/new_res/result_cpc2.txt",  -->
+<!-- #   removeNoncodinORFs   = FALSE) -->
+<!-- #  -->
+<!-- # ASwitchListAnalyzed <- analyzeSignalP( -->
+<!-- #   switchAnalyzeRlist       = ASwitchListAnalyzed, -->
+<!-- #   pathToSignalPresultFile  = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/ISAR/new_res/prediction_results.txt") -->
+<!-- #  -->
+<!-- # ASwitchListAnalyzed <- analyzeIUPred2A( -->
+<!-- #   switchAnalyzeRlist = ASwitchListAnalyzed,  -->
+<!-- #   pathToIUPred2AresultFile = "output/ISAR/new_res/isoformSwitchAnalyzeR_isoform_AA.result" -->
+<!-- # ) -->
+<!-- #  -->
+<!-- # ASwitchListAnalyzed <- analyzeAlternativeSplicing( -->
+<!-- #   switchAnalyzeRlist = ASwitchListAnalyzed, -->
+<!-- #   quiet=TRUE) -->
+<!-- #  -->
+<!-- # ``` -->
+
+```{r}
+# ASwitchListAnalyzed <- analyzeIUPred2A(
+#   switchAnalyzeRlist = ASwitchListAnalyzed,  
+#   pathToIUPred2AresultFile = "output/ISAR/new_res/isoformSwitchAnalyzeR_isoform_AA.result")
+
+
+
+# ASwitchListAnalyzed <- analyzeSignalP(
+#    switchAnalyzeRlist       = ASwitchListAnalyzed,
+#    pathToSignalPresultFile  = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/ISAR/new_res/SIgnalIP/prediction_results.txt")
+```
+
+
+<!-- # -->
+<!-- # ASwitchListAnalyzed <- analyzeSignalP( -->
+<!-- #   switchAnalyzeRlist       = ASwitchListAnalyzed, -->
+<!-- #   pathToSignalPresultFile  = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/ISAR/new_res/prediction_results.txt") -->
+```{r}
+consequencesOfInterest <- c('intron_retention',
+                            'NMD_status', 'IDR_identified', 
+                            'IDR_type')
+ASwitchListAnalyzed <- analyzeSwitchConsequences(
+    ASwitchListAnalyzed,
+    consequencesToAnalyze = consequencesOfInterest, 
+    dIFcutoff = 0.1, # very high cutoff for fast runtimes - you should use the default (0.1)
+    showProgress=FALSE
+)
+
+```
+
+# Results 
+Results for each analysis and comparison. Columns indicate as following: 
+
+
+- `IF1`: Isoform fraction (IF) ratio in Controls calculated by dividing the isoform expression with the expression of the parent gene
+- `IF2`: IF ration in Condition calculated by dividing the isoform expression with the expression of the parent gene 
+- `dIF`: The difference in IF values (IF2 - IF1)
+- `isoform_switch_q_value`: Isoform level False Discovery Rate (FDR) corrected P-values 
+
+
+
+* All data
+
+```{r}
+ASwitchListAnalyzed$isoformFeatures %>% 
+  #dplyr::filter(condition_2 == "UPF3B_KD" & isoform_switch_q_value < 0.05 & abs(dIF) > 0.1 ) %>% 
+  #dplyr::select(-c("condition_1", "condition_2", "iso_ref", "gene_ref"), -contains("gene_value"), 
+   #             -contains("gene_stderr_"), -contains("iso_value"), -contains("iso_stderr")) %>%
+  dplyr::select("gene_name", everything()) %>% 
+  DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
+            options = list(scrollX = TRUE, 
+                           scrollCollapse = TRUE, 
+                           pageLength = 5, autoWidth = TRUE, 
+                           dom = 'Blfrtip',
+                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
+                           lengthMenu = list(c(10,25,50,-1),
+                                             c(10,25,50,"All"))))
+```
+
+
+* UPF3B KD 
+
+```{r}
+ASwitchListAnalyzed$isoformFeatures %>% 
+  dplyr::filter(condition_2 == "UPF3B_KD" & isoform_switch_q_value < 0.05 & abs(dIF) > 0.1 ) %>% 
+  dplyr::select(-c("condition_1", "condition_2", "iso_ref", "gene_ref"), -contains("gene_value"), 
+                -contains("gene_stderr_"), -contains("iso_value"), -contains("iso_stderr")) %>%
+  dplyr::select("gene_name", everything()) %>% 
+  DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
+            options = list(scrollX = TRUE, 
+                           scrollCollapse = TRUE, 
+                           pageLength = 5, autoWidth = TRUE, 
+                           dom = 'Blfrtip',
+                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
+                           lengthMenu = list(c(10,25,50,-1),
+                                             c(10,25,50,"All"))))
+```
+
+
+
+
+
+* UPF3A KD 
+
+```{r}
+ASwitchListAnalyzed$isoformFeatures %>% 
+  dplyr::filter(condition_2 == "UPF3A_KD" & isoform_switch_q_value < 0.05 & abs(dIF) > 0.1 ) %>% 
+  dplyr::select(-c("condition_1", "condition_2", "iso_ref", "gene_ref"), -contains("gene_value"), 
+                -contains("gene_stderr_"), -contains("iso_value"), -contains("iso_stderr")) %>%
+  dplyr::select("gene_name", everything()) %>% 
+  DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
+            options = list(scrollX = TRUE, 
+                           scrollCollapse = TRUE, 
+                           pageLength = 5, autoWidth = TRUE, 
+                           dom = 'Blfrtip',
+                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
+                           lengthMenu = list(c(10,25,50,-1),
+                                             c(10,25,50,"All"))))
+```
+
+
+* Double KD 
+
+```{r}
+ASwitchListAnalyzed$isoformFeatures %>% 
+  dplyr::filter(condition_2 == "UPF3A_KD_UPF3B_KD" & isoform_switch_q_value < 0.05 & abs(dIF) > 0.1 ) %>% 
+  dplyr::select(-c("condition_1", "condition_2", "iso_ref", "gene_ref"), -contains("gene_value"), 
+                -contains("gene_stderr_"), -contains("iso_value"), -contains("iso_stderr")) %>%
+  dplyr::select("gene_name", everything()) %>% 
+  DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
+            options = list(scrollX = TRUE, 
+                           scrollCollapse = TRUE, 
+                           pageLength = 5, autoWidth = TRUE, 
+                           dom = 'Blfrtip',
+                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
+                           lengthMenu = list(c(10,25,50,-1),
+                                             c(10,25,50,"All"))))
+```
+
+
+
+
+# Overview of results 
+After performing the analysis and annotating the transcripts we now want to see a global overview of the transcript usage. 
+```{r}
+#load("../output/ISAR/switchList.Rda")
+```
+
+
+```{r}
+ extractSwitchSummary(
+     ASwitchListAnalyzed,
+     filterForConsequences = FALSE) %>% pander(style="rmarkdown", 
+                                               caption= "Summary of switches across all comparisons. Results show number of significant isoforms. switches and gene ")
+```
+
+
+
+
+```{r}
+ extractSwitchSummary(
+     ASwitchListAnalyzed,
+     filterForConsequences = TRUE) %>% pander(style="rmarkdown", 
+                                               caption= "Summary of switches across all comparisons with functional consequences. Results show number of significant isoforms. switches and gene ")
+```
+
+
+```{r}
+extractConsequenceSummary(
+    ASwitchListAnalyzed,
+    consequencesToAnalyze='all',
+    plotGenes = FALSE,           # enables analysis of genes (instead of isoforms)
+    asFractionTotal = FALSE      # enables analysis of fraction of significant features
+)
+```
+
+
+```{r fig.width=10}
+extractConsequenceEnrichment(
+    ASwitchListAnalyzed,
+    consequencesToAnalyze='all',
+    analysisOppositeConsequence = TRUE,
+    returnResult = FALSE)
+```
+
+
+
+
+```{r fig.height=12, fig.width=15}
+extractSplicingEnrichmentComparison(
+    ASwitchListAnalyzed,
+    splicingToAnalyze = c('A3','A5','ATSS','ATTS'), # the splicing highlighted above
+    returnResult = FALSE # if TRUE returns a data.frame with the results
+)
+```
+
+
+<!-- # ```{r} -->
+<!-- # ggplot(data=ASwitchListAnalyzed$isoformFeatures, aes(x=dIF, y=-log10(isoform_switch_q_value))) + -->
+<!-- #      geom_point(aes( color=PTC & isoform_switch_q_value < 0.05 & abs(dIF) > 0.1 ), # default cutoff -->
+<!-- #         size=0.5) + -->
+<!-- #     geom_point(data=filter(., is.na(PTC)), aes(color="lightgray"), alpha = 0.5) +  -->
+<!-- # 	  geom_point(data=filter(dIF_all, PTC == FALSE), aes(color="royalblue"), alpha = 0.5) + -->
+<!-- # 	  geom_point(data=filter(dIF_all, PTC == TRUE), aes(color="red"), alpha = 0.5) + -->
+<!-- #     geom_hline(yintercept = -log10(0.05), linetype='dashed') + # default cutoff -->
+<!-- #     geom_vline(xintercept = c(-0.1, 0.1), linetype='dashed') + # default cutoff -->
+<!-- #     facet_wrap( ~ condition_2) + -->
+<!-- #     #facet_grid(condition_1 ~ condition_2) + # alternative to facet_wrap if you have overlapping conditions -->
+<!-- #     scale_color_manual('PTC', values = c('black','red')) + -->
+<!-- #     labs(x='dIF', y='-Log10 ( Isoform Switch Q Value )') + -->
+<!-- #     theme_bw() -->
+<!-- #  -->
+<!-- # ``` -->
+
+### Switch plots of specific genes 
+
+```{r}
+switchingIso <- extractTopSwitches( 
+    ASwitchListAnalyzed, 
+    filterForConsequences = TRUE, 
+    n = NA,                  # n=NA: all features are returned
+    extractGenes = FALSE,    # when FALSE isoforms are returned
+    sortByQvals = TRUE
+)
+```
+
+```{r}
+switchingIso %>% 
+  DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
+            options = list(scrollX = TRUE, 
+                           scrollCollapse = TRUE, 
+                           pageLength = 5, autoWidth = TRUE, 
+                           dom = 'Blfrtip',
+                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
+                           lengthMenu = list(c(10,25,50,-1),
+                                             c(10,25,50,"All"))))
+
+```
+
+
+<!-- # ```{r} -->
+<!-- # switchPlot( -->
+<!-- #     exampleSwitchListAnalyzed, -->
+<!-- #     gene='Cdkl2', -->
+<!-- #     condition1 = 'Control', -->
+<!-- #     condition2 = 'UPF3A_KD', -->
+<!-- #     localTheme = theme_bw(base_size = 13) # making text sightly larger for vignette -->
+<!-- # ) -->
+<!-- #  -->
+<!-- # ``` -->
+
+
+
+## Data for each analysis
+
+
+
+# Exporting data 
+
+```{r}
+save(ASwitchListAnalyzed, file=here::here("output/ISAR/new_res/ISAR_results.Rda"))
+```
+

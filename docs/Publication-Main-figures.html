@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="unawaz1996" />
+
+<meta name="date" content="2026-02-20" />
+
+<title>Publication Main Figures</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="site_libs/datatables-binding-0.34.0/datatables.js"></script>
+<link href="site_libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="site_libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="site_libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="site_libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Analysis of UPF3 paralogs</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="Quality-control.html">Pre-processing</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Differential Expression Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="DEG-analysis.html">DEG analysis</a>
+    </li>
+    <li>
+      <a href="Enichment-analysis-goseq.html">Enrichment analysis using goseq</a>
+    </li>
+    <li>
+      <a href="Enichment-analysis-fgsea.html">Enrichment analysis using fgsea</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Transcript Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Differential-transcript-expression.html">DET analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="RNA-stability.html">RNA Stability analysis</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Figures
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Publication-Main-figures.Rmd">Main Figures</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/unawaz1996/NMD-analysis">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Publication Main Figures</h1>
+<h4 class="author">unawaz1996</h4>
+<h4 class="date">2026-02-20</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-03-05
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 2
+</p>
+<p>
+<strong>Knit directory:</strong> <code>NMD-analysis/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20230314code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20230314)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20230314code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20230314)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
+</p>
+</div>
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Using absolute paths to the files within your workflowr project makes it
+difficult for you and others to run your code on a different machine.
+Change the absolute path(s) below to the suggested relative path(s) to
+make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/Count_NIF_2f.png
+</td>
+<td style="text-align:left;">
+output/Figures/Main/Count_NIF_2f.png
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/Upf3b-stability_fig3a.png
+</td>
+<td style="text-align:left;">
+output/Figures/Main/Upf3b-stability_fig3a.png
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/Upf3b-stability_overlap_fig3b.png
+</td>
+<td style="text-align:left;">
+output/Figures/Main/Upf3b-stability_overlap_fig3b.png
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/Upf3b-stability-overlap_3c.png
+</td>
+<td style="text-align:left;">
+output/Figures/Main/Upf3b-stability-overlap_3c.png
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/DD-NMD-overlap_fig3e.png
+</td>
+<td style="text-align:left;">
+output/Figures/Main/DD-NMD-overlap_fig3e.png
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996NMDanalysistree08bbafdab99816f40a57c3c5dd83827d85201f53targetblank08bbafda">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/unawaz1996/NMD-analysis/tree/08bbafdab99816f40a57c3c5dd83827d85201f53" target="_blank">08bbafd</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996NMDanalysistree08bbafdab99816f40a57c3c5dd83827d85201f53targetblank08bbafda"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/unawaz1996/NMD-analysis/tree/08bbafdab99816f40a57c3c5dd83827d85201f53" target="_blank">08bbafd</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/Enichment-analysis-fgsea.nb.html
+    Ignored:    archive/
+    Ignored:    tmp/
+
+Untracked files:
+    Untracked:  Rplots.pdf
+    Untracked:  Upf3b-all-DEGs-genes.tsv
+    Untracked:  Upf3b-bf-genes.tsv
+    Untracked:  Upf3b-bf-genes.xlsx
+    Untracked:  analysis/Differential-transcript-usage.Rmd
+    Untracked:  analysis/Publication-Main-figures.Rmd
+    Untracked:  analysis/Stability-DD-NMD.Rmd
+    Untracked:  analysis/transcript-features.Rmd
+    Untracked:  analysis/transcript-preprocessing.Rmd
+    Untracked:  code/Archive/
+    Untracked:  code/eisaR.R
+    Untracked:  code/external_code/
+    Untracked:  data/LTK_Sample Metafile_V3.txt
+    Untracked:  data/Mus_musculus.GRCm39.105__nifs.tsv
+    Untracked:  data/data.txt
+    Untracked:  data/data2.txt
+    Untracked:  data/fastq/
+    Untracked:  data/fastqc/
+    Untracked:  data/geneLists/
+    Untracked:  data/genesets/
+    Untracked:  data/genewalk/
+    Untracked:  data/human_mouse_1to1_orthologs.csv
+    Untracked:  data/nif_output/
+    Untracked:  data/samples.txt
+    Untracked:  genesets.csv
+    Untracked:  output/Bona-fide-genes.xlsx
+    Untracked:  output/DEG-limma-results.Rda
+    Untracked:  output/DEG-list.Rda
+    Untracked:  output/DEG-results.xlsx
+    Untracked:  output/DEG/
+    Untracked:  output/DET-analysis.xlsx
+    Untracked:  output/DET-list.Rda
+    Untracked:  output/EISA/
+    Untracked:  output/Figures/
+    Untracked:  output/For_presentation/
+    Untracked:  output/GOseq-results.xlsx
+    Untracked:  output/ISAR/
+    Untracked:  output/Overlap-stability-DEG.xlsx
+    Untracked:  output/Poster_plots/
+    Untracked:  output/QC/
+    Untracked:  output/RNA-stability.xlsx
+    Untracked:  output/Stability/
+    Untracked:  output/Thesis_plots/DD-NMD-overlaps.pdf
+    Untracked:  output/Thesis_plots/DD-NMD/
+    Untracked:  output/Thesis_plots/DEG_ratios.svg
+    Untracked:  output/Thesis_plots/DEGs/
+    Untracked:  output/Thesis_plots/DETs/
+    Untracked:  output/Thesis_plots/GO-DEGs.png
+    Untracked:  output/Thesis_plots/GO-DEGs.svg
+    Untracked:  output/Thesis_plots/Gene-PCA.png
+    Untracked:  output/Thesis_plots/NIFs/
+    Untracked:  output/Thesis_plots/Proprotion_NIF.svg
+    Untracked:  output/Thesis_plots/Upf2.svg
+    Untracked:  output/Thesis_plots/Upf2_exp.png
+    Untracked:  output/Thesis_plots/Upf3-dKD-stability-overlap.svg
+    Untracked:  output/Thesis_plots/Upf3-dKD-stability.svg
+    Untracked:  output/Thesis_plots/Upf3KD-overlap-DSG-DEG.pdf
+    Untracked:  output/Thesis_plots/Upf3_cumulative.svg
+    Untracked:  output/Thesis_plots/Upf3_paralog_cor.png
+    Untracked:  output/Thesis_plots/Upf3_paralog_cor.svg
+    Untracked:  output/Thesis_plots/Upf3a-bf-NIF-proportion.png
+    Untracked:  output/Thesis_plots/Upf3a-bf-NIF-proportion.svg
+    Untracked:  output/Thesis_plots/Upf3a-bf-candidates-features.svg
+    Untracked:  output/Thesis_plots/Upf3a-bf-exp.svg
+    Untracked:  output/Thesis_plots/Upf3a-bf-features.svg
+    Untracked:  output/Thesis_plots/Upf3a-down-bf.svg
+    Untracked:  output/Thesis_plots/Upf3a-down-exp.svg
+    Untracked:  output/Thesis_plots/Upf3a-overlap-DSG-DEG.pdf
+    Untracked:  output/Thesis_plots/Upf3a-stability-overlap.png
+    Untracked:  output/Thesis_plots/Upf3a-stability-overlap.svg
+    Untracked:  output/Thesis_plots/Upf3a-stability.png
+    Untracked:  output/Thesis_plots/Upf3a-stability.svg
+    Untracked:  output/Thesis_plots/Upf3a-transcript-overlap.svg
+    Untracked:  output/Thesis_plots/Upf3a_OE_Upf3b_KD_cor.png
+    Untracked:  output/Thesis_plots/Upf3a_Upf3dKD_cor.png
+    Untracked:  output/Thesis_plots/Upf3a_bf_cumulative.svg
+    Untracked:  output/Thesis_plots/Upf3a_oR_cor.svg
+    Untracked:  output/Thesis_plots/Upf3a_specific_cumulative.svg
+    Untracked:  output/Thesis_plots/Upf3b-NIF-proportion.svg
+    Untracked:  output/Thesis_plots/Upf3b-bf-NIF-proportion.png
+    Untracked:  output/Thesis_plots/Upf3b-bf-NIF-proportion.svg
+    Untracked:  output/Thesis_plots/Upf3b-bf-candidates-features.svg
+    Untracked:  output/Thesis_plots/Upf3b-bf-exp.svg
+    Untracked:  output/Thesis_plots/Upf3b-bf-features.svg
+    Untracked:  output/Thesis_plots/Upf3b-stability-overlap.png
+    Untracked:  output/Thesis_plots/Upf3b-stability-overlap.svg
+    Untracked:  output/Thesis_plots/Upf3b-stability.png
+    Untracked:  output/Thesis_plots/Upf3b-stability.svg
+    Untracked:  output/Thesis_plots/Upf3b-transcript-overlap.svg
+    Untracked:  output/Thesis_plots/Upf3b_Upf3dKD_cor.png
+    Untracked:  output/Thesis_plots/Upf3b_bf_cumulative.svg
+    Untracked:  output/Thesis_plots/Upf3d-KD-candidates-features-1.svg
+    Untracked:  output/Thesis_plots/Upf3d-KD-candidates-features-2.svg
+    Untracked:  output/Thesis_plots/Upf3dKD-bf-NIF-features.svg
+    Untracked:  output/Thesis_plots/Upf3dKD-bf-NIF-proportion.png
+    Untracked:  output/Thesis_plots/Upf3dKD-bf-NIF-proportion.svg
+    Untracked:  output/Thesis_plots/Upf3dKD-bf-candidates-features.svg
+    Untracked:  output/Thesis_plots/Upf3dKD-stability-overlap.png
+    Untracked:  output/Thesis_plots/Upf3dKD-stability.png
+    Untracked:  output/Thesis_plots/Upf3dKD-transcript-overlap.svg
+    Untracked:  output/Thesis_plots/all_overlaps-transcript-DEGs.svg
+    Untracked:  output/Thesis_plots/all_overlaps-transcript.svg
+    Untracked:  output/Thesis_plots/all_overlaps.svg
+    Untracked:  output/Thesis_plots/all_overlaps_enrichment.svg
+    Untracked:  output/Thesis_plots/overlap-bf-exp.svg
+    Untracked:  output/Thesis_plots/overlapping-bf-features.svg
+    Untracked:  output/Thesis_plots/overlaps/
+    Untracked:  output/Thesis_plots/ratio_DET.svg
+    Untracked:  output/Thesis_plots/total_DEG.svg
+    Untracked:  output/Thesis_plots/trans-pca-final.svg
+    Untracked:  output/Thesis_plots/trans-pca.svg
+    Untracked:  output/Thesis_plots/transcript-gc-qc.pdf
+    Untracked:  output/Thesis_plots/transcript_det_ma.pdf
+    Untracked:  output/Thesis_plots/upf3a-check.svg
+    Untracked:  output/Thesis_plots/upf3b-DEG-DSA.pdf
+    Untracked:  output/Thesis_plots/upf3b-check.svg
+    Untracked:  output/Thesis_plots/venn-bona-fide.pdf
+    Untracked:  output/Transcript/
+    Untracked:  output/Upf3b-high-confident-genes.xlsx
+    Untracked:  output/fgsea-heatmap-data.Rda
+    Untracked:  output/fgsea-output.xlsx
+    Untracked:  output/fgsea_geneset_characterization.csv
+    Untracked:  output/isoformSwitchAnalyzeR_isoform_AA_complete.fasta
+    Untracked:  output/isoformSwitchAnalyzeR_isoform_AA_subset_1_of_3.fasta
+    Untracked:  output/isoformSwitchAnalyzeR_isoform_AA_subset_2_of_3.fasta
+    Untracked:  output/isoformSwitchAnalyzeR_isoform_AA_subset_3_of_3.fasta
+    Untracked:  output/isoformSwitchAnalyzeR_isoform_nt.fasta
+    Untracked:  output/limma-matrices.Rda
+    Untracked:  output/sequences/
+
+Unstaged changes:
+    Deleted:    .Rprofile
+    Modified:   .gitignore
+    Modified:   NMD-analysis.Rproj
+    Modified:   analysis/DEG-analysis.Rmd
+    Modified:   analysis/Differential-transcript-expression.Rmd
+    Modified:   analysis/Enichment-analysis-fgsea.Rmd
+    Modified:   analysis/Enichment-analysis-goseq.Rmd
+    Modified:   analysis/Quality-control.Rmd
+    Modified:   analysis/RNA-stability.Rmd
+    Modified:   analysis/_site.yml
+    Modified:   code/functions.R
+    Modified:   code/libraries.R
+    Modified:   output/Thesis_plots/Count_NIF.svg
+    Modified:   output/Thesis_plots/NIF_feature_OR.svg
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<pre class="r"><code>source(&quot;code/plots.R&quot;) 
+source(&quot;code/functions.R&quot;)
+source(&quot;code/libraries.R&quot;)
+library(biomaRt)
+library(nVennR)
+library(eulerr)
+library(ggsci)
+library(janitor)
+library(ggside)
+library(ggstatsplot)
+library(stargazer)
+library(coin)
+library(GeneOverlap)</code></pre>
+<pre class="r"><code>txdf = transcripts(EnsDb.Mmusculus.v79, return.type=&quot;DataFrame&quot;)
+tx2gene = as.data.frame(txdf[,c(&quot;tx_id&quot;,&quot;gene_id&quot;, &quot;tx_biotype&quot;)])</code></pre>
+<div id="figure-2" class="section level2">
+<h2>Figure 2</h2>
+<pre class="r"><code>load(&quot;output/DEG-list.Rda&quot;)</code></pre>
+<div id="figure-2a" class="section level3">
+<h3>Figure 2a</h3>
+<pre class="r"><code>DEColours &lt;- c(&quot;Downregulated&quot; = &quot;#53A08E&quot;,&quot;Upregulated&quot; = &quot;#690020&quot;,  &quot;Not Sig&quot; = &quot;#CECCCA&quot;)
+
+fc_thr &lt;- log2(1.5)
+
+
+contrast_labeller &lt;- as_labeller(c(
+  &quot;UPF3B_vs_Control&quot; = &quot;italic(Upf3b)~&#39;KD DEGs&#39;&quot;,
+  &quot;UPF3A_vs_Control&quot;= &quot;italic(Upf3a)~&#39;KD DEGs&#39;&quot;,
+  &quot;DoubleKD_vs_Control&quot;    = &quot;italic(Upf3)~&#39;dKD DEGs&#39;&quot;,
+  &quot;UPF3A_OE_UPF3B_KD_vs_Control&quot; = &quot;italic(Upf3a)~&#39;OE&#39;~italic(Upf3b)~&#39;KD DEGs&#39;&quot;
+), label_parsed)
+
+
+
+df = res %&gt;% 
+  do.call(&quot;rbind&quot;, .) %&gt;%
+    mutate(Result = ifelse(adj.P.Val &lt; 0.05 &amp; logFC &gt; log2(1.5), &quot;Upregulated&quot;,        
+               ifelse(adj.P.Val &lt; 0.05 &amp; abs(logFC) &gt; log2(1.5), &quot;Downregulated&quot;, &quot;Not Sig&quot;))) %&gt;% 
+  dplyr::filter(contrast != &quot;UPF3A_OE_vs_Control&quot;) %&gt;%
+  mutate(contrast = factor(contrast, levels= c(&quot;UPF3B_vs_Control&quot;,
+                                               &quot;UPF3A_vs_Control&quot;,
+                                               &quot;DoubleKD_vs_Control&quot;,
+                                               &quot;UPF3A_OE_UPF3B_KD_vs_Control&quot;)))
+
+counts &lt;- df %&gt;%
+  dplyr::filter(Result %in% c(&quot;Upregulated&quot;,&quot;Downregulated&quot;)) %&gt;%
+  group_by(contrast) %&gt;%
+  summarise(
+    n_up   = sum(Result == &quot;Upregulated&quot;, na.rm = TRUE),
+    n_down = sum(Result == &quot;Downregulated&quot;, na.rm = TRUE),
+    xmin   = min(logFC, na.rm = TRUE),
+    xmax   = max(logFC, na.rm = TRUE),
+    .groups = &quot;drop&quot;
+  ) %&gt;%
+  pivot_longer(c(n_up, n_down), names_to = &quot;which&quot;, values_to = &quot;n&quot;) %&gt;%
+  mutate(
+    Result = ifelse(which == &quot;n_up&quot;, &quot;Upregulated&quot;, &quot;Downregulated&quot;),
+
+    # 5% inward from panel edge
+    x = ifelse(
+      Result == &quot;Upregulated&quot;,
+      xmax - 0.05 * (xmax - xmin),
+      xmin + 0.05 * (xmax - xmin)
+    ),
+
+    y = 7.5,
+    label = paste0(&quot;n = &quot;, n)
+  )
+
+
+
+deg_volcano_plot = df %&gt;% 
+    ggplot(aes(x= logFC,
+               y = -log10(adj.P.Val),
+               colour = as.factor(as.character(Result )))) +
+    geom_point(alpha = 0.75, size = 4) +
+    scale_colour_manual(values = DEColours) + theme_bw() +
+  #    geom_text(
+  #   data = counts,
+  #   aes(x = x, y = y, label = label, colour = Result),
+  #   inherit.aes = FALSE,
+  #   family = &quot;serif&quot;,
+  #   size = 5
+  # ) +
+  xlab(bquote(log[&quot;2&quot;](FC))) +
+  ylab(bquote(log[&quot;10&quot;](&quot;adjusted P-value&quot;))) +
+   scale_colour_manual(
+    values = DEColours,
+    breaks = c(&quot;Upregulated&quot;, &quot;Downregulated&quot;),
+    drop = TRUE
+  ) +
+  guides(colour = guide_legend(override.aes = list(size = 5, alpha = 1))) +
+  theme_bw() + geom_vline(xintercept = c(-log2(1.5),log2(1.5)), linetype = &quot;dashed&quot;) +
+  theme(
+    legend.position = &quot;top&quot;,
+    legend.title = element_blank(),
+    legend.background = element_rect(fill = &quot;white&quot;, colour = &quot;black&quot;, linewidth = 0.25),
+    legend.box.background = element_rect(fill = NA, colour = &quot;black&quot;, linewidth = 0.25),
+    legend.key = element_rect(fill = &quot;white&quot;, colour = NA),
+
+    axis.text = element_text(family = &quot;serif&quot;, size = 14, color = &quot;black&quot;),
+    axis.title = element_text(family = &quot;serif&quot;, size = 20, color = &quot;black&quot;),
+    strip.text = element_text(family = &quot;serif&quot;, size = 14)
+  ) + facet_grid(~contrast, scales =  &quot;free_x&quot;, labeller = contrast_labeller) +  ylim(0, 10)
+ 
+ 
+deg_volcano_plot      </code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(plot = deg_volcano_plot, filename = here::here(&quot;output/Figures/Main/DEG_volcano_fig2a.png&quot;),
+       dpi =1200, height = 6, width =10)</code></pre>
+</div>
+<div id="figure-2b" class="section level3">
+<h3>Figure 2b</h3>
+<pre class="r"><code>contrasts = c(&quot;UPF3B_vs_Control&quot;,&quot;UPF3A_vs_Control&quot;        , &quot;UPF3A_OE_vs_Control&quot;, &quot;DoubleKD_vs_Control&quot;         , &quot;UPF3A_OE_UPF3B_KD_vs_Control&quot;)
+
+for_upf3b =  contrasts[-c(1,3)]
+
+overlap_upf3b = list()
+for (c in for_upf3b ){
+  overlap = DEGenes$UPF3B_vs_Control %&gt;% 
+    inner_join(DEGenes[[c]] , by=&quot;EnsID&quot;) %&gt;% 
+      mutate(Label = ifelse(logFC.x &gt; 0 &amp; logFC.y &gt;0 | 
+                            logFC.x &lt; 0 &amp; logFC.y &lt;0, &quot;Concordance&quot;, &quot;Discordant&quot;)) 
+  total = table(overlap$Label) %&gt;% as.data.frame() 
+  overlap_upf3b[[paste0(c, &quot;_vs_Upf3b_KD&quot;)]] = total
+  
+}
+
+for_upf3a = contrasts[c(4:5)]
+overlap_upf3a = list()
+for (c in for_upf3a ){
+  overlap = DEGenes$UPF3A_vs_Control %&gt;% 
+    inner_join(DEGenes[[c]], by=&quot;EnsID&quot;) %&gt;% 
+      mutate(Label = ifelse(logFC.x &gt; 0 &amp; logFC.y &gt;0 | 
+                            logFC.x &lt; 0 &amp; logFC.y &lt;0, &quot;Concordance&quot;, &quot;Discordant&quot;)) 
+  total = table(overlap$Label) %&gt;% as.data.frame() 
+  overlap_upf3a[[paste0(c, &quot;_vs_Upf3A_KD&quot;)]] = total
+  
+}
+
+
+for_dkDupf3 = contrasts[c(5)]
+overlap_dkDupf3 = list()
+for (c in for_dkDupf3 ){
+  overlap = DEGenes$DoubleKD_vs_Control %&gt;% 
+    inner_join(DEGenes[[c]], by=&quot;EnsID&quot;) %&gt;% 
+      mutate(Label = ifelse(logFC.x &gt; 0 &amp; logFC.y &gt;0 | 
+                            logFC.x &lt; 0 &amp; logFC.y &lt;0, &quot;Concordance&quot;, &quot;Discordant&quot;)) 
+  total = table(overlap$Label) %&gt;% as.data.frame() 
+  overlap_dkDupf3 [[paste0(c, &quot;_vs_Upf3_dKD&quot;)]] = total
+  
+}
+
+
+
+overlap_upf3b =do.call(&quot;rbind&quot;,overlap_upf3b) %&gt;% 
+  rownames_to_column(&quot;Comparisons&quot;) %&gt;% 
+   mutate_at(.vars = &quot;Comparisons&quot;, .funs = gsub, pattern = &quot;\\.[0-9]*$&quot;, replacement = &quot;&quot;) 
+  
+
+overlap_upf3a =do.call(&quot;rbind&quot;,overlap_upf3a) %&gt;% 
+  rownames_to_column(&quot;Comparisons&quot;) %&gt;% 
+   mutate_at(.vars = &quot;Comparisons&quot;, .funs = gsub, pattern = &quot;\\.[0-9]*$&quot;, replacement = &quot;&quot;) 
+
+
+overlap_dkDupf3  =do.call(&quot;rbind&quot;,overlap_dkDupf3 ) %&gt;% 
+  rownames_to_column(&quot;Comparisons&quot;) %&gt;% 
+   mutate_at(.vars = &quot;Comparisons&quot;, .funs = gsub, pattern = &quot;\\.[0-9]*$&quot;, replacement = &quot;&quot;) 
+
+
+all_comparisons = rbind(overlap_upf3b,overlap_upf3a, overlap_dkDupf3) %&gt;% 
+  mutate(Var1 = factor(Var1, levels = c(&quot;Discordant&quot;, &quot;Concordance&quot; )), 
+         Comparisons = factor(Comparisons, levels = c(&quot;UPF3A_OE_UPF3B_KD_vs_Control_vs_Upf3_dKD&quot;, 
+                                                      &quot;UPF3A_OE_UPF3B_KD_vs_Control_vs_Upf3A_KD&quot;,
+                                                       &quot;DoubleKD_vs_Control_vs_Upf3A_KD&quot;, 
+                                                      &quot;UPF3A_OE_UPF3B_KD_vs_Control_vs_Upf3b_KD&quot;,
+                                                        &quot;DoubleKD_vs_Control_vs_Upf3b_KD&quot;,
+                                                      &quot;UPF3A_vs_Control_vs_Upf3b_KD&quot;
+                                                      ) )) %&gt;%
+  ggplot(aes(x = Comparisons, y = Freq, fill = Var1)) + 
+  geom_bar(stat= &quot;identity&quot;, width= 0.65) + coord_flip() + scale_fill_manual(values = c( &quot;#BAB8B5&quot;,&quot;#EB635E&quot;)) +
+  theme_bw() +
+     theme(axis.text.x = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;),
+            axis.text.y = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;),
+        axis.title = element_text(size=14, family = &quot;serif&quot;), 
+         legend.box.background = element_rect(color = &quot;black&quot;),
+          legend.text = element_text(family = &quot;serif&quot;, size=10), 
+          legend.title = element_text( family = &quot;serif&quot;),
+           plot.title = element_text(family = &quot;serif&quot;, size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = &quot;top&quot;,
+        strip.text.y = element_text(
+        size = 10, face = &quot;bold.italic&quot;, family = &quot;serif&quot;
+        ),
+         strip.text.x = element_text(
+        size = 10, family = &quot;serif&quot;
+        )) + labs(y= &quot;Number of Overlapping transcripts&quot;,
+                  fill = &quot;Expression&quot;, 
+                  x= &quot;&quot;) + 
+   scale_x_discrete(labels = c(
+    &quot;UPF3A_vs_Control_vs_Upf3b_KD&quot; = &quot;Upf3b KD DEGs,\nUpf3a KD DEGs&quot;,
+    &quot;DoubleKD_vs_Control_vs_Upf3b_KD&quot; = &quot;Upf3b KD DEGs,\nUpf3 dKD DEGs&quot;,
+    &quot;UPF3A_OE_UPF3B_KD_vs_Control_vs_Upf3b_KD&quot; = &quot;Upf3b KD DEGs,\nUpf3a OE — Upf3b KD\nDEGs&quot;,
+    &quot;DoubleKD_vs_Control_vs_Upf3A_KD&quot; = &quot;Upf3a KD DEGs, \nUpf3 dKD DEGs&quot;,
+    &quot;UPF3A_OE_UPF3B_KD_vs_Control_vs_Upf3A_KD&quot; = &quot;Upf3a KD DEGs,\nUpf3a OE — Upf3b KD\nDEGs&quot;, 
+    &quot;UPF3A_OE_UPF3B_KD_vs_Control_vs_Upf3_dKD&quot; = &quot;Upf3 dKD DEGs,\nUpf3a OE — Upf3b KD\nDEGs&quot;
+    
+  ))
+all_comparisons </code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(filename = here::here(&quot;output/Figures/Main/DEGs-overlap-enrichment-fig2b.png&quot;), plot = all_comparisons, dpi = 1200,
+       units = c(&quot;in&quot;), height = 6, width = 6.5)</code></pre>
+<pre class="r"><code>library(GeneOverlap)
+
+enrichment_DEGs_P = list()
+enrichment_DEGs_OR = list()
+
+
+test.list = list()
+test.list$UPF3B_vs_Control = DEGenes$UPF3B_vs_Control$EnsID
+test.list$UPF3A_vs_Control = DEGenes$UPF3A_vs_Control$EnsID
+test.list$DoubleKD_vs_Control = DEGenes$DoubleKD_vs_Control$EnsID
+test.list$UPF3A_OE_UPF3B_KD_vs_Control = DEGenes$UPF3A_OE_UPF3B_KD_vs_Control$EnsID
+test.list$BG = res$UPF3B_vs_Control$EnsID
+
+for_upf3b = contrasts[-c(1,3)]
+
+for (c in for_upf3b ){
+  
+  go.obj &lt;- newGeneOverlap(test.list$UPF3B_vs_Control, 
+                         test.list[[c]],
+                         genome.size=length(test.list$BG))
+  go.obj &lt;- testGeneOverlap(go.obj)
+  enrichment_DEGs_P[[paste0(&quot;Upf3b_KD&quot;, &quot;_&quot;, c)]] = go.obj@pval
+  enrichment_DEGs_OR[[paste0(&quot;Upf3b_KD&quot;, &quot;_&quot;, c)]] = go.obj@odds.ratio 
+}
+  
+for_upf3a = contrasts[c(4:5)]
+
+for (c in for_upf3a ){
+    go.obj &lt;- newGeneOverlap(test.list$UPF3A_vs_Control, 
+                         test.list[[c]],
+                         genome.size=length(test.list$BG))
+  go.obj &lt;- testGeneOverlap(go.obj)
+  enrichment_DEGs_P[[paste0(&quot;Upf3a_KD&quot;, &quot;_&quot;, c)]] = go.obj@pval
+  enrichment_DEGs_OR[[paste0(&quot;Upf3a_KD&quot;, &quot;_&quot;, c)]] = go.obj@odds.ratio 
+}
+
+
+for_dkDupf3 = contrasts[c(5)]
+for (c in for_dkDupf3 ){
+      go.obj &lt;- newGeneOverlap(test.list$DoubleKD_vs_Control, 
+                         test.list[[c]],
+                         genome.size=length(test.list$BG))
+  go.obj &lt;- testGeneOverlap(go.obj)
+  enrichment_DEGs_P[[paste0(&quot;Upf3_dKD&quot;, &quot;_&quot;, c)]] = go.obj@pval
+  enrichment_DEGs_OR[[paste0(&quot;Upf3_dKD&quot;, &quot;_&quot;, c)]] = go.obj@odds.ratio 
+  
+}
+
+enrichment_DEGs_OR %&gt;% do.call(rbind,.) %&gt;% 
+  set_colnames(&quot;OR&quot;) %&gt;% 
+  cbind(enrichment_DEGs_P %&gt;% do.call(rbind,.) %&gt;% set_colnames(&quot;pvalue&quot;)) %&gt;% 
+  as.data.frame()  %&gt;% DT::datatable()</code></pre>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-dff419b18c84ddd6c2a0" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-dff419b18c84ddd6c2a0">{"x":{"filter":"none","vertical":false,"data":[["Upf3b_KD_UPF3A_vs_Control","Upf3b_KD_DoubleKD_vs_Control","Upf3b_KD_UPF3A_OE_UPF3B_KD_vs_Control","Upf3a_KD_DoubleKD_vs_Control","Upf3a_KD_UPF3A_OE_UPF3B_KD_vs_Control","Upf3_dKD_UPF3A_OE_UPF3B_KD_vs_Control"],[20.77494593129651,49.05703373036758,190.1362670297746,43.21969877790252,18.96826630685567,49.35725398504333],[2.476923535158474e-109,2.119059411924938e-271,0,1.219489719047688e-245,1.358535065725006e-86,6.748620864926088e-222]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>OR<\/th>\n      <th>pvalue<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"OR","targets":1},{"name":"pvalue","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="figure-2c" class="section level3">
+<h3>Figure 2c</h3>
+<pre class="r"><code>cor_upf3a_upf3b =  DEGenes$UPF3B_vs_Control %&gt;% 
+  
+  inner_join(DEGenes$UPF3A_vs_Control,  by = &quot;EnsID&quot;) %&gt;% 
+  mutate(Label = ifelse(logFC.x &gt; 0 &amp; logFC.y &gt;0 | 
+                            logFC.x &lt; 0 &amp; logFC.y &lt;0, &quot;Concordance&quot;, &quot;Discordant&quot;)) %&gt;% 
+  ggscatter(., x= &quot;logFC.x&quot;, y=&quot;logFC.y&quot;, 
+              cor.coef = TRUE, add = &quot;reg.line&quot;, 
+              cor.coeff.args = list(size = 6, family = &quot;serif&quot;), 
+              size=5, alpha =0.75, color = &quot;Label&quot;,
+              conf.int = TRUE, add.params = list(color = &quot;blue&quot;,
+                                                 fill = &quot;lightgray&quot;)) + 
+    theme_bw() + ylab(expression(italic(&quot;Upf3a&quot;) ~ &quot;KD (LFC)&quot;)) +
+xlab(expression(italic(&quot;Upf3b&quot;) ~ &quot;KD (LFC)&quot;)) +
+  geom_hline(yintercept = 0, size = 0.5,lty = &quot;dashed&quot;, color = &quot;grey60&quot;) +
+  geom_vline(xintercept = 0, size = 0.5, lty = &quot;dashed&quot;, color = &quot;grey60&quot;) + theme(legend.position = &quot;none&quot;) +
+  scale_color_manual(values = c(&quot;#EB635E&quot;, &quot;#BAB8B5&quot;)) +  
+  theme(axis.text.x = element_text(size = 18, family = &quot;serif&quot;, color = &quot;black&quot;),
+            axis.text.y = element_text(size = 18, family = &quot;serif&quot;, color = &quot;black&quot;),
+        axis.title = element_text(size=20, family = &quot;serif&quot;), 
+         legend.box.background = element_rect(color = &quot;black&quot;),
+          legend.text = element_text(family = &quot;serif&quot;), 
+          legend.title = element_text( family = &quot;serif&quot;),
+           plot.title = element_text(family = &quot;serif&quot;, size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = &quot;top&quot;,
+        strip.text.y = element_text(
+        size = 10, face = &quot;bold.italic&quot;, family = &quot;serif&quot;
+        ),
+         strip.text.x = element_text(
+        size = 10, family = &quot;serif&quot;
+        )) + labs(color = &quot;Expression&quot;)
+
+cor_upf3a_upf3b </code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(filename = here::here(&quot;output/Figures/Main/Upf3b-Upf3a-cor-fig2c.png&quot;), plot = cor_upf3a_upf3b , dpi = 1200,
+       units = c(&quot;in&quot;), height = 7.5, width = 4)
+
+cor_upf3b_upf3d =  DEGenes$UPF3B_vs_Control %&gt;% 
+  
+  inner_join(DEGenes$DoubleKD_vs_Control,  by = &quot;EnsID&quot;) %&gt;% 
+  mutate(Label = ifelse(logFC.x &gt; 0 &amp; logFC.y &gt;0 | 
+                            logFC.x &lt; 0 &amp; logFC.y &lt;0, &quot;Concordance&quot;, &quot;Discordant&quot;)) %&gt;% 
+  ggscatter(., x= &quot;logFC.x&quot;, y=&quot;logFC.y&quot;, 
+              cor.coef = TRUE, add = &quot;reg.line&quot;, 
+              size=5, alpha =0.75, color = &quot;Label&quot;,
+            cor.coeff.args = list(size = 6, family = &quot;serif&quot;), 
+              conf.int = TRUE, add.params = list(color = &quot;blue&quot;,
+                                                 fill = &quot;lightgray&quot;)) + 
+    theme_bw() + ylab(expression(italic(&quot;Upf3&quot;) ~ &quot;dKD (LFC)&quot;)) +
+xlab(expression(italic(&quot;Upf3b&quot;) ~ &quot;KD (LFC)&quot;)) +
+  geom_hline(yintercept = 0, size = 0.5,lty = &quot;dashed&quot;, color = &quot;grey60&quot;) +
+  geom_vline(xintercept = 0, size = 0.5, lty = &quot;dashed&quot;, color = &quot;grey60&quot;) + theme(legend.position = &quot;none&quot;) +
+  scale_color_manual(values = c(&quot;#EB635E&quot;, &quot;#BAB8B5&quot;)) +  
+  theme(axis.text.x = element_text(size = 18, family = &quot;serif&quot;, color = &quot;black&quot;),
+            axis.text.y = element_text(size = 18, family = &quot;serif&quot;, color = &quot;black&quot;),
+        axis.title = element_text(size=25, family = &quot;serif&quot;), 
+         legend.box.background = element_rect(color = &quot;black&quot;),
+          legend.text = element_text(family = &quot;serif&quot;), 
+          legend.title = element_text( family = &quot;serif&quot;),
+           plot.title = element_text(family = &quot;serif&quot;, size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = &quot;top&quot;,
+        strip.text.y = element_text(
+        size = 10, face = &quot;bold.italic&quot;, family = &quot;serif&quot;
+        ),
+         strip.text.x = element_text(
+        size = 10, family = &quot;serif&quot;
+        )) + labs(color = &quot;Expression&quot;)
+
+cor_upf3b_upf3d</code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(filename = here::here(&quot;output/Figures/Main/Upf3b-Upf3dKD-cor-fig2c.png&quot;), plot = cor_upf3b_upf3d , dpi = 1200,
+       units = c(&quot;in&quot;), height = 7.5, width = 4)
+
+
+cor_upf3a_upf3d =  DEGenes$UPF3A_vs_Control %&gt;% 
+  
+  inner_join(DEGenes$DoubleKD_vs_Control,  by = &quot;EnsID&quot;) %&gt;% 
+  mutate(Label = ifelse(logFC.x &gt; 0 &amp; logFC.y &gt;0 | 
+                            logFC.x &lt; 0 &amp; logFC.y &lt;0, &quot;Concordance&quot;, &quot;Discordant&quot;)) %&gt;% 
+  ggscatter(., x= &quot;logFC.x&quot;, y=&quot;logFC.y&quot;, 
+              cor.coef = TRUE, add = &quot;reg.line&quot;, 
+              size=5, alpha =0.75, color = &quot;Label&quot;,
+            cor.coeff.args = list(size = 6, family = &quot;serif&quot;),
+              conf.int = TRUE, add.params = list(color = &quot;blue&quot;,
+                                                 fill = &quot;lightgray&quot;)) + 
+    theme_bw() +ylab(expression(italic(&quot;Upf3&quot;) ~ &quot;dKD (LFC)&quot;)) +
+xlab(expression(italic(&quot;Upf3a&quot;) ~ &quot;KD (LFC)&quot;)) +
+  geom_hline(yintercept = 0, size = 0.5,lty = &quot;dashed&quot;, color = &quot;grey60&quot;) +
+  geom_vline(xintercept = 0, size = 0.5, lty = &quot;dashed&quot;, color = &quot;grey60&quot;) + theme(legend.position = &quot;none&quot;) +
+  scale_color_manual(values = c(&quot;#EB635E&quot;, &quot;#BAB8B5&quot;)) +  
+  theme(axis.text.x = element_text(size = 18, family = &quot;serif&quot;, color = &quot;black&quot;),
+            axis.text.y = element_text(size = 18, family = &quot;serif&quot;, color = &quot;black&quot;),
+        axis.title = element_text(size=20, family = &quot;serif&quot;), 
+         legend.box.background = element_rect(color = &quot;black&quot;),
+          legend.text = element_text(family = &quot;serif&quot;), 
+          legend.title = element_text( family = &quot;serif&quot;),
+           plot.title = element_text(family = &quot;serif&quot;, size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = &quot;top&quot;,
+        strip.text.y = element_text(
+        size = 10, face = &quot;bold.italic&quot;, family = &quot;serif&quot;
+        ),
+         strip.text.x = element_text(
+        size = 10, family = &quot;serif&quot;
+        )) + labs(color = &quot;Expression&quot;)
+
+
+cor_upf3a_upf3d</code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-6-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(filename = here::here(&quot;output/Figures/Main/Upf3a-Upf3dKD-cor-fig2c.png&quot;), plot = cor_upf3a_upf3d , dpi = 1200,
+       units = c(&quot;in&quot;), height = 7.5, width = 4)
+
+
+Upf3a_oR_cor = DEGenes$UPF3B_vs_Control %&gt;% 
+  #rownames_to_column(&quot;EnsID&quot;) %&gt;% 
+  
+  inner_join(DEGenes$UPF3A_OE_UPF3B_KD_vs_Control, #%&gt;% 
+              # rownames_to_column(&quot;EnsID&quot;),
+             by = &quot;EnsID&quot;) %&gt;% 
+  mutate(Label = ifelse(logFC.x &gt; 0 &amp; logFC.y &gt;0 | 
+                            logFC.x &lt; 0 &amp; logFC.y &lt;0, &quot;Concordant&quot;, &quot;Discordant&quot;)) %&gt;% 
+  ggscatter(., x= &quot;logFC.x&quot;, y=&quot;logFC.y&quot;, 
+              cor.coef = TRUE, add = &quot;reg.line&quot;, 
+              size=5, alpha =0.75, color = &quot;Label&quot;,
+            cor.coeff.args = list(size = 6, family = &quot;serif&quot;), 
+              conf.int = TRUE, add.params = list(color = &quot;blue&quot;,
+                                                 fill = &quot;lightgray&quot;)) + 
+    theme_bw() + 
+  ylab(expression(italic(&quot;Upf3a&quot;) ~ &quot;OE -&quot; ~ italic(&quot;Upf3b&quot;) ~ &quot;KD (LFC)&quot;)) +
+  xlab(expression(italic(&quot;Upf3b&quot;) ~ &quot;KD (LFC)&quot;)) +
+  geom_hline(yintercept = 0, size = 0.5,lty = &quot;dashed&quot;, color = &quot;grey60&quot;) +
+  geom_vline(xintercept = 0, size = 0.5, lty = &quot;dashed&quot;, color = &quot;grey60&quot;) + theme(legend.position = &quot;none&quot;) +
+  scale_color_manual(values = c(&quot;#EB635E&quot;, &quot;#BAB8B5&quot;)) +  
+  theme(axis.text.x = element_text(size = 18, family = &quot;serif&quot;, color = &quot;black&quot;),
+            axis.text.y = element_text(size = 18, family = &quot;serif&quot;, color = &quot;black&quot;),
+        axis.title = element_text(size=20, family = &quot;serif&quot;), 
+         legend.box.background = element_rect(color = &quot;black&quot;),
+          legend.text = element_text(family = &quot;serif&quot;), 
+          legend.title = element_text( family = &quot;serif&quot;),
+           plot.title = element_text(family = &quot;serif&quot;, size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = &quot;top&quot;,
+        strip.text.y = element_text(
+        size = 10, face = &quot;bold.italic&quot;, family = &quot;serif&quot;
+        ),
+         strip.text.x = element_text(
+        size = 10, family = &quot;serif&quot;
+        )) + labs(color = &quot;Expression&quot;)
+
+Upf3a_oR_cor</code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-6-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(filename = here::here(&quot;output/Figures/Main/Upf3a-Upf3aOEUpf3bKD-cor-fig2c.png&quot;), plot = cor_upf3a_upf3d , dpi = 1200,
+       units = c(&quot;in&quot;), height = 7.5, width = 4)
+
+ggarrange(cor_upf3a_upf3b, cor_upf3b_upf3d,
+          cor_upf3a_upf3d, Upf3a_oR_cor, ncol =4, common.legend = TRUE)</code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-6-5.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="figure-2e" class="section level3">
+<h3>Figure 2e</h3>
+<pre class="r"><code>load(file=here::here(&quot;output/DET-list.Rda&quot;))</code></pre>
+<!-- #  -->
+<!-- # NMD_features = read.table("data/nif_output/Mus_musculus__nifs.tsv", sep = "\t", skip =1) -->
+<!-- #  -->
+<!-- # colnames(NMD_features)[1:4] = c("EnsID", "NIF_dEJ", "NIF_uORF", "NIF_long-3'utr") -->
+<!-- # NMD_features = NMD_features[,1:4] -->
+<!-- # tx_NMD = NMD_features %>% -->
+<!-- #   mutate_at(.vars = "EnsID", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "") %>% -->
+<!-- #   dplyr::rename("tx_id" = "EnsID") %>% -->
+<!-- #   right_join(dge.scaled.filtr$counts %>% -->
+<!-- #                as.data.frame() %>% -->
+<!-- #                rownames_to_column("tx_id") %>% -->
+<!-- #                mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = ""), -->
+<!-- #              by="tx_id") -->
+<!-- #  -->
+<!-- # dEJ = tx_NMD %>% -->
+<!-- #   dplyr::filter(NIF_dEJ == "True") %>% -->
+<!-- #   dplyr::select(tx_id) -->
+<!-- #  -->
+<!-- #  -->
+<!-- # uORF = tx_NMD %>% -->
+<!-- #   dplyr::filter(NIF_uORF == "True") %>% -->
+<!-- #   dplyr::select(tx_id) -->
+<!-- # UTR = tx_NMD %>% -->
+<!-- #   dplyr::filter(`NIF_long-3'utr` == "True") %>% -->
+<!-- #   dplyr::select(tx_id) -->
+<!-- #  -->
+<!-- # x = list( "dEJ" = dEJ$tx_id, -->
+<!-- #           "uORF" = uORF$tx_id, -->
+<!-- #           "Long 3'UTR" = UTR$tx_id, -->
+<!-- #           "All transcripts" = tx_NMD$tx_id) -->
+<!-- #  -->
+<!-- # UpSetR::upset(fromList(x), main.bar.color = c("#585A58", "#6d597a", "#eaac8b", "#fcb9b2", -->
+<!-- #                                               "#585A58", "#585A58", "#585A58", "#585A58"), -->
+<!-- #               sets.bar.color = c("#585A58", "#6d597a", "#eaac8b", "#fcb9b2"), -->
+<!-- #                   mainbar.y.label = "Overlap of Transcripts with NMD inducing features", -->
+<!-- #               sets.x.label = "Number of transcripts", -->
+<!-- #                 text.scale = c(0.8,1.2,1.2, 1.2, 1.2), -->
+<!-- #               point.size = 4.3) -->
+<!-- #  -->
+<!-- # ``` -->
+</div>
+<div id="figure-2f" class="section level3">
+<h3>Figure 2f</h3>
+<pre class="r"><code>nif_features = list()
+for (i in names(res_dte)[-3]){
+  name = i
+  temp = res_dte[[i]]
+  
+  message(&quot;Counting NIFs in upregulated transcripts for &quot;, name)
+  sig_up = temp %&gt;%  as.data.frame() %&gt;%  
+        dplyr::filter(FDR &lt; 0.05, logFC &gt; log2(1)) 
+  utr = table(sig_up$NIF_long_3utr)[2]
+  dej = table(sig_up$NIF_dEJ)[2]
+  uorf = table(sig_up$NIF_uORF)[2]
+  none = table(sig_up$nif_feature)[1]
+  total_nif_up  = rbind(utr, dej, uorf, none) %&gt;% 
+    as.data.frame() %&gt;% 
+    rownames_to_column(&quot;NIF_feature&quot;) %&gt;% 
+    mutate(Condition = name, 
+           Expression = &quot;Up&quot;) %&gt;% 
+    dplyr::rename(&quot;Count&quot; = &quot;1&quot;)
+  
+  message(&quot;Counting NIFs in downregulated transcripts for &quot;, name)
+  
+  sig_down = temp %&gt;%  as.data.frame() %&gt;%  
+        dplyr::filter(FDR &lt; 0.05, logFC &lt; log2(1)) 
+  utr = table(sig_down$NIF_long_3utr)[2]
+  dej = table(sig_down$NIF_dEJ)[2]
+  uorf = table(sig_down$NIF_uORF)[2]
+   none = table(sig_down$nif_feature)[1]
+  total_nif_down  = rbind(utr, dej, uorf, none) %&gt;% 
+    as.data.frame() %&gt;% 
+    rownames_to_column(&quot;NIF_feature&quot;) %&gt;% 
+    mutate(Condition = name, 
+           Expression = &quot;Down&quot;) %&gt;% 
+    dplyr::rename(&quot;Count&quot; = &quot;1&quot;)
+  
+  nif_features= rbind(nif_features, total_nif_up, total_nif_down, stringsAsFactors = FALSE)
+  
+}
+
+OE_df = data.frame(&quot;NIF_feature&quot; = &quot;&quot;)
+
+### For overexprssion - up
+## 0 for long 3&#39;UTR
+## 0 for dEJ 
+## 1 for uORF
+
+### down 
+## 3 long utr
+## 0 dej
+### 1 for uORF
+
+OE_df = data.frame(&quot;NIF_feature&quot; = rep(c(&quot;utr&quot;, &quot;dej&quot;, &quot;uorf&quot;), 2), 
+                   &quot;Count&quot; = c(0,0, 1,3,0, 1), 
+                   &quot;Condition&quot; = rep(c(&quot;UPF3A_OE_Control&quot;)),
+                   &quot;Expression&quot; = c(rep(&quot;Up&quot;,3), rep(&quot;Down&quot;, 3)))
+
+nif_features= rbind(nif_features, OE_df, stringsAsFactors = FALSE)
+
+
+condition.labs &lt;- c(&quot;Upf3b KD&quot;, &quot;Upf3a KD&quot;, &quot;Upf3 dKD&quot;, &quot;Upf3a OE&quot;, &quot;Upf3a OE, Upf3b KD&quot;)
+names(condition.labs) &lt;- c(&quot;UPF3B_KD&quot;, &quot;UPF3A_KD&quot;, &quot;UPF3A_KD_UPF3B_KD&quot;,
+                      &quot;UPF3A_OE&quot;, &quot;UPF3A_OE_UPF3B_KD&quot;) 
+nif_number = nif_features %&gt;%
+  mutate(NIF_feature = gsub(&quot;utr&quot;, &quot;Long 3&#39;UTR&quot;, NIF_feature), 
+         NIF_feature = gsub(&quot;uorf&quot;, &quot;Upstream ORF&quot;, NIF_feature), 
+         NIF_feature = gsub(&quot;dej&quot;, &quot;Downstream exon junction&quot;, NIF_feature), 
+         Condition = gsub(&quot;_Control&quot;, &quot;&quot;, Condition)) %&gt;%
+  mutate(Condition = factor(Condition, levels = c(&quot;UPF3B_KD&quot;,
+                                                  &quot;UPF3A_KD&quot;, 
+                                                  &quot;UPF3A_KD_UPF3B_KD&quot;, 
+                                                  &quot;UPF3A_OE&quot;,
+                                                  &quot;UPF3A_OE_UPF3B_KD&quot;)), 
+         Expression = factor(Expression, levels = c(&quot;Down&quot;, &quot;Up&quot;)),
+          NIF_feature = factor(NIF_feature, levels = c(&quot;none&quot;,
+                                                             
+                                                             &quot;Upstream ORF&quot;,
+                                                             &quot;Long 3&#39;UTR&quot;,
+                                                       &quot;Downstream exon junction&quot;))) %&gt;%
+  
+  ggplot(aes(x= NIF_feature, y = Count, fill = Expression)) + 
+  geom_bar(stat = &quot;identity&quot;, position = &quot;stack&quot;, width = .5) + coord_flip() + 
+  theme_bw() +
+  facet_grid(~Condition,
+             labeller = labeller(Condition = condition.labs))  +
+  xlab(&quot;&quot;) + ylab(&quot;&quot;) + scale_fill_manual(values = c(&quot;Up&quot;= &quot;#b23a48&quot;,
+                                                     &quot;Down&quot; = &quot;grey&quot;)) + 
+   
+     theme(axis.text.x = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;, angle = 90),
+        axis.text.y = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;), 
+        axis.title = element_text(size=15, family = &quot;serif&quot;), 
+         legend.box.background = element_rect(color = &quot;black&quot;),
+          legend.text = element_text(family = &quot;serif&quot;), 
+          legend.title = element_text( family = &quot;serif&quot;),
+           plot.title = element_text(family = &quot;serif&quot;, size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = &quot;top&quot;,
+         strip.text.x = element_text(
+        size = 12, face = &quot;bold.italic&quot;, family = &quot;serif&quot;
+        ))
+
+nif_number</code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(filename = &quot;/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/Count_NIF_2f.png&quot;,
+       plot = nif_number  ,  units = c(&quot;in&quot;), height = 5, width = 14)</code></pre>
+</div>
+</div>
+<div id="figure-3" class="section level2">
+<h2>Figure 3</h2>
+<div id="figure-3a" class="section level3">
+<h3>Figure 3a</h3>
+<pre class="r"><code>load(&quot;output/Stability/differential-stability.Rda&quot;)</code></pre>
+<pre class="r"><code>upf3b_res = z[[2]]
+
+DEColours &lt;- c(&quot;Destabilized&quot; = &quot;#2F124B&quot;,&quot;Stabilised&quot; = &quot;#ee6c4d&quot;,  &quot;Not significant&quot; = &quot;#D3D5E3&quot;, &quot;NA&quot; = &quot;#D3D5E3&quot;)
+volc = upf3b_res %&gt;%
+   mutate(results = ifelse(log2FoldChange&gt; 0 &amp; padj &lt; 0.05, &quot;Stabilised&quot;,
+                           ifelse(padj &lt; 0.05 &amp; log2FoldChange &lt; 0, &quot;Destabilized&quot;, &quot;Not significant&quot;))) %&gt;%
+  drop_na(&quot;results&quot;) %&gt;%
+    ggplot(aes(x = log2FoldChange, 
+               y = -log10(padj), 
+               colour = as.factor(as.character(results )))) +
+    geom_point(alpha = 0.8, size =3) +
+    scale_colour_manual(values = DEColours) + theme_classic() +
+    geom_hline(yintercept = -log10(0.05), color = &quot;grey60&quot;, size = 0.5, lty = &quot;dashed&quot;) +
+    xlab(bquote(log[&quot;2&quot;](FC))) +
+  ylab(bquote(-log[&quot;10&quot;](&quot;adjusted P-value&quot;))) +
+  
+  #  labs(x = &quot;log2 Fold Change&quot;, y = &quot;-log10 adj p-value&quot;) +
+  #  ggtitle(&quot;Upf3b KD differentially stabilised genes&quot;) + 
+  geom_vline(xintercept = 0, size = 0.5, lty = &quot;dashed&quot;, color = &quot;grey60&quot;) + xlim(-3, 3) + 
+  ylim(0,7.5) +
+        theme(axis.text.x = element_text(size = 20, family = &quot;serif&quot;, color = &quot;black&quot;),
+              axis.text.y = element_text(size = 20, family = &quot;serif&quot;, color = &quot;black&quot;),
+        axis.title = element_text(size=20, family = &quot;serif&quot;), 
+         legend.box.background = element_rect(color = &quot;black&quot;),
+          legend.text = element_text(family = &quot;serif&quot;, size = 15), 
+          legend.title = element_text( family = &quot;serif&quot;),
+           plot.title = element_text(family = &quot;serif&quot;, size =15),
+        legend.position = &quot;top&quot;
+        )  + labs(color = &quot;&quot;) 
+
+volc</code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code> ggsave(filename = &quot;/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/Upf3b-stability_fig3a.png&quot;, plot = volc,  units = c(&quot;in&quot;), height = 6, width = 6, dpi =1200)</code></pre>
+</div>
+<div id="figure-3b" class="section level3">
+<h3>Figure 3b</h3>
+<pre class="r"><code>upf3b_res = z[[2]] %&gt;% as.data.frame() %&gt;%
+  dplyr::filter(padj &lt; 0.05) %&gt;% 
+  #rownames_to_column(&quot;EnsID&quot;) %&gt;% 
+    mutate(gene = mapIds(org.Mm.eg.db, keys=EnsemblID,  column=&quot;SYMBOL&quot;,keytype=&quot;ENSEMBL&quot;, multiVals=&quot;first&quot;), 
+           entrez = mapIds(org.Mm.eg.db, keys=EnsemblID,  column=&quot;ENTREZID&quot;,keytype=&quot;ENSEMBL&quot;, multiVals=&quot;first&quot;),
+           type =  mapIds(org.Mm.eg.db, keys=EnsemblID,  column=&quot;GENETYPE&quot;,keytype=&quot;ENSEMBL&quot;, multiVals=&quot;first&quot;)) %&gt;% drop_na(entrez)
+
+
+x= list( &quot;Upf3b KD DEGs&quot; = DEGenes$UPF3B_vs_Control$EnsID, 
+    &quot;Upf3b KD DSGs&quot; = upf3b_res$EnsemblID)
+
+
+ggvenn(x[c(1,2)], fill_color = c(&quot;#2F124B&quot;, &quot;#801D2E&quot;),
+       set_name_color = &quot;black&quot;, text_color = &quot;white&quot;, text_size = 6, 
+       stroke_size = 0.45, fill_alpha = 0.8, 
+       stroke_color = &quot;white&quot;, show_percentage = FALSE)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-11-1.png" alt="Overlap of DEG and DSA analysis from differential stability estimates" width="768" />
+<p class="caption">
+Overlap of DEG and DSA analysis from differential stability estimates
+</p>
+</div>
+<pre class="r"><code> ggsave(filename = &quot;/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/Upf3b-stability_overlap_fig3b.png&quot;,  units = c(&quot;in&quot;), height = 6, width = 6, dpi =1200)</code></pre>
+<pre class="r"><code>x = calculate.overlap(x)
+
+go.obj &lt;- newGeneOverlap(DEGenes$UPF3B_vs_Control$EnsID, 
+                         upf3b_res$EnsemblID,
+                         genome.size=length(res$UPF3B_vs_Control$EnsID))
+go.obj &lt;- testGeneOverlap(go.obj)
+
+message(paste(&quot;Odds ratio=&quot;, go.obj@odds.ratio))
+message(paste(&quot;p-value=&quot;, go.obj@pval))</code></pre>
+</div>
+<div id="figure-3c" class="section level3">
+<h3>Figure 3c</h3>
+<pre class="r"><code>overlapping_upf3b = DEGenes$UPF3B_vs_Control %&gt;% 
+  inner_join(upf3b_res %&gt;% dplyr::rename(EnsID = EnsemblID ), by=&quot;EnsID&quot;) %&gt;% 
+    dplyr::rename(&quot;gene_id&quot; = &quot;EnsID&quot;) %&gt;% 
+    left_join(res_dte$UPF3B_KD_Control %&gt;% 
+               left_join(tx2gene) %&gt;% 
+               dplyr::filter(FDR &lt; 0.05),by = &quot;gene_id&quot;) %&gt;%
+   mutate(nif= ifelse(nif_feature == &quot;None&quot; | is.na(nif_feature),&quot;NIF-&quot;, &quot;NIF+&quot;))
+
+overlap_DSA = overlapping_upf3b %&gt;%  
+  distinct(gene_id, .keep_all = TRUE) %&gt;%
+  ggscatter(.,x=&quot;logFC.x&quot;, y =&quot;log2FoldChange&quot;, cor.coef = TRUE, add = &quot;reg.line&quot;,
+              conf.int = TRUE, color = &quot;nif&quot;, 
+            cor.coeff.args = list(size = 7, family = &quot;serif&quot;), 
+            add.params = list(color = &quot;blue&quot;,
+                                                 fill = &quot;lightgray&quot;), alpha =0.8, shape = &quot;nif&quot;, size =3) + 
+    theme_bw() + 
+  #ylab(&quot;Upf3b DSG (log2FC)&quot;) +   scale_color_manual(values = c(&quot;#F15A2B&quot;, &quot;#2E368F&quot;)) + 
+    geom_hline(yintercept = 0, size = 0.5,lty = &quot;dashed&quot;, color = &quot;grey60&quot;) +
+  geom_vline(xintercept = 0, size = 0.5, lty = &quot;dashed&quot;, color = &quot;grey60&quot;) + theme(legend.position = &quot;none&quot;) +
+  theme(axis.text.x = element_text(size = 18, family = &quot;serif&quot;, color = &quot;black&quot;),
+            axis.text.y = element_text(size = 18, family = &quot;serif&quot;, color = &quot;black&quot;),
+        axis.title = element_text(size=20, family = &quot;serif&quot;), 
+         legend.box.background = element_rect(color = &quot;black&quot;),
+          legend.text = element_text(family = &quot;serif&quot;), 
+          legend.title = element_text( family = &quot;serif&quot;),
+           plot.title = element_text(family = &quot;serif&quot;, size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = &quot;top&quot;,
+        strip.text.y = element_text(
+        size = 10, face = &quot;bold.italic&quot;, family = &quot;serif&quot;
+        ),
+         strip.text.x = element_text(
+        size = 10, family = &quot;serif&quot;
+        )) + labs(color = &quot;Expression&quot;) + geom_xsideboxplot(aes(y = nif, fill= nif), orientation = &quot;y&quot;) +
+   theme(ggside.panel.scale = .3) +
+  scale_xsidey_discrete()  + geom_ysidedensity(aes(x = after_stat(density), fill = nif), alpha = 0.5) +
+  scale_color_manual(values = c(&quot;NIF+&quot; = &quot;#b23a48&quot;,
+                                &quot;NIF-&quot; = &quot;grey&quot;)) +  scale_fill_manual(values = c(&quot;NIF+&quot; = &quot;#b23a48&quot;,
+                                &quot;NIF-&quot; = &quot;grey&quot;)) + scale_shape_manual(values = c(19,15)) + labs(
+  y = expression(italic(Upf3b) ~ &quot;KD DSG (&quot; * log[2] * &quot;FC)&quot;), 
+  x = expression(italic(Upf3b) ~ &quot;KD DEG (&quot; * log[2] * &quot;FC)&quot;))
+overlap_DSA</code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(filename = &quot;/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/Upf3b-stability-overlap_3c.png&quot;, plot = overlap_DSA,  units = c(&quot;in&quot;), height = 7, width = 7, dpi =1200)</code></pre>
+</div>
+<div id="figure-3d" class="section level3">
+<h3>Figure 3d</h3>
+</div>
+<div id="figure-3e" class="section level3">
+<h3>Figure 3e</h3>
+<pre class="r"><code>upf3a_res = z[[1]] %&gt;% as.data.frame() %&gt;% dplyr::rename(EnsID = EnsemblID ) %&gt;%  dplyr::filter(padj &lt; 0.05)
+
+overlapping_upf3a = DEGenes$UPF3A_vs_Control %&gt;% 
+  inner_join(upf3a_res, by=&quot;EnsID&quot;) %&gt;% 
+    dplyr::rename(&quot;gene_id&quot; = &quot;EnsID&quot;) %&gt;% 
+    left_join(res_dte$UPF3A_KD_Control %&gt;% 
+               left_join(tx2gene) %&gt;% 
+               dplyr::filter(FDR &lt; 0.05),by = &quot;gene_id&quot;) %&gt;%
+   mutate(nif= ifelse(nif_feature == &quot;None&quot; | is.na(nif_feature) ,&quot;NIF-&quot;, &quot;NIF+&quot;))
+
+upf3dKD_res = z[[3]] %&gt;% as.data.frame() %&gt;% dplyr::rename(EnsID = EnsemblID ) %&gt;%  dplyr::filter(padj &lt; 0.05)
+overlapping_upf3dKD = DEGenes$DoubleKD_vs_Control %&gt;% 
+  inner_join(upf3dKD_res, by=&quot;EnsID&quot;) %&gt;% 
+    dplyr::rename(&quot;gene_id&quot; = &quot;EnsID&quot;) %&gt;% 
+    left_join(res_dte$UPF3A_KD_UPF3B_KD_Control %&gt;% 
+               left_join(tx2gene) %&gt;% 
+               dplyr::filter(FDR &lt; 0.05),by = &quot;gene_id&quot;) %&gt;%
+   mutate(nif= ifelse(nif_feature == &quot;None&quot; |is.na(nif_feature),&quot;NIF-&quot;, &quot;NIF+&quot;))</code></pre>
+<pre class="r"><code>DD_NMD_candidates = list()
+
+DD_NMD_candidates$Upf3b = overlapping_upf3b %&gt;% 
+  dplyr::filter(logFC.x &gt; 0) %&gt;% 
+   dplyr::filter(nif == &quot;NIF+&quot;)
+
+
+DD_NMD_candidates$Upf3a = overlapping_upf3a %&gt;% 
+  dplyr::filter(logFC.x &gt; 0) %&gt;% 
+   dplyr::filter(nif == &quot;NIF+&quot;) 
+
+DD_NMD_candidates$Upf3dKD = overlapping_upf3dKD %&gt;% 
+  dplyr::filter(logFC.x &gt; 0) %&gt;% 
+   dplyr::filter(nif == &quot;NIF+&quot;) </code></pre>
+<pre class="r"><code>x= list( &quot;Upf3b KD&quot; = DD_NMD_candidates$Upf3b$gene_id, 
+    &quot;Upf3a KD&quot; =DD_NMD_candidates$Upf3a$gene_id,
+    &quot;Upf3 dKD&quot; = DD_NMD_candidates$Upf3dKD$gene_id)
+
+ggvenn(x, fill_color = c(&quot;#1c174a&quot;, &quot;#ef476f&quot;, &quot;#7175b3&quot;),
+       set_name_color = &quot;black&quot;, text_color = &quot;white&quot;, text_size = 5, 
+       stroke_size = 0.45, fill_alpha = 0.8, 
+       stroke_color = &quot;white&quot;, show_percentage = FALSE)</code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code> ggsave(filename = &quot;/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/DD-NMD-overlap_fig3e.png&quot;,  units = c(&quot;in&quot;), height = 8, width = 6, dpi =1200)</code></pre>
+<pre class="r"><code>overlaps = calculate.overlap(x)</code></pre>
+<pre class="r"><code>go.obj &lt;- newGeneOverlap(DD_NMD_candidates$Upf3b$gene_id, 
+                         DD_NMD_candidates$Upf3a$gene_id,
+                         genome.size=length(res$UPF3A_vs_Control$EnsID))
+go.obj &lt;- testGeneOverlap(go.obj)
+
+message(paste(&quot;Odds ratio=&quot;, go.obj@odds.ratio))
+message(paste(&quot;p-value=&quot;, go.obj@pval))</code></pre>
+<pre class="r"><code>go.obj &lt;- newGeneOverlap(DD_NMD_candidates$Upf3dKD$gene_id, 
+                         DD_NMD_candidates$Upf3a$gene_id,
+                         genome.size=length(res$UPF3A_vs_Control$EnsID))
+go.obj &lt;- testGeneOverlap(go.obj)
+
+message(paste(&quot;Odds ratio=&quot;, go.obj@odds.ratio))
+message(paste(&quot;p-value=&quot;, go.obj@pval))</code></pre>
+<pre class="r"><code>go.obj &lt;- newGeneOverlap(DD_NMD_candidates$Upf3dKD$gene_id, 
+                         DD_NMD_candidates$Upf3b$gene_id,
+                         genome.size=length(res$UPF3A_vs_Control$EnsID))
+go.obj &lt;- testGeneOverlap(go.obj)
+
+message(paste(&quot;Odds ratio=&quot;, go.obj@odds.ratio))
+message(paste(&quot;p-value=&quot;, go.obj@pval))</code></pre>
+</div>
+<div id="figure-3f" class="section level3">
+<h3>Figure 3f</h3>
+</div>
+</div>
+<div id="figure-4" class="section level2">
+<h2>Figure 4</h2>
+<pre class="r"><code>load(here::here(&quot;output/fgsea-heatmap-data.Rda&quot;))</code></pre>
+<pre class="r"><code>heatmap_1 =all_heatmap  |&gt; 
+  mutate(geneRatio = leSize/fgsea.size,
+         Geneset = tolower(gsub(&quot;REACTOME_&quot;, &quot;&quot;, Geneset))) |&gt;
+  mutate(Geneset = gsub(&quot;_&quot;, &quot; &quot;, Geneset)) |&gt;
+  dplyr::filter(Category %in%  c(&quot;Cell Cycle&quot;,
+                                 &quot;Gene expression (transcription)&quot;,
+                                 &quot;Metabolism of RNAs&quot;, 
+                                 &quot;Extracellular matrix&quot;,
+                                 &quot;Cellular responses to stimuli&quot;)) |&gt;
+  mutate(Category = factor(Category, levels =  c(&quot;Cell Cycle&quot;,
+                                 &quot;Gene expression (transcription)&quot;,
+                                 &quot;Metabolism of RNAs&quot;, 
+                                 &quot;Extracellular matrix&quot;,
+                                 &quot;Cellular responses to stimuli&quot;)),
+         comparison = factor(comparison, levels = c(&quot;UPF3B_KD_vs_Control&quot;,
+                                                    &quot;UPF3A_KD_vs_Control&quot;,
+                                                    &quot;DoubleKD_vs_Control&quot;,
+                                                    &quot;UPF3A_OE_vs_Control&quot;,
+                                                    &quot;UPF3A_OE_UPF3B_KD_vs_Control&quot;))) |&gt;
+  ggplot(aes(x = comparison, y = fct_reorder(Geneset, as.integer(Category)))) +
+  geom_point(
+    aes(fill = fgsea.NES, size = leSize), shape = 21
+  ) +
+    theme_bw() +
+  theme(
+    legend.position = &#39;top&#39;,
+    text = element_text(color = &#39;grey40&#39;)
+  )  +
+  scale_fill_gradient2(low=&quot;#7CCCBE&quot;,mid=&quot;#E8C1A0&quot;, high = &quot;#F4593E&quot;) +
+  #  scale_color_manual(values = &quot;black&quot;) +
+  labs(fill = &quot;Normalized enrichment score&quot;) +
+    theme(axis.text.x = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;, angle = 90),
+        axis.title = element_text(size=15, family = &quot;serif&quot;), 
+         legend.box.background = element_rect(color = &quot;black&quot;),
+          legend.text = element_text(family = &quot;serif&quot;), 
+          legend.title = element_text( family = &quot;serif&quot;),
+           plot.title = element_text(family = &quot;serif&quot;, size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = &quot;top&quot;) +  coord_flip()
+heatmap_1 </code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>heatmap_2 = all_heatmap  |&gt; 
+  mutate(geneRatio = leSize/fgsea.size,
+         Geneset = tolower(gsub(&quot;REACTOME_&quot;, &quot;&quot;, Geneset))) |&gt;
+  mutate(Geneset = gsub(&quot;_&quot;, &quot; &quot;, Geneset)) |&gt;
+  dplyr::filter(Category %in%  c( &quot;Signal Transduction&quot;,
+                                 &quot;Developmental Biology&quot;,
+                                 &quot;Metabolism of proteins&quot;,
+                                 &quot;Metabolism of Proteins&quot;,
+                                 &quot;Chromatin organization&quot;,
+                                 &quot;DNA Replication&quot;,
+                                 &quot;DNA Repair&quot;,
+                                 &quot;Disease&quot;,
+                                 &quot;Immune&quot;,
+                                 &quot;Metabolism&quot;,
+                                 &quot;Programmed Cell Death&quot;,
+                                 &quot;Autophagy&quot;))  |&gt;
+  mutate(Category = factor(Category, levels =  c(&quot;Signal Transduction&quot;,
+                                 &quot;Developmental Biology&quot;,
+                                 &quot;Metabolism of proteins&quot;,
+                                 &quot;Metabolism of Proteins&quot;,
+                                 &quot;Chromatin organization&quot;,
+                                 &quot;DNA Replication&quot;,
+                                 &quot;DNA Repair&quot;,
+                                 &quot;Disease&quot;,
+                                 &quot;Immune&quot;,
+                                 &quot;Metabolism&quot;,
+                                 &quot;Programmed Cell Death&quot;,
+                                 &quot;Autophagy&quot;)),
+         comparison = factor(comparison, levels = c(&quot;UPF3B_KD_vs_Control&quot;,
+                                                    &quot;UPF3A_KD_vs_Control&quot;,
+                                                    &quot;DoubleKD_vs_Control&quot;,
+                                                    &quot;UPF3A_OE_vs_Control&quot;,
+                                                    &quot;UPF3A_OE_UPF3B_KD_vs_Control&quot;))) |&gt;
+  ggplot(aes(x = comparison, y =fct_reorder(Geneset, as.integer(Category)))) +
+  geom_point(
+    aes(fill = fgsea.NES, size = leSize), shape = 21
+  ) +
+    theme_bw() +
+  theme(
+    legend.position = &#39;top&#39;,
+    text = element_text(color = &#39;grey40&#39;)
+  )  +
+  scale_fill_gradient2(low=&quot;#7CCCBE&quot;,mid=&quot;#E8C1A0&quot;, high = &quot;#F4593E&quot;) +
+  #  scale_color_manual(values = &quot;black&quot;) +
+  labs(fill = &quot;Normalized enrichment score&quot;) +
+    theme(#axis.text.x = element_text(size = 12, family = &quot;serif&quot;, color = &quot;black&quot;, angle = 90),
+        axis.title = element_text(size=15, family = &quot;serif&quot;), 
+         legend.box.background = element_rect(color = &quot;black&quot;),
+          legend.text = element_text(family = &quot;serif&quot;), 
+          legend.title = element_text( family = &quot;serif&quot;),
+           plot.title = element_text(family = &quot;serif&quot;, size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = &quot;top&quot;) + coord_flip()
+
+heatmap_2</code></pre>
+<p><img src="figure/Publication-Main-figures.Rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.5 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.10.0 
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.10.0  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_AU.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_AU.UTF-8        LC_COLLATE=en_AU.UTF-8    
+ [5] LC_MONETARY=en_AU.UTF-8    LC_MESSAGES=en_AU.UTF-8   
+ [7] LC_PAPER=en_AU.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_AU.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Australia/Adelaide
+tzcode source: system (glibc)
+
+attached base packages:
+ [1] grid      stats4    tools     stats     graphics  grDevices utils    
+ [8] datasets  methods   base     
+
+other attached packages:
+ [1] GeneOverlap_1.44.0          coin_1.4-3                 
+ [3] survival_3.8-3              stargazer_5.2.3            
+ [5] ggstatsplot_0.13.2          ggside_0.4.0               
+ [7] janitor_2.2.1               ggsci_4.0.0                
+ [9] eulerr_7.0.2                nVennR_0.2.3               
+[11] IsoformSwitchAnalyzeR_2.8.0 pfamAnalyzeR_1.8.0         
+[13] sva_3.56.0                  genefilter_1.90.0          
+[15] mgcv_1.9-3                  nlme_3.1-168               
+[17] satuRn_1.16.0               DEXSeq_1.54.1              
+[19] BiocParallel_1.42.2         ggrepel_0.9.6              
+[21] pander_0.6.6                msigdbr_25.1.1             
+[23] cowplot_1.2.0               ngsReports_2.10.1          
+[25] patchwork_1.3.2             VennDiagram_1.7.3          
+[27] futile.logger_1.4.3         UpSetR_1.4.0               
+[29] fgsea_1.34.2                GOplot_1.0.2               
+[31] RColorBrewer_1.1-3          gridExtra_2.3              
+[33] ggdendro_0.2.0              AnnotationHub_3.16.1       
+[35] BiocFileCache_2.16.2        dbplyr_2.5.1               
+[37] openxlsx_4.2.8              ggiraph_0.9.1              
+[39] wasabi_1.0.1                sleuth_0.30.1              
+[41] DT_0.34.0                   VennDetail_1.23.0          
+[43] msigdb_1.16.0               GSEABase_1.70.1            
+[45] graph_1.86.0                annotate_1.86.1            
+[47] XML_3.99-0.19               pheatmap_1.0.13            
+[49] ggvenn_0.1.10               MetBrewer_0.2.0            
+[51] ggpubr_0.6.1                venn_1.12                  
+[53] viridis_0.6.5               viridisLite_0.4.2          
+[55] tximeta_1.26.2              tximport_1.36.1            
+[57] goseq_1.60.0                geneLenDataBase_1.44.0     
+[59] BiasedUrn_2.0.12            org.Mm.eg.db_3.21.0        
+[61] EnsDb.Mmusculus.v79_2.99.0  ensembldb_2.32.0           
+[63] AnnotationFilter_1.32.0     GenomicFeatures_1.60.0     
+[65] AnnotationDbi_1.70.0        biomaRt_2.64.0             
+[67] edgeR_4.6.3                 limma_3.64.3               
+[69] DESeq2_1.48.2               SummarizedExperiment_1.38.1
+[71] Biobase_2.68.0              MatrixGenerics_1.20.0      
+[73] matrixStats_1.5.0           GenomicRanges_1.60.0       
+[75] GenomeInfoDb_1.44.3         IRanges_2.42.0             
+[77] S4Vectors_0.46.0            BiocGenerics_0.54.0        
+[79] generics_0.1.4              corrplot_0.95              
+[81] lubridate_1.9.4             forcats_1.0.0              
+[83] purrr_1.1.0                 readr_2.1.5                
+[85] tidyverse_2.0.0             stringr_1.5.2              
+[87] tidyr_1.3.1                 scales_1.4.0               
+[89] data.table_1.17.8           readxl_1.4.5               
+[91] tibble_3.3.0                magrittr_2.0.4             
+[93] reshape2_1.4.4              ggplot2_4.0.0              
+[95] dplyr_1.1.4                
+
+loaded via a namespace (and not attached):
+  [1] dichromat_2.0-0.1        progress_1.2.3           locfdr_1.1-8            
+  [4] Biostrings_2.76.0        TH.data_1.1-4            vctrs_0.6.5             
+  [7] effectsize_1.0.1         digest_0.6.37            png_0.1-8               
+ [10] git2r_0.36.2             bayestestR_0.17.0        correlation_0.8.8       
+ [13] MASS_7.3-65              httpuv_1.6.16            withr_3.0.2             
+ [16] xfun_0.53                memoise_2.0.1            emmeans_1.11.2-8        
+ [19] parameters_0.28.2        systemfonts_1.2.3        ragg_1.4.0              
+ [22] gtools_3.9.5             zoo_1.8-14               pbapply_1.7-4           
+ [25] Formula_1.2-5            prettyunits_1.2.0        datawizard_1.2.0        
+ [28] rematch2_2.1.2           KEGGREST_1.48.1          promises_1.3.3          
+ [31] httr_1.4.7               rstatix_0.7.2            restfulr_0.0.16         
+ [34] rhdf5filters_1.20.0      rhdf5_2.52.1             rstudioapi_0.17.1       
+ [37] UCSC.utils_1.4.0         babelgene_22.9           curl_7.0.0              
+ [40] GenomeInfoDbData_1.2.14  SparseArray_1.8.1        xtable_1.8-4            
+ [43] evaluate_1.0.5           S4Arrays_1.8.1           hms_1.1.3               
+ [46] filelock_1.0.3           snakecase_0.11.1         modeltools_0.2-24       
+ [49] later_1.4.4              lattice_0.22-7           pillar_1.11.1           
+ [52] pwalign_1.4.0            caTools_1.18.3           compiler_4.5.2          
+ [55] stringi_1.8.7            GenomicAlignments_1.44.0 plyr_1.8.9              
+ [58] crayon_1.5.3             abind_1.4-8              BiocIO_1.18.0           
+ [61] locfit_1.5-9.12          bit_4.6.0                sandwich_3.1-1          
+ [64] libcoin_1.0-10           fastmatch_1.1-6          textshaping_1.0.3       
+ [67] codetools_0.2-20         multcomp_1.4-28          crosstalk_1.2.2         
+ [70] bslib_0.9.0              paletteer_1.6.0          plotly_4.11.0           
+ [73] splines_4.5.2            Rcpp_1.1.0               cellranger_1.1.0        
+ [76] knitr_1.50               blob_1.2.4               here_1.0.2              
+ [79] BiocVersion_3.21.1       fs_1.6.6                 admisc_0.38             
+ [82] ggsignif_0.6.4           estimability_1.5.1       Matrix_1.7-4            
+ [85] statmod_1.5.0            tzdb_0.5.0               pkgconfig_2.0.3         
+ [88] cachem_1.1.0             RSQLite_2.4.3            DBI_1.2.3               
+ [91] fastmap_1.2.0            rmarkdown_2.29           geneplotter_1.86.0      
+ [94] Rsamtools_2.24.1         broom_1.0.10             sass_0.4.10             
+ [97] coda_0.19-4.1            BiocManager_1.30.26      insight_1.4.2           
+[100] carData_3.0-5            farver_2.1.2             yaml_2.3.10             
+[103] workflowr_1.7.2          rtracklayer_1.68.0       cli_3.6.5               
+[106] txdbmaker_1.4.2          lifecycle_1.0.4          mvtnorm_1.3-3           
+[109] lambda.r_1.2.4           backports_1.5.0          timechange_0.3.0        
+[112] gtable_0.3.6             rjson_0.2.23             parallel_4.5.2          
+[115] jsonlite_2.0.0           bitops_1.0-9             bit64_4.6.0-1           
+[118] assertthat_0.2.1         zip_2.3.3                RcppParallel_5.1.11-1   
+[121] futile.options_1.0.1     jquerylib_0.1.4          zeallot_0.2.0           
+[124] lazyeval_0.2.2           htmltools_0.5.8.1        GO.db_3.21.0            
+[127] rappdirs_0.3.3           formatR_1.14             glue_1.8.0              
+[130] httr2_1.2.1              XVector_0.48.0           RCurl_1.98-1.17         
+[133] rprojroot_2.1.1          BSgenome_1.76.0          boot_1.3-32             
+[136] R6_2.6.1                 gplots_3.2.0             labeling_0.4.3          
+[139] Rhdf5lib_1.30.0          rstantools_2.5.0         DelayedArray_0.34.1     
+[142] tidyselect_1.2.1         ProtGenerics_1.40.0      xml2_1.4.0              
+[145] car_3.1-3                statsExpressions_1.7.1   KernSmooth_2.23-26      
+[148] S7_0.2.0                 htmlwidgets_1.6.4        hwriter_1.3.2.1         
+[151] rlang_1.1.6              uuid_1.2-1              </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

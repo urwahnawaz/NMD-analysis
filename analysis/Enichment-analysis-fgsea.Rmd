@@ -7,7 +7,7 @@ output:
   workflowr::wflow_html:
     code_folding: hide
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -35,7 +35,7 @@ panderOptions("big.mark", ",")
 
 ```{r load data}
 load("output/limma-matrices.Rda")
-load("output/DEG-limma-results.Rda")
+#load("output/DEG-limma-results.Rda")
 load("output/DEG-list.Rda")
 ```
 
@@ -48,30 +48,55 @@ Fast Gene Set Enrichment Analysis implements a fast version of the gsea algorith
 - `NES`: Normalized Enrichment Score
 
 
-# Datasets
+# Gene sets
 
-## Hallmark Gene sets 
+- Hallmark Gene sets 
 
 ```{r}
-hm = msigdbr("Mus musculus", category = "H") %>% 
+library(msigdbr)
+hm = msigdbr(species = "mouse", category = "H") %>% 
   distinct(gs_name, ensembl_gene, .keep_all = TRUE)
 ```
 
-## C2 genesets
+- C2 genesets
 
 Using the MSigDB genesets as above, we will conduct a fgsea analysis on the sets of interest including KEGG, Wikipathways and Reactome. In our analysis, we will be using 2,465 gene sets in total.  
 
 ```{r}
-c2 =  msigdbr("Mus musculus", category = "C2") %>% 
-  dplyr::filter(gs_subcat == "CP:WIKIPATHWAYS" |
-                          gs_subcat == "CP:KEGG"  | 
-                          gs_subcat == "CP:REACTOME") %>% 
+c2 =  msigdbr(species = "mouse", category = c("C2")) %>% 
+  dplyr::filter(gs_subcat == "CP:REACTOME") %>% 
   distinct(gs_name, ensembl_gene, .keep_all = TRUE)
 
 ```
 
+
+```{r}
+ah <- AnnotationHub() %>%
+    subset(species == "Mus musculus") %>%
+    subset(rdataclass == "EnsDb") %>% 
+  subset(genome == "GRCm39")
+ensDb <- ah[["AH104895"]]
+grTrans <- transcripts(ensDb)
+trLengths <- exonsBy(ensDb, "tx") %>%
+    width() %>%
+    vapply(sum, integer(1))
+mcols(grTrans)$length <- trLengths[names(grTrans)]
+
+genesGR = genes(ensDb)
+```
+
+```{r}
+id2Name <- structure(
+  genesGR$gene_name,
+  names = genesGR$gene_id
+) %>% 
+  .[!duplicated(names(.))]
+```
+
+### Hallmark gene sets 
+
 ```{r include = FALSE}
-fgsea_res = run_fgsea(v = v,  contrasts = contrasts, design = design, idx = c2)
+fgsea_res = run_fgsea(v = v,  contrasts = contrasts, design = design, idx = hm )
 ```
 
 
@@ -79,922 +104,850 @@ fgsea_res = run_fgsea(v = v,  contrasts = contrasts, design = design, idx = c2)
 sigRes = list()
 
 sigRes[["UPF3B_KD_vs_Control"]] = fgsea_res$UPF3B_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) 
+  mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj) 
+  
 
 sigRes[["UPF3A_KD_vs_Control"]] = fgsea_res$UPF3A_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) 
+  mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj)
 
 sigRes[["UPF3A_OE_vs_Control"]] = fgsea_res$UPF3A_OE_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) 
+ mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj)
 
 sigRes[["DoubleKD_vs_Control"]] = fgsea_res$DoubleKD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) 
+ mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj)
 
 sigRes[["UPF3A_OE_UPF3B_KD_vs_Control"]] = fgsea_res$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) 
-```
-
-
-1. UPF3B KD vs Controls 
-
-```{r}
-gsSizes = bind_rows(hm, c2) %>% 
-  dplyr::select(gs_name, gene_symbol, ensembl_gene) %>% 
-  chop(c(gene_symbol, ensembl_gene)) %>%
+mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
   mutate(
-    gs_size = vapply(gene_symbol, length, integer(1)),
-    de_id = lapply(
-      X = ensembl_gene, 
-      FUN = intersect, 
-      y = dplyr::filter(DEGenes$UPF3B_vs_Control, Res.UPF3B_vs_Control != 0)$ensembl_gene_id
-      ),
-    de_size = vapply(de_id, length, integer(1))
-  )
-
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj)
 ```
 
-* KEGG pathways 
 ```{r}
-fgsea_res$UPF3B_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('KEGG_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3B KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r fig.height=10, fig.width=10, fig.cap="*UpSet plot indicating distribution of DE genes within all significant gene sets. Gene sets were restricted to those with an FDR < 0.05 and at least 5 DE genes*"}
 sigRes$UPF3B_KD_vs_Control %>% 
-  dplyr::rename("gs_name" = fgsea.Geneset) %>%
-  left_join(gsSizes) %>%
-  dplyr::filter(de_size >= 5, fgsea.padj  < 0.05, grepl("KEGG_", gs_name)) %>%
-  dplyr::select(gs_name, de_id) %>%
-   mutate(gs_name = str_remove(gs_name, "KEGG_")) %>%
-  unnest(de_id) %>% 
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
+  separate_rows(fgsea.leadingEdge_genes, sep = ";") %>% 
+  mutate(leadingEdge = gsub(" ", "", fgsea.leadingEdge_genes)) %>% 
+  dplyr::rename("SYMBOL" = "fgsea.leadingEdge_genes") %>% 
+  inner_join(DEGenes$UPF3B_vs_Control$gene %>%
+              as.data.frame() %>% 
+              set_colnames("SYMBOL"), by = "SYMBOL")
+
 ```
-
-
-
-* Reactome 
 
 ```{r}
-fgsea_res$UPF3B_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('REACTOME_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3B KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
+sigRes_summary = lapply(sigRes, function(x) { x %>% dplyr::select(fgsea.Geneset, fgsea.NES, leSize, fgsea.size) })
+
+
+
+sig_heatmap_mh = sigRes_summary %>% do.call(rbind, .) %>% rownames_to_column("comparison") %>% 
+  mutate(comparison=gsub("\\.[0-9]*$","", comparison)) %>% as.data.frame()
 ```
 
-```{r fig.height=10, fig.width=10, fig.cap="*UpSet plot indicating distribution of DE genes within all significant gene sets. Gene sets were restricted to those with an FDR < 0.05 and at least 5 DE genes*"}
-sigRes$UPF3B_KD_vs_Control %>% 
-  dplyr::rename("gs_name" = fgsea.Geneset) %>%
-  left_join(gsSizes) %>%
-  dplyr::filter(de_size >= 10, fgsea.padj  < 0.05, grepl("REACTOME", gs_name)) %>%
-  dplyr::select(gs_name, de_id) %>%
-  mutate(gs_name = str_remove(gs_name, "REACTOME_"))  %>%
-  unnest(de_id) %>% 
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
-```
 
-* Wikipathways 
 
 ```{r}
-fgsea_res$UPF3B_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('WP_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3B KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r fig.height=10, fig.width=10, fig.cap="*UpSet plot indicating distribution of DE genes within all significant gene sets. Gene sets were restricted to those with an FDR < 0.05 and at least 5 DE genes*"}
-sigRes$UPF3B_KD_vs_Control %>% 
-  dplyr::rename("gs_name" = fgsea.Geneset) %>%
-  left_join(gsSizes) %>%
-  dplyr::filter(de_size >= 5, fgsea.padj  < 0.05, grepl("WP_", gs_name)) %>%
-  dplyr::select(gs_name, de_id) %>%
-   mutate(gs_name = str_remove(gs_name, "WP_")) %>%
-  unnest(de_id) %>% 
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
+x = list("Upf3b" = sigRes$UPF3B_KD_vs_Control$fgsea.Geneset, 
+         "Upf3a" = sigRes$UPF3A_KD_vs_Control$fgsea.Geneset)
+ggvenn(x)
 ```
 
 
-
-2. UPF3A KD 
 
 ```{r}
-gsSizes = bind_rows(hm, c2) %>% 
-  dplyr::select(gs_name, gene_symbol, ensembl_gene) %>% 
-  chop(c(gene_symbol, ensembl_gene)) %>%
+genesets = calculate.overlap(x)
+```
+
+What are the genes (that are also DEG) in each category?
+
+```{r}
+in_common_upf3b = sigRes$UPF3B_KD_vs_Control %>%  
+  dplyr::filter(fgsea.Geneset %in% genesets$a3) %>%
+  separate_rows(fgsea.leadingEdge_genes, sep=";") %>%
+    dplyr::rename("SYMBOL" = "fgsea.leadingEdge_genes") %>% 
+  dplyr::mutate(Comparison = "Upf3b KD") %>% as.data.frame() 
+
+
+
+in_common_upf3a = sigRes$UPF3A_KD_vs_Control %>%  
+  dplyr::filter(fgsea.Geneset %in% genesets$a3) %>%
+  separate_rows(fgsea.leadingEdge_genes, sep=";") %>%
+    dplyr::rename("SYMBOL" = "fgsea.leadingEdge_genes") %>% 
+  dplyr::mutate(Comparison = "Upf3a KD")
+```
+
+```{r}
+in_common_upf3a %<>%
+  dplyr::filter(fgsea.Geneset %in% c("HALLMARK_MTORC1_SIGNALING")) %>% as.data.frame()
+
+in_common_upf3b %<>%
+  dplyr::filter(fgsea.Geneset %in% c("HALLMARK_MTORC1_SIGNALING")) %>% as.data.frame()
+```
+
+```{r}
+x = list("Upf3b" = in_common_upf3b$SYMBOL, 
+         "Upf3a" = in_common_upf3a$SYMBOL)
+ggvenn(x)
+```
+
+```{r}
+in_common_upf3a$SYMBOL
+```
+
+## Reactome datasets 
+
+```{r include = FALSE}
+fgsea_res_c2 = run_fgsea(v = v,  contrasts = contrasts, design = design, idx = c2)
+```
+
+
+```{r}
+sigres_c2 = list()
+
+sigres_c2[["UPF3B_KD_vs_Control"]] = fgsea_res_c2$UPF3B_vs_Control %>% as.data.frame %>%
+  mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
   mutate(
-    gs_size = vapply(gene_symbol, length, integer(1)),
-    de_id = lapply(
-      X = ensembl_gene, 
-      FUN = intersect, 
-      y = dplyr::filter(DEGenes$UPF3A_vs_Control, Res.UPF3A_vs_Control != 0)$ensembl_gene_id
-      ),
-    de_size = vapply(de_id, length, integer(1))
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) 
+
+sigres_c2[["UPF3A_KD_vs_Control"]] = fgsea_res_c2$UPF3A_vs_Control %>% as.data.frame %>%
+  mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) 
+
+sigres_c2[["UPF3A_OE_vs_Control"]] = fgsea_res_c2$UPF3A_OE_vs_Control %>% as.data.frame %>%
+ mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) 
+
+sigres_c2[["DoubleKD_vs_Control"]] = fgsea_res_c2$DoubleKD_vs_Control %>% as.data.frame %>%
+ mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) 
+
+sigres_c2[["UPF3A_OE_UPF3B_KD_vs_Control"]] = fgsea_res_c2$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>%
+mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
   )
-
 ```
-
-* KEGG pathways 
-```{r}
-fgsea_res$UPF3A_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('KEGG_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3A KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r fig.height=10, fig.width=10, fig.cap="*UpSet plot indicating distribution of DE genes within all significant gene sets. Gene sets were restricted to those with an FDR < 0.05 and at least 5 DE genes*"}
-sigRes$UPF3A_KD_vs_Control %>% 
-  dplyr::rename("gs_name" = fgsea.Geneset) %>%
-  left_join(gsSizes) %>%
-  dplyr::filter(de_size >= 5, fgsea.padj  < 0.05, grepl("KEGG_", gs_name)) %>%
-  dplyr::select(gs_name, de_id) %>%
-   mutate(gs_name = str_remove(gs_name, "KEGG_")) %>%
-  unnest(de_id) %>% 
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
-```
-
-
-
-* Reactome 
 
 ```{r}
-fgsea_res$UPF3A_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('REACTOME_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3A KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
+sigRes_all = list()
 
-```{r fig.height=10, fig.width=10, fig.cap="*UpSet plot indicating distribution of DE genes within all significant gene sets. Gene sets were restricted to those with an FDR < 0.05 and at least 5 DE genes*"}
-sigRes$UPF3A_KD_vs_Control %>% 
-  dplyr::rename("gs_name" = fgsea.Geneset) %>%
-  left_join(gsSizes) %>%
-  dplyr::filter(de_size >= 5, fgsea.padj  < 0.05, grepl("REACTOME", gs_name)) %>%
-  dplyr::select(gs_name, de_id) %>%
-   mutate(gs_name = str_remove(gs_name, "REACTOME_")) %>%
-  unnest(de_id) %>% 
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
-```
-
-* Wikipathways 
-
-```{r}
-fgsea_res$UPF3A_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('WP_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3A KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r fig.height=10, fig.width=10, fig.cap="*UpSet plot indicating distribution of DE genes within all significant gene sets. Gene sets were restricted to those with an FDR < 0.05 and at least 5 DE genes*"}
-sigRes$UPF3A_KD_vs_Control %>% 
-  dplyr::rename("gs_name" = fgsea.Geneset) %>%
-  left_join(gsSizes) %>%
-  dplyr::filter(de_size >= 5, fgsea.padj  < 0.05, grepl("WP_", gs_name)) %>%
-  dplyr::select(gs_name, de_id) %>%
-  mutate(gs_name = str_remove(gs_name, "WP_")) %>%
-  unnest(de_id) %>% 
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
-```
-
-
-3. Double KDs
-
-```{r}
-gsSizes = bind_rows(hm, c2) %>% 
-  dplyr::select(gs_name, gene_symbol, ensembl_gene) %>% 
-  chop(c(gene_symbol, ensembl_gene)) %>%
+sigRes_all[["UPF3B_KD_vs_Control"]] = fgsea_res_c2$UPF3B_vs_Control %>% as.data.frame %>%
+  mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
   mutate(
-    gs_size = vapply(gene_symbol, length, integer(1)),
-    de_id = lapply(
-      X = ensembl_gene, 
-      FUN = intersect, 
-      y = dplyr::filter(DEGenes$DoubleKD_vs_Control, Res.DoubleKD_vs_Control != 0)$ensembl_gene_id
-      ),
-    de_size = vapply(de_id, length, integer(1))
-  )
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj) %>%
+  rbind(sigRes$UPF3B_KD_vs_Control)
 
-```
-
-* KEGG pathways 
-```{r}
-fgsea_res$DoubleKD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('KEGG_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for Double KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r fig.height=10, fig.width=10, fig.cap="*UpSet plot indicating distribution of DE genes within all significant gene sets. Gene sets were restricted to those with an FDR < 0.05 and at least 5 DE genes*"}
-sigRes$DoubleKD_vs_Control %>% 
-  dplyr::rename("gs_name" = fgsea.Geneset) %>%
-  left_join(gsSizes) %>%
-  dplyr::filter(de_size >= 5, fgsea.padj  < 0.05, grepl("KEGG_", gs_name)) %>%
-  dplyr::select(gs_name, de_id) %>%
-  mutate(gs_name = str_remove(gs_name, "KEGG_")) %>%
-  unnest(de_id) %>% 
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
-```
-
-
-
-* Reactome 
-
-```{r}
-fgsea_res$DoubleKD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('REACTOME_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for Double compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r fig.height=10, fig.width=10, fig.cap="*UpSet plot indicating distribution of DE genes within all significant gene sets. Gene sets were restricted to those with an FDR < 0.05 and at least 8 DE genes*"}
-sigRes$DoubleKD_vs_Control %>% 
-  dplyr::rename("gs_name" = fgsea.Geneset) %>%
-  left_join(gsSizes) %>%
-  dplyr::filter(de_size >= 8, fgsea.padj  < 0.05, grepl("REACTOME", gs_name)) %>%
-  dplyr::select(gs_name, de_id) %>%
-   mutate(gs_name = str_remove(gs_name, "REACTOME_")) %>%
-  unnest(de_id) %>% 
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
-```
-
-* Wikipathways 
-
-```{r}
-fgsea_res$DoubleKD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('WP_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for Double KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r fig.height=10, fig.width=10, fig.cap="*UpSet plot indicating distribution of DE genes within all significant gene sets. Gene sets were restricted to those with an FDR < 0.05 and at least 5 DE genes*"}
-sigRes$DoubleKD_vs_Control %>% 
-  dplyr::rename("gs_name" = fgsea.Geneset) %>%
-  left_join(gsSizes) %>%
-  dplyr::filter(de_size >= 5, fgsea.padj  < 0.05, grepl("WP_", gs_name)) %>%
-  dplyr::select(gs_name, de_id) %>%
-  mutate(gs_name = str_remove(gs_name, "WP_")) %>%
-  unnest(de_id) %>% 
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
-```
-
-
-4. UPF3A OE 
-
-```{r}
-gsSizes = bind_rows(hm, c2) %>% 
-  dplyr::select(gs_name, gene_symbol, ensembl_gene) %>% 
-  chop(c(gene_symbol, ensembl_gene)) %>%
+sigRes_all[["UPF3A_KD_vs_Control"]] = fgsea_res_c2$UPF3A_vs_Control %>% as.data.frame %>%
+  mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
   mutate(
-    gs_size = vapply(gene_symbol, length, integer(1)),
-    de_id = lapply(
-      X = ensembl_gene, 
-      FUN = intersect, 
-      y = dplyr::filter(DEGenes$UPF3A_OE_vs_Control, Res.UPF3A_OE_vs_Control != 0)$ensembl_gene_id
-      ),
-    de_size = vapply(de_id, length, integer(1))
-  )
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj) %>% 
+  rbind(sigRes$UPF3A_KD_vs_Control)
 
-```
-
-* KEGG pathways 
-```{r}
-fgsea_res$UPF3A_OE_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('KEGG_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3A OE compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-
-
-
-* Reactome 
-
-```{r}
-fgsea_res$UPF3A_OE_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('REACTOME_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3A OE compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-
-
-* Wikipathways 
-
-```{r}
-fgsea_res$UPF3A_OE_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('WP_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3A OE compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-
-5. UPF3A OE UPF3B KD 
-
-```{r}
-gsSizes = bind_rows(hm, c2) %>% 
-  dplyr::select(gs_name, gene_symbol, ensembl_gene) %>% 
-  chop(c(gene_symbol, ensembl_gene)) %>%
+sigRes_all[["UPF3A_OE_vs_Control"]] = fgsea_res_c2$UPF3A_OE_vs_Control %>% as.data.frame %>%
+ mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
   mutate(
-    gs_size = vapply(gene_symbol, length, integer(1)),
-    de_id = lapply(
-      X = ensembl_gene, 
-      FUN = intersect, 
-      y = dplyr::filter(DEGenes$UPF3A_OE_UPF3B_KD_vs_Control, Res.UPF3A_OE_UPF3B_KD_vs_Control != 0)$ensembl_gene_id
-      ),
-    de_size = vapply(de_id, length, integer(1))
-  )
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>%
+  dplyr::arrange(fgsea.padj) %>% 
+  rbind(sigRes$UPF3A_OE_vs_Control)
 
-```
-
-* KEGG pathways 
-```{r}
-fgsea_res$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('KEGG_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3B KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r fig.height=10, fig.width=10, fig.cap="*UpSet plot indicating distribution of DE genes within all significant gene sets. Gene sets were restricted to those with an FDR < 0.05 and at least 5 DE genes*"}
-sigRes$UPF3A_OE_UPF3B_KD_vs_Control %>% 
-  dplyr::rename("gs_name" = fgsea.Geneset) %>%
-  left_join(gsSizes) %>%
-  dplyr::filter(de_size >= 5, fgsea.padj  < 0.05, grepl("KEGG_", gs_name)) %>%
-  dplyr::select(gs_name, de_id) %>%
-  unnest(de_id) %>% 
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
-```
-
-
-
-* Reactome 
-
-```{r}
-fgsea_res$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('REACTOME_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3B KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r fig.height=10, fig.width=10, fig.cap="*UpSet plot indicating distribution of DE genes within all significant gene sets. Gene sets were restricted to those with an FDR < 0.05 and at least 5 DE genes*"}
-sigRes$UPF3A_OE_UPF3B_KD_vs_Control %>% 
-  dplyr::rename("gs_name" = fgsea.Geneset) %>%
-  left_join(gsSizes) %>%
-  dplyr::filter(de_size >= 5, fgsea.padj  < 0.05, grepl("REACTOME", gs_name)) %>%
-  dplyr::select(gs_name, de_id) %>%
-  unnest(de_id) %>% 
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
-```
-
-* Wikipathways 
-
-```{r}
-fgsea_res$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05 & grepl('WP_', fgsea.Geneset)) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3B KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r fig.height=10, fig.width=10, fig.cap="*UpSet plot indicating distribution of DE genes within all significant gene sets. Gene sets were restricted to those with an FDR < 0.05 and at least 5 DE genes*"}
-sigRes$UPF3A_OE_UPF3B_KD_vs_Control %>% 
-  dplyr::rename("gs_name" = fgsea.Geneset) %>%
-  left_join(gsSizes) %>%
-  dplyr::filter(de_size >= 5, fgsea.padj  < 0.05, grepl("WP_", gs_name)) %>%
-  dplyr::select(gs_name, de_id) %>%
-  unnest(de_id) %>% 
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
-```
-
-
-
-## Summary of results from all comparisons 
-
-
-```{r}
-enrich_GSEA = list("UPF3B KD" = sigRes$UPF3B_KD_vs_Control$fgsea.Geneset, 
-                "UPF3A KD" = sigRes$UPF3A_KD_vs_Control$fgsea.Geneset, 
-                "Double KD" = sigRes$DoubleKD_vs_Control$fgsea.Geneset, 
-                "UPF3A OE" = sigRes$UPF3A_OE_vs_Control$fgsea.Geneset, 
-                "UPF3A OE, UPF3B KD" = sigRes$UPF3A_OE_UPF3B_KD_vs_Control$fgsea.Geneset)
-```
-
-
-# Hallmark sets 
-
-```{r message = FALSE, include = FALSE}
-fgsea_resH = run_fgsea(v = v,  contrasts = contrasts, design = design, idx = hm)
-
-```
-
-```{r}
-sigRes_H = list()
-
-sigRes_H[["UPF3B_KD_vs_Control"]] = fgsea_resH$UPF3B_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) 
-
-sigRes_H[["UPF3A_KD_vs_Control"]] = fgsea_resH$UPF3A_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) 
-
-sigRes_H[["UPF3A_OE_vs_Control"]] = fgsea_resH$UPF3A_OE_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) 
-
-sigRes_H[["DoubleKD_vs_Control"]] = fgsea_resH$DoubleKD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) 
-
-sigRes_H[["UPF3A_OE_UPF3B_KD_vs_Control"]] = fgsea_resH$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) 
-```
-
-## UPF3B vs Controls 
-
-```{r}
-sigRes_H$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3B KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r}
-bind_rows(hm, c2) %>% 
-  dplyr::select(gs_name, gene_symbol, ensembl_gene) %>% 
-  chop(c(gene_symbol, ensembl_gene)) %>%
+sigRes_all[["DoubleKD_vs_Control"]] = fgsea_res_c2$DoubleKD_vs_Control %>% as.data.frame %>%
+ mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
   mutate(
-    gs_size = vapply(gene_symbol, length, integer(1)),
-    de_id = lapply(
-      X = ensembl_gene, 
-      FUN = intersect, 
-      y = dplyr::filter(DEGenes$UPF3B_vs_Control, Res.UPF3B_vs_Control != 0)$ensembl_gene_id
-      ),de_size = vapply(de_id, length, integer(1))) %>% 
-  right_join(dplyr::rename(sigRes_H$UPF3B_KD_vs_Contro, "gs_name" = fgsea.Geneset)) %>% 
-  dplyr::filter(fgsea.padj  < 0.05) %>%
-  dplyr::select(gs_name, de_id) %>%
-  unnest(de_id) %>%
-   mutate(gs_name = str_remove(gs_name, "HALLMARK_")) %>%
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj) %>%
+  rbind(sigRes$DoubleKD_vs_Control)
 
-```
-
-
-
-## UPF3A vs Controls 
-
-```{r}
-sigRes_H$UPF3A_KD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3A KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r}
-bind_rows(hm, c2) %>% 
-  dplyr::select(gs_name, gene_symbol, ensembl_gene) %>% 
-  chop(c(gene_symbol, ensembl_gene)) %>%
+sigRes_all[["UPF3A_OE_UPF3B_KD_vs_Control"]] = fgsea_res_c2$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>%
+mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
   mutate(
-    gs_size = vapply(gene_symbol, length, integer(1)),
-    de_id = lapply(
-      X = ensembl_gene, 
-      FUN = intersect, 
-      y = dplyr::filter(limma_results, Res.UPF3A_vs_Control != 0)$ensembl_gene_id
-      ),
-    de_size = vapply(de_id, length, integer(1))
-  ) %>% right_join( dplyr::rename(sigRes_H$UPF3A_KD_vs_Control, "gs_name" = fgsea.Geneset)) %>% 
-  dplyr::filter(fgsea.padj  < 0.05) %>%
-  dplyr::select(gs_name, de_id) %>%
-  unnest(de_id) %>%
-   mutate(gs_name = str_remove(gs_name, "HALLMARK_")) %>%
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
-
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj) %>% 
+  rbind(sigRes$UPF3A_OE_UPF3B_KD_vs_Control)
 ```
 
 
-## Double KD vs Controls 
-
 ```{r}
-sigRes_H$DoubleKD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3B KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
+sigRes_all = list()
 
-```{r}
-bind_rows(hm, c2) %>% 
-  dplyr::select(gs_name, gene_symbol, ensembl_gene) %>% 
-  chop(c(gene_symbol, ensembl_gene)) %>%
+sigRes_all[["UPF3B_KD_vs_Control"]] = fgsea_res_c2$UPF3B_vs_Control %>% as.data.frame %>%
+  mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
   mutate(
-    gs_size = vapply(gene_symbol, length, integer(1)),
-    de_id = lapply(
-      X = ensembl_gene, 
-      FUN = intersect, 
-      y = dplyr::filter(DEGenes$DoubleKD_vs_Control, Res.DoubleKD_vs_Control != 0)$ensembl_gene_id
-      ),
-    de_size = vapply(de_id, length, integer(1))
-  ) %>% right_join( dplyr::rename(sigRes_H$DoubleKD_vs_Control, "gs_name" = fgsea.Geneset)) %>% 
-  dplyr::filter(fgsea.padj  < 0.05) %>%
-  dplyr::select(gs_name, de_id) %>%
-  unnest(de_id) %>%
-   mutate(gs_name = str_remove(gs_name, "HALLMARK_")) %>%
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
-```
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj) %>%
+  rbind(sigRes$UPF3B_KD_vs_Control)
 
-## UPF3A OE vs Controls 
-
-```{r}
-sigRes_H$UPF3A_OE_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3A OE compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-```
-
-```{r}
-bind_rows(hm, c2) %>% 
-  dplyr::select(gs_name, gene_symbol, ensembl_gene) %>% 
-  chop(c(gene_symbol, ensembl_gene)) %>%
+sigRes_all[["UPF3A_KD_vs_Control"]] = fgsea_res_c2$UPF3A_vs_Control %>% as.data.frame %>%
+  mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
   mutate(
-    gs_size = vapply(gene_symbol, length, integer(1)),
-    de_id = lapply(
-      X = ensembl_gene, 
-      FUN = intersect, 
-      y = dplyr::filter(limma_results, Res.UPF3A_OE_vs_Control != 0)$ensembl_gene_id
-      ),
-    de_size = vapply(de_id, length, integer(1))
-  ) %>% right_join( dplyr::rename(sigRes_H$UPF3A_OE_vs_Control, "gs_name" = fgsea.Geneset)) %>% 
-  dplyr::filter(fgsea.padj  < 0.05) %>%
-  dplyr::select(gs_name, de_id) %>%
-  unnest(de_id) %>%
-   mutate(gs_name = str_remove(gs_name, "HALLMARK_")) %>%
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj) %>% 
+  rbind(sigRes$UPF3A_KD_vs_Control)
 
-
-```
-
-
-## UPF3A OE, UPF3B KD
-
-```{r}
-sigRes_H$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>%
-    dplyr::filter(fgsea.padj < 0.05) %>%
- DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'),
-               caption ="GSEA results for UPF3B KD compared to controls",
-               style = "auto", width = NULL, height = NULL, elementId = NULL,
-            options = list(scrollX = TRUE, 
-                           scrollCollapse = TRUE, 
-                           pageLength = 5, autoWidth = TRUE, 
-                           dom = 'Blfrtip',
-                           buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'),
-                           lengthMenu = list(c(10,25,50,-1),
-                                             c(10,25,50,"All"))))
-
-```
-
-```{r}
-bind_rows(hm, c2) %>% 
-  dplyr::select(gs_name, gene_symbol, ensembl_gene) %>% 
-  chop(c(gene_symbol, ensembl_gene)) %>%
+sigRes_all[["UPF3A_OE_vs_Control"]] = fgsea_res_c2$UPF3A_OE_vs_Control %>% as.data.frame %>%
+ mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
   mutate(
-    gs_size = vapply(gene_symbol, length, integer(1)),
-    de_id = lapply(
-      X = ensembl_gene, 
-      FUN = intersect, 
-      y = dplyr::filter(limma_results, Res.UPF3A_OE_UPF3B_KD_vs_Control != 0)$ensembl_gene_id
-      ),
-    de_size = vapply(de_id, length, integer(1))
-  ) %>% right_join( dplyr::rename(sigRes_H$UPF3A_OE_UPF3B_KD_vs_Contro, "gs_name" = fgsea.Geneset)) %>% 
-  dplyr::filter(fgsea.padj  < 0.05) %>%
-  dplyr::select(gs_name, de_id) %>%
-  unnest(de_id) %>%
-   mutate(gs_name = str_remove(gs_name, "HALLMARK_")) %>%
-  split(f = .$gs_name) %>% 
-  lapply(magrittr::extract2, "de_id") %>% 
-  fromList() %>% 
-  upset(
-    nsets = length(.), 
-    nintersects = 20,
-    order.by = "freq", 
-    mb.ratio = c(0.6, 0.4),
-    sets.x.label = "Number Of DE Genes"
-    )
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>%
+  dplyr::arrange(fgsea.padj) %>% 
+  rbind(sigRes$UPF3A_OE_vs_Control)
 
+sigRes_all[["DoubleKD_vs_Control"]] = fgsea_res_c2$DoubleKD_vs_Control %>% as.data.frame %>%
+ mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj) %>%
+  rbind(sigRes$DoubleKD_vs_Control)
 
+sigRes_all[["UPF3A_OE_UPF3B_KD_vs_Control"]] = fgsea_res_c2$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>%
+mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+    dplyr::filter(padj < 0.05) %>% 
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj) %>% 
+  rbind(sigRes$UPF3A_OE_UPF3B_KD_vs_Control)
 ```
 
-## Gene sets enriched in all comparisons 
 
 ```{r}
-enrich_H = list("UPF3B KD" = sigRes_H$UPF3B_KD_vs_Control$fgsea.Geneset, 
-                "UPF3A KD" = sigRes_H$UPF3A_KD_vs_Control$fgsea.Geneset, 
-                "Double KD" = sigRes_H$DoubleKD_vs_Control$fgsea.Geneset, 
-                "UPF3A OE" = sigRes_H$UPF3A_OE_vs_Control$fgsea.Geneset, 
-                "UPF3A OE, UPF3B KD" = sigRes_H$UPF3A_OE_UPF3B_KD_vs_Control$fgsea.Geneset)
+#write.xlsx(sigRes_all, file= "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/fgsea-output.xlsx")
+```
+
+
+
+```{r}
+sigRes_summary_c2 = lapply(sigres_c2, function(x) { x %>% dplyr::select(fgsea.Geneset, fgsea.NES, leSize, fgsea.size) })
+
+
+
+sig_heatmap = sigRes_summary_c2 %>% do.call(rbind, .) %>% rownames_to_column("comparison") %>%
+  mutate(comparison=gsub("\\.[0-9]*$","", comparison))
+
+all_heatmap =rbind(sig_heatmap_mh, sig_heatmap)
+```
+
+
+
+## Upf3a and Upf3b
+```{r}
+x = list("Upf3b" = sigRes_all$UPF3B_KD_vs_Control$fgsea.Geneset, 
+         "Upf3a" = sigRes_all$UPF3A_KD_vs_Control$fgsea.Geneset)
+ggvenn(x)
+```
+
+
+
+```{r}
+x = list("Upf3b" = sigRes_all$UPF3B_KD_vs_Control$fgsea.Geneset, 
+         "Upf3a" = sigRes_all$UPF3A_KD_vs_Control$fgsea.Geneset)
+ggvenn(x)
+```
+
+
+
+```{r}
+genesets = calculate.overlap(x)
+```
+
+<!-- What are the genes (that are also DEG) in each category? -->
+
+<!-- ```{r} -->
+<!-- in_common_upf3b = sigRes_all$UPF3B_KD_vs_Control %>%   -->
+<!--   #dplyr::filter(fgsea.Geneset %in% genesets$a3) %>% -->
+<!--   separate_rows(fgsea.leadingEdge_genes, sep=";") %>% -->
+<!--     dplyr::rename("SYMBOL" = "fgsea.leadingEdge_genes") %>%  -->
+<!--   as.data.frame() #%>% -->
+<!-- #  inner_join(DEGenes$UPF3B_vs_Control$gene %>% -->
+<!--  #              as.data.frame() %>% -->
+<!--   #             set_colnames("SYMBOL"), by = "SYMBOL") -->
+
+
+
+<!-- in_common_upf3a = sigRes_c2$UPF3A_KD_vs_Control %>%   -->
+<!--   dplyr::filter(fgsea.Geneset %in% genesets$a3) %>% -->
+<!--   separate_rows(fgsea.leadingEdge, sep=";") %>% -->
+<!--     dplyr::rename("SYMBOL" = "fgsea.leadingEdge") %>% -->
+<!--   as.data.frame() #%>% -->
+<!--  # right_join(DEGenes$UPF3A_vs_Control$gene %>% -->
+<!--   #             as.data.frame() %>% -->
+<!--    #            set_colnames("SYMBOL"), by = "SYMBOL") -->
+
+<!-- ``` -->
+
+
+```{r}
+x = list("Upf3b" = in_common_upf3b$SYMBOL, 
+         "Upf3a" = in_common_upf3a$SYMBOL)
+ggvenn(x)
+```
+
+
+Next I wanted to categorize my genesets 
+
+```{r}
+categories_reactome = read_excel(here::here("data/genesets/genesets-categories.xls")) %>% 
+  as.data.frame() %>% 
+  dplyr::select(-thesis_category)
+
+all_heatmap %<>%
+  dplyr::rename(Geneset = "fgsea.Geneset") %>% 
+  left_join(categories_reactome)
+
+all_heatmap$Category[4] <- c("Extracellular matrix")
+```
+
+
+
+
+<!-- ## Summary of results from all comparisons  -->
+
+
+<!-- ```{r} -->
+<!-- enrich_GSEA = list("UPF3B KD" = sigRes$UPF3B_KD_vs_Control$fgsea.Geneset,  -->
+<!--                 "UPF3A KD" = sigRes$UPF3A_KD_vs_Control$fgsea.Geneset,  -->
+<!--                 "Double KD" = sigRes$DoubleKD_vs_Control$fgsea.Geneset,  -->
+<!--                 "UPF3A OE" = sigRes$UPF3A_OE_vs_Control$fgsea.Geneset,  -->
+<!--                 "UPF3A OE, UPF3B KD" = sigRes$UPF3A_OE_UPF3B_KD_vs_Control$fgsea.Geneset) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- allRes_summary = lapply(allRes, function(x) { x %>% dplyr::select(fgsea.Geneset, fgsea.NES, fgsea.padj) }) -->
+
+<!-- allRes_summary = allRes_summary %>% do.call(rbind, .) %>% rownames_to_column("comparison") %>%  -->
+<!--   mutate(comparison=gsub("\\.[0-9]*$","", comparison)) #%>%  -->
+<!--   xtabs(fgsea.NES ~ comparison + fgsea.Geneset,.) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+
+<!-- rg <- max(abs(allRes_summary$fgsea.NES)); -->
+
+<!-- allRes_summary %>%  -->
+<!--   head(10) %>% -->
+<!-- ggplot(aes(fgsea.Geneset, forcats::fct_rev(comparison),  -->
+<!--            fill = fgsea.NES, size = -log(fgsea.padj))) + -->
+<!--   geom_point(shape = 21, stroke = 1) + -->
+<!--   geom_hline(yintercept = seq(.5, 4.5, 1), size = .2) + -->
+<!--   scale_x_discrete(position = "top") + -->
+<!--   scale_radius(range = c(1, 15)) + -->
+<!--   scale_fill_gradient(low = "#2F124B", high = "#EA2A5F", -->
+<!--                       breaks = seq(-rg, rg, length.out = 100)) + -->
+<!--   theme_minimal() + -->
+<!--   theme(legend.position = "bottom",  -->
+<!--         panel.grid.major = element_blank(), -->
+<!--         legend.text = element_text(size = 8), -->
+<!--         legend.title = element_text(size = 8)) + -->
+<!--   guides(size = guide_legend(override.aes = list(fill = NA, color = "black", stroke = .25),  -->
+<!--                              label.position = "bottom", -->
+<!--                              title.position = "right",  -->
+<!--                              order = 1), -->
+<!--          fill = guide_colorbar(ticks.colour = NA, title.position = "top", order = 2)) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- library(ggplot2) -->
+
+<!-- set.seed(42) -->
+
+<!-- d <- data.frame( -->
+<!--   x = rep(paste("Team", LETTERS[1:8]), 4), -->
+<!--   y = rep(paste("Task", 1:4), each = 8), -->
+<!--   value = runif(32) -->
+<!-- ) -->
+
+<!-- ggplot(d, aes(x, forcats::fct_rev(y), fill = value, size = value)) + -->
+<!--   geom_point(shape = 21, stroke = 0) + -->
+<!--   geom_hline(yintercept = seq(.5, 4.5, 1), size = .2) + -->
+<!--   scale_x_discrete(position = "top") + -->
+<!--   scale_radius(range = c(1, 15)) + -->
+<!--   scale_fill_gradient(low = "orange", high = "blue", breaks = c(0, .5, 1), labels = c("Great", "OK", "Bad"), limits = c(0, 1)) + -->
+<!--   theme_minimal() + -->
+<!--   theme(legend.position = "bottom",  -->
+<!--         panel.grid.major = element_blank(), -->
+<!--         legend.text = element_text(size = 8), -->
+<!--         legend.title = element_text(size = 8)) + -->
+<!--   guides(size = guide_legend(override.aes = list(fill = NA, color = "black", stroke = .25),  -->
+<!--                              label.position = "bottom", -->
+<!--                              title.position = "right",  -->
+<!--                              order = 1), -->
+<!--          fill = guide_colorbar(ticks.colour = NA, title.position = "top", order = 2)) + -->
+<!--   labs(size = "Area = Time Spent", fill = "Score:", x = NULL, y = NULL) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- sigRes_summary = lapply(sigRes, function(x) { x %>% dplyr::select(fgsea.Geneset, fgsea.NES, fgsea.padj) }) -->
+
+<!-- sig_heatmap = sigRes_summary %>% do.call(rbind, .) %>% rownames_to_column("comparison") %>%  -->
+<!--   mutate(comparison=gsub("\\.[0-9]*$","", comparison)) %>%  -->
+<!--   xtabs(fgsea.NES ~ comparison + fgsea.Geneset,.) -->
+
+
+
+
+<!-- sig_heatmap %<>% as.data.frame.matrix(sig_heatmap, row.names = c("Double KD", "UPF3A KD",  -->
+<!--                                                                  "UPF3A OE, UPF3B KD", "UPF3A OE", -->
+<!--                                                                  "UPF3B KD")) -->
+
+
+
+<!-- rg <- sig_heatmap %>% max(abs(.)); -->
+
+<!-- # class(sig_heatmap) -->
+<!-- # #[c(5, 2, 1, 4,3),] -->
+<!-- # WP_heatmap = sig_heatmap[c(5, 2, 1, 4,3),] %>%  -->
+<!-- #   dplyr::select(contains("WP_")) %>% -->
+<!-- #     pheatmap(, -->
+<!-- #         scale="none",  -->
+<!-- #         cluster_cols = FALSE, -->
+<!-- #         cluster_rows = FALSE, -->
+<!-- #         breaks = seq(-rg, rg, length.out = 100), -->
+<!-- #         clustering_distance_rows = "euclidean",  -->
+<!-- #         border_color = "white",  -->
+<!-- #         treeheight_row = 0, -->
+<!-- #         fontsize = 6, -->
+<!-- #         color = colorRampPalette(c("#2F124B", "#6E74B4","#F9F9F9", "#FD9675", "#EA2A5F"))(100), -->
+<!-- #         labels_row = row.names(.),  -->
+<!-- #         cellwidth = 15,  -->
+<!-- #         cellheight = 15 -->
+<!-- #     ) -->
+<!-- # ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/DEG/Thesis_figures/WP_pathway_fgsea.svg", width=18.80, height =7.79, units = "in", plot= WP_heatmap) -->
+
+<!-- sig_heatmap[c(5, 2, 1, 4,3),] %>%  -->
+<!--   as.data.frame() %>% -->
+<!--   rownames_to_column("conditions") %>%  -->
+<!--   dplyr::filter("UPF3A KD" != 0  & "UPF3B KD" > 0) %>% -->
+<!--   column_to_rownames("conditions") %>% -->
+<!--     pheatmap(, -->
+<!--         scale="none",  -->
+<!--         cluster_cols = FALSE, -->
+<!--         cluster_rows = FALSE, -->
+<!--         breaks = seq(-rg, rg, length.out = 100), -->
+<!--         clustering_distance_rows = "euclidean",  -->
+<!--         border_color = "white",  -->
+<!--         treeheight_row = 0, -->
+<!--         fontsize = 6, -->
+<!--         color = colorRampPalette(c("#2F124B", "#6E74B4","#F9F9F9", "#FD9675", "#EA2A5F"))(100), -->
+<!--         labels_row = row.names(.) -->
+<!--     ) -->
+
+<!-- HM_heatmap = sig_heatmap[c(5, 2, 1, 4,3),] %>%  -->
+<!--   dplyr::select(contains("HALLMARK_")) %>% -->
+<!--     pheatmap(, -->
+<!--         scale="none",  -->
+<!--         cluster_cols = FALSE, -->
+<!--         cluster_rows = FALSE, -->
+<!--         breaks = seq(-rg, rg, length.out = 100), -->
+<!--         clustering_distance_rows = "euclidean",  -->
+<!--         border_color = "white",  -->
+<!--         treeheight_row = 0, -->
+<!--         fontsize = 6, -->
+<!--         color = colorRampPalette(c("#2F124B", "#6E74B4","#F9F9F9", "#FD9675", "#EA2A5F"))(100), -->
+<!--         labels_row = row.names(.),  -->
+<!--         cellwidth = 15,  -->
+<!--         cellheight = 15 -->
+<!--     ) -->
+<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/DEG/Thesis_figures/KEGG_pathway_fgsea_July.svg", width=18.80, height =7.79, units = "in", plot= KEGG_heatmap) -->
+
+<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/DEG/Thesis_figures/HM_pathway_fgsea_July.svg", width=18.80, height =7.79, units = "in", plot= HM_heatmap) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- allRes_summary = lapply(allRes, function(x) { x %>% dplyr::select(fgsea.Geneset, fgsea.NES) }) -->
+
+
+<!-- all_heatmap = allRes_summary %>% do.call(rbind, .) %>% rownames_to_column("comparison") %>%  -->
+<!--   mutate(comparison=gsub("\\.[0-9]*$","", comparison)) %>%  -->
+<!--   xtabs(fgsea.NES ~ comparison + fgsea.Geneset,.) -->
+
+
+<!-- all_heatmap  %<>% as.data.frame.matrix(all_heatmap , row.names = c("Double KD", "UPF3A KD",  -->
+<!--                                                                  "UPF3A OE, UPF3B KD", "UPF3A OE", -->
+<!--                                                                  "UPF3B KD")) -->
+
+
+<!-- all_heatmap[c(5, 2, 1, 4,3),] %>%  -->
+<!--   dplyr::select(contains("HALLMARK_")) %>% -->
+<!--     pheatmap(, -->
+<!--         scale="none",  -->
+<!--         cluster_cols = FALSE, -->
+<!--         cluster_rows = FALSE, -->
+<!--         breaks = seq(-rg, rg, length.out = 100), -->
+<!--         clustering_distance_rows = "euclidean",  -->
+<!--         border_color = "white",  -->
+<!--         treeheight_row = 0, -->
+<!--         fontsize = 6, -->
+<!--         color = colorRampPalette(c("#2F124B", "#6E74B4","#F9F9F9", "#FD9675", "#EA2A5F"))(100), -->
+<!--         labels_row = row.names(.),  -->
+<!--         cellwidth = 15,  -->
+<!--         cellheight = 15 -->
+<!--     ) -->
+
+
+<!-- ``` -->
+
+
+
+
+<!-- ```{r} -->
+<!-- bf_genes = read_excel("/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Upf3b-high-confident-genes.xlsx") %>%  -->
+<!--   as.data.frame() #%>% -->
+<!--  # dplyr::filter(logFC.x > 0) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r} -->
+<!-- sigRes_all$UPF3B_KD_vs_Control %>%   -->
+<!--   #dplyr::filter(fgsea.Geneset %in% genesets$a3) %>% -->
+<!--   separate_rows(fgsea.leadingEdge_gesnes, sep=";") %>% -->
+<!--     dplyr::rename("gene.x" = "fgsea.leadingEdge_genes") %>%  -->
+<!--   as.data.frame() %>%  -->
+<!--   inner_join(bf_genes, by = "gene.x") -->
+<!-- ``` -->
+
+
+<!-- # Hallmark sets  -->
+
+<!-- ```{r message = FALSE, include = FALSE} -->
+<!-- fgsea_resH = run_fgsea(v = v,  contrasts = contrasts, design = design, idx = hm) -->
+
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- sigRes_H = list() -->
+
+<!-- sigRes_H[["UPF3B_KD_vs_Control"]] = fgsea_resH$UPF3B_vs_Control %>% as.data.frame %>% -->
+<!--     dplyr::filter(fgsea.padj < 0.05)  -->
+
+<!-- sigRes_H[["UPF3A_KD_vs_Control"]] = fgsea_resH$UPF3A_vs_Control %>% as.data.frame %>% -->
+<!--     dplyr::filter(fgsea.padj < 0.05)  -->
+
+<!-- sigRes_H[["UPF3A_OE_vs_Control"]] = fgsea_resH$UPF3A_OE_vs_Control %>% as.data.frame %>% -->
+<!--     dplyr::filter(fgsea.padj < 0.05)  -->
+
+<!-- sigRes_H[["DoubleKD_vs_Control"]] = fgsea_resH$DoubleKD_vs_Control %>% as.data.frame %>% -->
+<!--     dplyr::filter(fgsea.padj < 0.05)  -->
+
+<!-- sigRes_H[["UPF3A_OE_UPF3B_KD_vs_Control"]] = fgsea_resH$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>% -->
+<!--     dplyr::filter(fgsea.padj < 0.05)  -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- x = list("Upf3b" = sigRes_H$UPF3B_KD_vs_Control$fgsea.Geneset,  -->
+<!--          "Upf3a" = sigRes_H$UPF3A_KD_vs_Control$fgsea.Geneset) -->
+<!-- ggvenn(x) -->
+
+<!-- ``` -->
+
+
+
+
+<!-- ```{r fig.height=10, fig.width=10} -->
+<!-- sigRes_H_summary = lapply(sigRes_H, function(x) { x %>% dplyr::select(fgsea.Geneset, fgsea.NES) }) -->
+
+
+
+<!-- sig_heatmap = sigRes_H_summary %>% do.call(rbind, .) %>% rownames_to_column("comparison") %>%  -->
+<!--   mutate(comparison=gsub("\\.[0-9]*$","", comparison)) %>%  -->
+<!--   xtabs(fgsea.NES ~ comparison + fgsea.Geneset,.) -->
+
+<!-- rg <- sig_heatmap %>% max(abs(.)); -->
+
+
+<!-- hallmark_heatmap = sig_heatmap[c(5, 2, 1, 4,3),]  %>%  -->
+<!--     pheatmap(, -->
+<!--         scale="none", -->
+<!--         cluster_rows = FALSE,  -->
+<!--         cluster_cols = FALSE, -->
+<!--         breaks = seq(-rg, rg, length.out = 100), -->
+<!--         clustering_distance_rows = "euclidean",  -->
+<!--         border_color = "white",  -->
+<!--         treeheight_row = 0, -->
+<!--         fontsize = 6, -->
+<!--         color = colorRampPalette(c("#2F124B", "#6E74B4","#F9F9F9", "#FD9675", "#EA2A5F"))(100), -->
+<!--         labels_row = row.names(.),  -->
+<!--         cellwidth = 15, -->
+<!--         cellheight=15) -->
+
+<!-- ggsave(filename="/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/DEG/Thesis_figures/fgsea_gsea_H.svg",  -->
+<!--        plot = hallmark_heatmap, width =9.23, height = 7.79, units = "in") -->
+
+<!-- #%>% -->
+<!--  # pheatmap(border_color = "white", cellheight =15, cellwidth = 15, scale = "none") -->
+
+
+<!-- ``` -->
+
+
+
+## Creating bubble heatmaps 
+
+```{r}
+heatmap_1 =all_heatmap  |> 
+  mutate(geneRatio = leSize/fgsea.size,
+         Geneset = tolower(gsub("REACTOME_", "", Geneset))) |>
+  mutate(Geneset = gsub("_", " ", Geneset)) |>
+  dplyr::filter(Category %in%  c("Cell Cycle",
+                                 "Gene expression (transcription)",
+                                 "Metabolism of RNAs", 
+                                 "Extracellular matrix",
+                                 "Cellular responses to stimuli")) |>
+  mutate(Category = factor(Category, levels =  c("Cell Cycle",
+                                 "Gene expression (transcription)",
+                                 "Metabolism of RNAs", 
+                                 "Extracellular matrix",
+                                 "Cellular responses to stimuli")),
+         comparison = factor(comparison, levels = c("UPF3B_KD_vs_Control",
+                                                    "UPF3A_KD_vs_Control",
+                                                    "DoubleKD_vs_Control",
+                                                    "UPF3A_OE_vs_Control",
+                                                    "UPF3A_OE_UPF3B_KD_vs_Control"))) |>
+  ggplot(aes(x = comparison, y = fct_reorder(Geneset, as.integer(Category)))) +
+  geom_point(
+    aes(fill = fgsea.NES, size = leSize), shape = 21
+  ) +
+    theme_bw() +
+  theme(
+    legend.position = 'top',
+    text = element_text(color = 'grey40')
+  )  +
+  scale_fill_gradient2(low="#7CCCBE",mid="#E8C1A0", high = "#F4593E") +
+  #  scale_color_manual(values = "black") +
+  labs(fill = "Normalized enrichment score") +
+    theme(axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")
+heatmap_1 
+```
+
+```{r}
+heatmap_2 = all_heatmap  |> 
+  mutate(geneRatio = leSize/fgsea.size,
+         Geneset = tolower(gsub("REACTOME_", "", Geneset))) |>
+  mutate(Geneset = gsub("_", " ", Geneset)) |>
+  dplyr::filter(Category %in%  c( "Signal Transduction",
+                                 "Developmental Biology",
+                                 "Metabolism of proteins",
+                                 "Metabolism of Proteins",
+                                 "Chromatin organization",
+                                 "DNA Replication",
+                                 "DNA Repair",
+                                 "Disease",
+                                 "Immune",
+                                 "Metabolism",
+                                 "Programmed Cell Death",
+                                 "Autophagy"))  |>
+  mutate(Category = factor(Category, levels =  c("Signal Transduction",
+                                 "Developmental Biology",
+                                 "Metabolism of proteins",
+                                 "Metabolism of Proteins",
+                                 "Chromatin organization",
+                                 "DNA Replication",
+                                 "DNA Repair",
+                                 "Disease",
+                                 "Immune",
+                                 "Metabolism",
+                                 "Programmed Cell Death",
+                                 "Autophagy")),
+         comparison = factor(comparison, levels = c("UPF3B_KD_vs_Control",
+                                                    "UPF3A_KD_vs_Control",
+                                                    "DoubleKD_vs_Control",
+                                                    "UPF3A_OE_vs_Control",
+                                                    "UPF3A_OE_UPF3B_KD_vs_Control"))) |>
+  ggplot(aes(x = comparison, y =fct_reorder(Geneset, as.integer(Category)))) +
+  geom_point(
+    aes(fill = fgsea.NES, size = leSize), shape = 21
+  ) +
+    theme_bw() +
+  theme(
+    legend.position = 'top',
+    text = element_text(color = 'grey40')
+  )  +
+  scale_fill_gradient2(low="#7CCCBE",mid="#E8C1A0", high = "#F4593E") +
+  #  scale_color_manual(values = "black") +
+  labs(fill = "Normalized enrichment score") +
+    theme(#axis.text.x = element_text(size = 12, family = "serif", color = "black", angle = 90),
+        axis.title = element_text(size=15, family = "serif"), 
+         legend.box.background = element_rect(color = "black"),
+          legend.text = element_text(family = "serif"), 
+          legend.title = element_text( family = "serif"),
+           plot.title = element_text(family = "serif", size =20),         
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line( size=.1 ),
+              legend.position = "top")
+
+heatmap_2
 ```
 
 
 ```{r}
-upset(fromList(enrich_H),  order.by = "freq")
+save(all_heatmap, file= "output/fgsea-heatmap-data.Rda")
 ```
 
-
-
-```{r fig.height=10, fig.width=10}
-sigRes_H_summary = lapply(sigRes_H, function(x) { x %>% dplyr::select(fgsea.Geneset, fgsea.NES) })
-
-sigRes_H_summary %>% do.call(rbind, .) %>% rownames_to_column("comparison") %>% 
-  mutate(comparison=gsub("\\.[0-9]*$","", comparison)) %>% 
-  xtabs(fgsea.NES ~ comparison + fgsea.Geneset,.) %>%
-  pheatmap(border_color = "white", cellheight =15, cellwidth = 15, scale = "none")
-
-
+```{r}
+#ggsave(heatmap_1, filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/DEG/Thesis_figures/fgsea-plots-1.svg",# 
+  #     height = 14, width = 9, units = "in")
 ```
 
+```{r}
+#ggsave(heatmap_2, filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/DEG/Thesis_figures/fgsea-plots-2.svg", 
+ #      height = 14, width = 9, units = "in")
+```

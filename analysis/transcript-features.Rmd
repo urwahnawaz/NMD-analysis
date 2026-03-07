@@ -1,0 +1,312 @@
+---
+title: "Extracting mouse transcript features"
+author: "unawaz1996"
+date: "2023-07-29"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+
+```{r load-packages, include=FALSE}
+library(BSgenome.Mmusculus.UCSC.mm10)
+library(AnnotationHub)
+library(plyranges)
+library(magrittr)
+library(scales)
+library(pander)
+library(tidyverse)
+library(here)
+library(biomaRt)
+source("code/libraries.R")
+```
+
+## 0. Introduction
+
+
+## 1. Retrieve sequences 
+
+
+```{r}
+library(TxDb.Mmusculus.UCSC.mm10.knownGene)
+library(BSgenome.Mmusculus.UCSC.mm10)
+
+genome = BSgenome.Mmusculus.UCSC.mm10
+txdb = TxDb.Mmusculus.UCSC.mm10.knownGene
+```
+
+```{r}
+txbygene <- transcriptsBy(txdb, "gene")
+```
+
+```{r}
+map <- relist(unlist(txbygene, use.names=FALSE)$tx_id, txbygene)
+```
+
+## Get sequnece
+
+
+```{r}
+ensembl <- useEnsembl(biomart = "genes")
+datasets <- listDatasets(ensembl)
+
+mart <- useEnsembl(dataset = "mmusculus_gene_ensembl", biomart='ensembl')
+head(columns(mart), n = 3)
+
+k = keys(mart, keytype= "ensembl_transcript_id")
+
+Lcell_seq = biomaRt::select(mart, keys=res_dte$UPF3B_KD_Control$tx_id, columns=c('ensembl_transcript_id','3_utr_start', "3_utr_end"),
+  keytype='ensembl_transcript_id') %>% 
+  mutate(length =  `3_utr_end`- `3_utr_start`)
+
+Lcell_seq = Lcell_seq %>% 
+  drop_na() %>% 
+  dplyr::filter(length > 50 & length < 10000)
+
+sequences =  biomaRt::select(mart, keys=Lcell_seq$ensembl_transcript_id, columns=c('ensembl_transcript_id',"3utr"),
+  keytype='ensembl_transcript_id') 
+
+```
+
+```{r}
+mart <- useMart("ensembl", dataset="mmusculus_gene_ensembl")
+
+seq = getSequence(id = Lcell_seq$ensembl_transcript_id, seqType = "3utr", type = "ensembl_transcript_id", mart = mart)
+z <- DNAStringSet(seq [,2])
+names(z) <- seq$ensembl_transcript_id
+  
+writeXStringSet(z, here("data","fastq" 
+                                  ,"ensembl_utr3.fa.gz"), compress = TRUE)
+  
+  #apply(seq[,-2], 2, paste, collapse = "; ")
+```
+
+
+```{r}
+exportFASTA(seq, file=here("data","fastq","ensembl_utr3.fa") )
+```
+
+
+```{r}
+seq2 = getSequence(id = Lcell_seq$ensembl_transcript_id, 
+            type="ensembl_transcript_id",
+            seqType="3utr",
+            mart=mart) 
+```
+
+
+
+```{r}
+fasta = getBM(attributes=c("coding", "ensembl_gene_id", "ensembl_transcript_id", "external_gene_name"), filters = "hgnc_symbol", values = genes$V1, mart = ensembl)
+```
+
+
+
+```{r}
+cds <- cdsBy(txdb, "tx", use.names=TRUE)
+threeUTR <- threeUTRsByTranscript(txdb, use.names = TRUE)
+fiveUTR <- fiveUTRsByTranscript(txdb, use.names=TRUE)
+```
+
+
+```{r}
+txid <- unlist(map, use.names=FALSE)
+```
+
+```{r}
+cds <- cds[names(cds) %in% txid]
+threeUTR <- threeUTR[names(threeUTR) %in% txid]
+fiveUTR <- fiveUTR[names(fiveUTR) %in% txid]
+```
+
+```{r}
+threeUTR_seqs <- extractTranscriptSeqs(genome, threeUTR)
+fiveUTR_seqs <- extractTranscriptSeqs(genome, fiveUTR)
+cds_seqs <- extractTranscriptSeqs(genome, cds)
+```
+
+
+## Export data 
+
+```{r}
+exportFASTA(seq2,here("data","fastq","ensembl_utr3.fa") )
+writeXStringSet(seq2, here("data","fastq" 
+                                  ,"ensembl_utr3.fa.gz"), compress = TRUE)
+```
+<!-- # ```{r} -->
+<!-- #  -->
+<!-- # writeXStringSet(threeUTR_seqs, here("data","fastq" -->
+<!-- #                                     ,"mm10_utr3.fa.gz"), compress = TRUE) -->
+<!-- #  -->
+<!-- # writeXStringSet(fiveUTR_seqs , here("data","fastq" -->
+<!-- #                                     ,"mm10_utr5.fa.gz"), compress = TRUE) -->
+<!-- #  -->
+<!-- # writeXStringSet(cds_seqs  , here("data","fastq" -->
+<!-- #                                     ,"mm10_cds.fa.gz"), compress = TRUE) -->
+<!-- # ``` -->
+
+
+## 3. Analysis of the Structures and Free Energy 
+
+
+ * 3'UTR 
+ 
+```{r}
+
+utr3 =  read.table("/home/neuro/Documents/NMD_analysis/Analysis/Results/ViennaRNA/utr3/mm10_utr3.fE.txt", header=FALSE, fill = TRUE)
+
+energy = data.frame(tx_id = utr3$V1[grep(">", utr3$V1, fixed = TRUE)], 
+                    energy = utr3$V2[grep("(", utr3$V2, fixed = TRUE)])
+
+energy$tx_id = gsub(">", "", energy$tx_id)
+energy$energy = gsub("\\(", "", energy$energy)
+energy$energy = gsub(")","",   energy$energy)
+energy$energy = as.numeric(energy$energy)
+
+energy %<>% 
+  mutate(tx_version = tx_id) %>%
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "")
+
+``` 
+ 
+ 
+ - Upf3b 
+ 
+ 
+```{r}
+upf3b_trgt = res_dte$UPF3B_KD_Control
+
+upf3b_fE = upf3b_trgt %>% 
+    mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% 
+  left_join(energy, by = "tx_id")
+
+
+upf3b_fE %>% 
+  mutate(fe_normalized = energy /Length) %>%
+  ggplot(aes(x = sig, y = energy, fill = sig)) + 
+  geom_jitter() + geom_boxplot() +
+  scale_fill_manual(values=c("cornsilk4", "antiquewhite2", "white")) +
+  labs(fill="") + ylab("MFE") + xlab("") +
+  ggtitle("5'UTR Predicted Minimum Free Energy (MFE)") +
+  theme(title = element_text(size = 20), 
+        text = element_text(size = 20), 
+        legend.position = "bottom")
+
+```
+
+```{r}
+upf3b_fE %>% 
+  mutate(fe_normalized = energy) %>%
+ ggplot(aes(x=fe_normalized, color = sig)) + stat_ecdf(geom = "point", size=0.8) +
+  scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") + theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("5'UTR Predicted Minimum Free Energy (MFE)")
+
+```
+
+
+ * 5'UTR 
+```{r}
+res = read.table("/home/neuro/Documents/NMD_analysis/Analysis/Results/ViennaRNA/utr5/mm10_utr5_fE.txt", header=FALSE, fill = TRUE)
+
+energy = data.frame(tx_id = res$V1[grep(">", res$V1, fixed = TRUE)], 
+                    energy = res$V2[grep("(", res$V2, fixed = TRUE)])
+
+energy$tx_id = gsub(">", "", energy$tx_id)
+energy$energy = gsub("\\(", "", energy$energy)
+energy$energy = gsub(")","",   energy$energy)
+energy$energy = as.numeric(energy$energy)
+
+energy %<>% 
+  mutate(tx_version = tx_id) %>%
+   mutate_at(.vars = "tx_id", .funs = gsub, pattern = "\\.[0-9]*$", replacement = "")
+
+```
+
+
+- Upf3b target transcripts 
+
+```{r upf3b}
+upf3b_trgt = res_dte$UPF3B_KD_Control
+
+upf3b_fE = upf3b_trgt %>% 
+    mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",
+                      ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% 
+  left_join(energy, by = "tx_id")
+
+
+upf3b_fE %>% 
+  mutate(fe_normalized = energy /Length) %>%
+  ggplot(aes(x = sig, y = energy, fill = sig)) + 
+  geom_jitter() + geom_boxplot() +
+  scale_fill_manual(values=c("cornsilk4", "antiquewhite2", "white")) +
+  labs(fill="") + ylab("MFE") + xlab("") +
+  ggtitle("5'UTR Predicted Minimum Free Energy (MFE)") +
+  theme(title = element_text(size = 20), 
+        text = element_text(size = 20), 
+        legend.position = "bottom")
+```
+
+
+```{r}
+upf3b_fE %>% 
+  mutate(fe_normalized = energy /Length) %>%
+  ggplot(aes(x = sig, y = fe_normalized, fill = sig)) + 
+  geom_jitter() + geom_boxplot() +
+  scale_fill_manual(values=c("cornsilk4", "antiquewhite2", "white")) +
+  labs(fill="") + ylab("MFE") + xlab("") +
+  ggtitle("5'UTR Predicted Minimum Free Energy (MFE)") +
+  theme(title = element_text(size = 20), 
+        text = element_text(size = 20), 
+        legend.position = "bottom")
+```
+
+```{r}
+upf3b_fE %>% 
+  mutate(fe_normalized = energy /Length) %>%
+ ggplot(aes(x=fe_normalized, color = sig)) + stat_ecdf(geom = "point", size=0.8) +
+  scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +
+  ylab("Cumulative Frequency") + xlab("") + theme(legend.position = "none") +
+  geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +
+  ggtitle("5'UTR Predicted Minimum Free Energy (MFE)")
+
+```
+
+
+```{r}
+ggvenn(data = list("upf3b annot" = upf3b_trgt$tx_id,  
+                 "structures" = energy$tx_id)) 
+```
+
+
+### Plots for poster 
+
+```{r}
+comparisons = names(res_dte)
+features = c("NIF_dEJ", "NIF_uORF", "NIF_long_3utr")
+
+for (c in comparisons){
+  comp = res_dte[[c]]
+  up = comp %>% 
+  dplyr::filter(FDR < 0.05,  logFC > 0)
+  
+  down = comp %>% 
+  dplyr::filter(FDR < 0.05,  logFC > 0)
+  
+  
+  for (f in features) {
+    feature = up %>% 
+    dplyr::select(NIF_dEJ, NIF_uORF, NIF_long_3utr) %>% 
+    dplyr::count(as.character(f)) %>%
+    dplyr::filter(f == 1)
+    }
+}
+
+res_dte$UPF3A_OE_UPF3B_KD_Control %>%
+  dplyr::filter(FDR < 0.05,  logFC >0) %>% 
+  dplyr::select(NIF_dEJ, NIF_uORF, NIF_long_3utr) %>% 
+  dplyr::count(NIF_dEJ) %>%
+  dplyr::filter(NIF_dEJ == 1) 
+```
