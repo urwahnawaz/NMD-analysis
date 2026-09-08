@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="urwahnawaz" />
+
+<meta name="date" content="2026-07-15" />
+
+<title>Edison_work</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Analysis of UPF3 paralogs</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="Quality-control.html">Pre-processing</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Differential Expression Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="DEG-analysis.html">DEG analysis</a>
+    </li>
+    <li>
+      <a href="Enichment-analysis-fgsea.html">Enrichment analysis using fgsea</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Transcript Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Differential-transcript-expression.html">DET analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="RNA-stability.html">RNA Stability analysis</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Figures
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Publication-Main-figures.Rmd">Main Figures</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/unawaz1996/NMD-analysis">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Edison_work</h1>
+<h4 class="author">urwahnawaz</h4>
+<h4 class="date">2026-07-15</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-07-15
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>NMD-analysis/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20230314code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20230314)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20230314code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20230314)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomurwahnawazNMDanalysistreef0433c039bbc70051c499e7d8555244ff8f31437targetblankf0433c0a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/urwahnawaz/NMD-analysis/tree/f0433c039bbc70051c499e7d8555244ff8f31437" target="_blank">f0433c0</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomurwahnawazNMDanalysistreef0433c039bbc70051c499e7d8555244ff8f31437targetblankf0433c0a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/urwahnawaz/NMD-analysis/tree/f0433c039bbc70051c499e7d8555244ff8f31437" target="_blank">f0433c0</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/Differential-transcript-expression.nb.html
+    Ignored:    analysis/Enichment-analysis-fgsea.nb.html
+    Ignored:    analysis/Publication-Main-figures.nb.html
+    Ignored:    analysis/figure/
+    Ignored:    archive/
+    Ignored:    code/external_code/out/
+    Ignored:    code/external_code/tmp/
+    Ignored:    data/fastq/
+    Ignored:    data/fastqc/
+    Ignored:    data/genewalk/
+    Ignored:    output/
+    Ignored:    tmp/
+
+Untracked files:
+    Untracked:  analysis/Edison_work.Rmd
+    Untracked:  data/Upf2/
+
+Unstaged changes:
+    Modified:   .gitignore
+    Modified:   Rplots.pdf
+    Modified:   analysis/DEG-analysis.Rmd
+    Modified:   analysis/Differential-transcript-expression.Rmd
+    Deleted:    analysis/Differential-transcript-usage.Rmd
+    Modified:   analysis/Enichment-analysis-fgsea.Rmd
+    Modified:   analysis/Publication-Main-figures.Rmd
+    Modified:   analysis/Publication-Supplementary-Figures.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<pre class="r"><code>library(tximport)
+library(edgeR)</code></pre>
+<pre><code>Loading required package: limma</code></pre>
+<pre class="r"><code>library(limma)
+library(EnsDb.Mmusculus.v79)</code></pre>
+<pre><code>Loading required package: ensembldb</code></pre>
+<pre><code>Loading required package: BiocGenerics</code></pre>
+<pre><code>Loading required package: generics</code></pre>
+<pre><code>
+Attaching package: &#39;generics&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,
+    setequal, union</code></pre>
+<pre><code>
+Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:limma&#39;:
+
+    plotMA</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    IQR, mad, sd, var, xtabs</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,
+    order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,
+    unsplit, which.max, which.min</code></pre>
+<pre><code>Loading required package: GenomicRanges</code></pre>
+<pre><code>Loading required package: stats4</code></pre>
+<pre><code>Loading required package: S4Vectors</code></pre>
+<pre><code>
+Attaching package: &#39;S4Vectors&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:utils&#39;:
+
+    findMatches</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    expand.grid, I, unname</code></pre>
+<pre><code>Loading required package: IRanges</code></pre>
+<pre><code>Loading required package: Seqinfo</code></pre>
+<pre><code>Loading required package: GenomicFeatures</code></pre>
+<pre><code>Loading required package: AnnotationDbi</code></pre>
+<pre><code>Loading required package: Biobase</code></pre>
+<pre><code>Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    &#39;browseVignettes()&#39;. To cite Bioconductor, see
+    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
+<pre><code>Loading required package: AnnotationFilter</code></pre>
+<pre><code>
+Attaching package: &#39;ensembldb&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:stats&#39;:
+
+    filter</code></pre>
+<pre class="r"><code>library(org.Mm.eg.db)</code></pre>
+<pre><code></code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     </code></pre>
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ lubridate::%within%() masks IRanges::%within%()
+✖ dplyr::collapse()     masks IRanges::collapse()
+✖ dplyr::combine()      masks Biobase::combine(), BiocGenerics::combine()
+✖ dplyr::desc()         masks IRanges::desc()
+✖ tidyr::expand()       masks S4Vectors::expand()
+✖ dplyr::filter()       masks ensembldb::filter(), stats::filter()
+✖ dplyr::first()        masks S4Vectors::first()
+✖ dplyr::lag()          masks stats::lag()
+✖ ggplot2::Position()   masks BiocGenerics::Position(), base::Position()
+✖ purrr::reduce()       masks GenomicRanges::reduce(), IRanges::reduce()
+✖ dplyr::rename()       masks S4Vectors::rename()
+✖ lubridate::second()   masks S4Vectors::second()
+✖ lubridate::second&lt;-() masks S4Vectors::second&lt;-()
+✖ dplyr::select()       masks ensembldb::select(), AnnotationDbi::select()
+✖ dplyr::slice()        masks IRanges::slice()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<pre class="r"><code>library(magrittr)</code></pre>
+<pre><code>
+Attaching package: &#39;magrittr&#39;
+
+The following object is masked from &#39;package:purrr&#39;:
+
+    set_names
+
+The following object is masked from &#39;package:tidyr&#39;:
+
+    extract
+
+The following object is masked from &#39;package:AnnotationFilter&#39;:
+
+    not
+
+The following object is masked from &#39;package:GenomicRanges&#39;:
+
+    subtract</code></pre>
+<pre class="r"><code>library(scales)</code></pre>
+<pre><code>
+Attaching package: &#39;scales&#39;
+
+The following object is masked from &#39;package:purrr&#39;:
+
+    discard
+
+The following object is masked from &#39;package:readr&#39;:
+
+    col_factor</code></pre>
+<pre class="r"><code>library(reshape2)</code></pre>
+<pre><code>
+Attaching package: &#39;reshape2&#39;
+
+The following object is masked from &#39;package:tidyr&#39;:
+
+    smiths</code></pre>
+<pre class="r"><code>library(gridExtra)</code></pre>
+<pre><code>
+Attaching package: &#39;gridExtra&#39;
+
+The following object is masked from &#39;package:dplyr&#39;:
+
+    combine
+
+The following object is masked from &#39;package:Biobase&#39;:
+
+    combine
+
+The following object is masked from &#39;package:BiocGenerics&#39;:
+
+    combine</code></pre>
+<pre class="r"><code>library(pheatmap)
+library(tibble)
+library(dplyr)
+library(tidyr)
+source(here::here(&quot;code/plots.R&quot;))
+source(here::here(&quot;code/functions.R&quot;))
+source(here::here(&quot;code/libraries.R&quot;))
+
+upf2_matrix = read_xlsx(here::here(&quot;data/Upf2/GSE295221_TPM_CPM.xlsx&quot;)) %&gt;% 
+  as.data.frame() %&gt;% 
+  column_to_rownames(&quot;gene_name&quot;)
+
+
+
+keep &lt;- (rowSums(upf2_matrix  &gt;= 1) &gt;= 4)
+
+genes_filtered &lt;- upf2_matrix [keep, ] %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;geneID&quot;) %&gt;%
+  mutate(geneName = mapIds(org.Mm.eg.db, keys = .$geneID,
+                            column = &quot;SYMBOL&quot;, keytype = &quot;ENSEMBL&quot;,
+                            multiVals = &quot;first&quot;)) %&gt;%
+  drop_na(geneName) %&gt;%
+  column_to_rownames(&quot;geneID&quot;) %&gt;%
+  dplyr::select(-geneName)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>exp_den &lt;- upf2_matrix %&gt;%
+  cpm(log = TRUE) %&gt;%
+  reshape2::melt() %&gt;%
+  dplyr::filter(is.finite(value)) %&gt;%
+  ggplot(aes(x = value, color = as.character(Var2))) +
+  geom_density() +
+  ggtitle(&quot;Before filtering&quot;) +
+  labs(x = &quot;logCPM&quot;, y = &quot;Proportion of genes&quot;) +
+  theme_bw() +
+  theme(legend.position = &quot;none&quot;)
+
+exp_den_filt &lt;-  upf2_matrix %&gt;%
+  cpm(log = TRUE) %&gt;%
+  magrittr::extract(keep, ) %&gt;%
+  reshape2::melt() %&gt;%
+  dplyr::filter(is.finite(value)) %&gt;%
+  ggplot(aes(x = value, color = as.character(Var2))) +
+  geom_density() +
+  ggtitle(&quot;After filtering&quot;) +
+  labs(x = &quot;logCPM&quot;, y = &quot;Proportion of genes&quot;) +
+  theme_bw() +
+  theme(legend.position = &quot;none&quot;)
+
+grid.arrange(exp_den, exp_den_filt, ncol = 2)</code></pre>
+<p><img src="figure/Edison_work.Rmd/unnamed-chunk-1-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pca &lt;- log2(upf2_matrix[keep, ] + 10^-6) %&gt;%
+  t() %&gt;%
+  prcomp(scale = TRUE)
+
+pcaVars &lt;- percent_format(0.1)(summary(pca)$importance[&quot;Proportion of Variance&quot;, ])
+
+gene_pca &lt;- pca$x[, 1:2] %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;sample&quot;) %&gt;%   # keep sample names before tibble drops them
+  as_tibble() %&gt;%
+  ggplot(aes(PC1, PC2, label = sample)) +
+  geom_point(size = 6) +
+  geom_text_repel(size = 3, max.overlaps = Inf) +
+  theme_bw() +
+  scale_shape_manual(values = c(0, 16)) +
+  labs(
+    x = paste0(&quot;PC1 (&quot;, pcaVars[[&quot;PC1&quot;]], &quot;)&quot;),
+    y = paste0(&quot;PC2 (&quot;, pcaVars[[&quot;PC2&quot;]], &quot;)&quot;)
+  )
+gene_pca</code></pre>
+<p><img src="figure/Edison_work.Rmd/unnamed-chunk-2-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>y &lt;- DGEList(genes_filtered)
+
+
+library(GEOquery)</code></pre>
+<pre><code>Setting options(&#39;download.file.method.GEOquery&#39;=&#39;auto&#39;)</code></pre>
+<pre><code>Setting options(&#39;GEOquery.inmemory.gpl&#39;=FALSE)</code></pre>
+<pre class="r"><code>gse &lt;- getGEO(&quot;GSE295221&quot;, GSEMatrix = TRUE)[[1]]</code></pre>
+<pre><code>Found 1 file(s)</code></pre>
+<pre><code>GSE295221_series_matrix.txt.gz</code></pre>
+<pre class="r"><code>meta &lt;- pData(gse)</code></pre>
+<pre class="r"><code>meta &lt;- meta %&gt;%
+  mutate(
+    sampleid = str_remove(str_trim(description), &quot;^Library name:\\s*&quot;),
+    condition = if_else(str_detect(sampleid, &quot;^KO&quot;), &quot;KO&quot;, &quot;Ctrl&quot;)) %&gt;% 
+  rownames_to_column(&quot;random&quot;) %&gt;%
+  dplyr::select(sampleid, condition) %&gt;%
+  column_to_rownames(&quot;sampleid&quot;)
+
+design &lt;- model.matrix(~0+condition, data = meta) %&gt;% 
+    set_colnames(gsub(pattern = &quot;condition&quot;, replacement =&quot;&quot;, x = colnames(.)))
+
+contrasts &lt;- makeContrasts(levels = colnames(design), 
+                           KO_vs_Control = KO - Ctrl)
+y &lt;- calcNormFactors(y)</code></pre>
+<pre><code>calcNormFactors has been renamed to normLibSizes</code></pre>
+<pre class="r"><code>v &lt;- voom(y, design)
+
+fit = lmFit(v, design) %&gt;% 
+    contrasts.fit(contrasts) %&gt;% 
+    eBayes()
+
+
+summary(decideTests(fit, lfc = 1))</code></pre>
+<pre><code>       KO_vs_Control
+Down             129
+NotSig         13733
+Up              1026</code></pre>
+<pre class="r"><code>res &lt;- colnames(contrasts) %&gt;%
+  lapply(function(x) {
+    topTable(fit, coef = x, number = Inf) %&gt;%
+      mutate(contrast = as.character(x)) %&gt;%
+      as.data.frame() %&gt;%
+      rownames_to_column(&quot;EnsID&quot;) %&gt;%
+      mutate(
+        gene = mapIds(org.Mm.eg.db, keys = EnsID, column = &quot;SYMBOL&quot;,
+                       keytype = &quot;ENSEMBL&quot;, multiVals = &quot;first&quot;)
+      )
+  })</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>names(res) &lt;- colnames(contrasts)
+
+results &lt;- decideTests(fit, p.value = 0.05, adjust.method = &quot;fdr&quot;,
+                        method = &quot;global&quot;, lfc = 1)
+
+limma_results &lt;- write_fit(fit, results = results, adjust = &quot;fdr&quot;) %&gt;%
+  rownames_to_column(&quot;ensembl_gene_id&quot;) %&gt;%
+  mutate(
+    gene = mapIds(org.Mm.eg.db, keys = ensembl_gene_id, column = &quot;SYMBOL&quot;,
+                   keytype = &quot;ENSEMBL&quot;, multiVals = &quot;first&quot;)
+  ) %&gt;%
+  drop_na(gene)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>DEColours &lt;- c(&quot;Downregulated&quot; = &quot;#53A08E&quot;, &quot;Upregulated&quot; = &quot;#690020&quot;, &quot;Not Sig&quot; = &quot;#CECCCA&quot;)
+
+df &lt;- res$KO_vs_Control %&gt;%
+  mutate(Result = ifelse(adj.P.Val &lt; 0.05 &amp; logFC &gt; 0, &quot;Upregulated&quot;,
+                   ifelse(adj.P.Val &lt; 0.05 &amp; logFC &lt; 0, &quot;Downregulated&quot;, &quot;Not Sig&quot;))) 
+
+
+contrast_labeller &lt;- as_labeller(c(
+  &quot;UPF3B_vs_Control&quot; = &quot;italic(Upf3b)~&#39;KD DEGs&#39;&quot;,
+  &quot;UPF3A_vs_Control&quot; = &quot;italic(Upf3a)~&#39;KD DEGs&#39;&quot;,
+  &quot;DoubleKD_vs_Control&quot; = &quot;italic(Upf3)~&#39;dKD DEGs&#39;&quot;,
+  &quot;UPF3A_OE_UPF3B_KD_vs_Control&quot; = &quot;italic(Upf3a)~&#39;OE&#39;~italic(Upf3b)~&#39;KD DEGs&#39;&quot;
+), label_parsed)
+
+deg_volcano_plot &lt;- df %&gt;%
+  ggplot(aes(x = logFC, y = -log10(adj.P.Val), colour = Result)) +
+  geom_point(alpha = 0.75, size = 3) +
+  scale_colour_manual(values = DEColours, breaks = c(&quot;Upregulated&quot;, &quot;Downregulated&quot;), drop = TRUE) +
+  xlab(bquote(log[&quot;2&quot;](FC))) +
+  ylab(bquote(-log[&quot;10&quot;](&quot;adjusted P-value&quot;))) +
+  geom_vline(xintercept = c(-log2(1.5), log2(1.5)), linetype = &quot;dashed&quot;) +
+  ylim(0, 10) +
+  facet_grid(~contrast, scales = &quot;free_x&quot;, labeller = contrast_labeller) +
+  theme_bw() +
+  theme(
+    legend.position = &quot;top&quot;,
+    legend.title = element_blank(),
+    strip.text = element_text(size = 12)
+  )
+
+deg_volcano_plot </code></pre>
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+<p><img src="figure/Edison_work.Rmd/unnamed-chunk-5-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>res &lt;- topTable(fit, coef = &quot;KO_vs_Control&quot;, number = Inf, sort.by = &quot;P&quot;) %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  as_tibble() %&gt;% 
+ mutate(Result = ifelse(adj.P.Val &lt; 0.05 &amp; logFC &gt; 1, &quot;Upregulated&quot;,
+                   ifelse(adj.P.Val &lt; 0.05 &amp; logFC &lt; -1, &quot;Downregulated&quot;, &quot;Not Sig&quot;)))
+
+
+universe_genes &lt;- res$gene  
+
+up_genes   &lt;- res %&gt;% dplyr::filter(Result == &quot;Upregulated&quot;)   %&gt;% pull(gene)
+down_genes &lt;- res %&gt;% dplyr::filter(Result == &quot;Downregulated&quot;) %&gt;% pull(gene)</code></pre>
+<pre class="r"><code>library(fgsea)
+library(msigdbr)
+
+pathways &lt;- msigdbr(species = &quot;Mus musculus&quot;, category = &quot;C5&quot;, subcategory = &quot;GO:BP&quot;) %&gt;%
+  split(x = .$ensembl_gene, f = .$gs_name)</code></pre>
+<pre><code>Using human MSigDB with ortholog mapping to mouse. Use `db_species = &quot;MM&quot;` for mouse-native gene sets.
+This message is displayed once per session.</code></pre>
+<pre><code>Warning: The `category` argument of `msigdbr()` is deprecated as of msigdbr 10.0.0.
+ℹ Please use the `collection` argument instead.
+This warning is displayed once per session.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+generated.</code></pre>
+<pre><code>Warning: The `subcategory` argument of `msigdbr()` is deprecated as of msigdbr 10.0.0.
+ℹ Please use the `subcollection` argument instead.
+This warning is displayed once per session.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+generated.</code></pre>
+<pre class="r"><code>ranks &lt;- res %&gt;% dplyr::arrange(desc(t)) %&gt;% pull(t, name = gene)
+fgseaRes &lt;- fgsea(pathways, ranks, minSize = 15, maxSize = 500)</code></pre>
+<pre><code>Warning in fgseaMultilevel(pathways = pathways, stats = stats, minSize =
+minSize, : There were 34 pathways for which P-values were not calculated
+properly due to unbalanced (positive and negative) gene-level statistic values.
+For such pathways pval, padj, NES, log2err are set to NA. You can try to
+increase the value of the argument nPermSimple (for example set it nPermSimple
+= 10000)</code></pre>
+<pre class="r"><code>library(topGO)</code></pre>
+<pre><code>Loading required package: GO.db</code></pre>
+<pre><code>Loading required package: SparseM</code></pre>
+<pre><code>
+groupGOTerms:   GOBPTerm, GOMFTerm, GOCCTerm environments built.</code></pre>
+<pre><code>
+Attaching package: &#39;topGO&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:mgcv&#39;:
+
+    feasible</code></pre>
+<pre><code>The following object is masked from &#39;package:grid&#39;:
+
+    depth</code></pre>
+<pre><code>The following objects are masked from &#39;package:GSEABase&#39;:
+
+    ontology, phenotype</code></pre>
+<pre><code>The following object is masked from &#39;package:ensembldb&#39;:
+
+    genes</code></pre>
+<pre><code>The following object is masked from &#39;package:GenomicFeatures&#39;:
+
+    genes</code></pre>
+<pre><code>The following object is masked from &#39;package:IRanges&#39;:
+
+    members</code></pre>
+<pre class="r"><code>allGenes &lt;- setNames(as.integer(res$gene %in% up_genes), res$gene)
+
+GOdata &lt;- new(&quot;topGOdata&quot;,
+  ontology    = &quot;BP&quot;,
+  allGenes    = allGenes,
+  geneSelectionFun = function(x) x == 1,
+  annot       = annFUN.org,
+  mapping     = &quot;org.Mm.eg.db&quot;,
+  ID          = &quot;ensembl&quot;,
+  nodeSize    = 10
+)</code></pre>
+<pre><code>
+Building most specific GOs .....</code></pre>
+<pre><code>    ( 11295 GO terms found. )</code></pre>
+<pre><code>
+Build GO DAG topology ..........</code></pre>
+<pre><code>    ( 14030 GO terms and 30769 relations. )</code></pre>
+<pre><code>
+Annotating nodes ...............</code></pre>
+<pre><code>    ( 13525 genes annotated to the GO terms. )</code></pre>
+<pre class="r"><code>resultElim &lt;- runTest(GOdata, algorithm = &quot;elim&quot;, statistic = &quot;fisher&quot;)</code></pre>
+<pre><code>
+             -- Elim Algorithm -- 
+
+         the algorithm is scoring 4635 nontrivial nodes
+         parameters: 
+             test statistic: fisher
+             cutOff: 0.01</code></pre>
+<pre><code>
+     Level 19:  2 nodes to be scored    (0 eliminated genes)</code></pre>
+<pre><code>
+     Level 18:  2 nodes to be scored    (0 eliminated genes)</code></pre>
+<pre><code>
+     Level 17:  7 nodes to be scored    (0 eliminated genes)</code></pre>
+<pre><code>
+     Level 16:  18 nodes to be scored   (0 eliminated genes)</code></pre>
+<pre><code>
+     Level 15:  40 nodes to be scored   (38 eliminated genes)</code></pre>
+<pre><code>
+     Level 14:  50 nodes to be scored   (47 eliminated genes)</code></pre>
+<pre><code>
+     Level 13:  75 nodes to be scored   (127 eliminated genes)</code></pre>
+<pre><code>
+     Level 12:  181 nodes to be scored  (152 eliminated genes)</code></pre>
+<pre><code>
+     Level 11:  337 nodes to be scored  (289 eliminated genes)</code></pre>
+<pre><code>
+     Level 10:  504 nodes to be scored  (440 eliminated genes)</code></pre>
+<pre><code>
+     Level 9:   622 nodes to be scored  (618 eliminated genes)</code></pre>
+<pre><code>
+     Level 8:   691 nodes to be scored  (918 eliminated genes)</code></pre>
+<pre><code>
+     Level 7:   701 nodes to be scored  (1606 eliminated genes)</code></pre>
+<pre><code>
+     Level 6:   633 nodes to be scored  (1863 eliminated genes)</code></pre>
+<pre><code>
+     Level 5:   435 nodes to be scored  (2338 eliminated genes)</code></pre>
+<pre><code>
+     Level 4:   242 nodes to be scored  (2565 eliminated genes)</code></pre>
+<pre><code>
+     Level 3:   78 nodes to be scored   (2593 eliminated genes)</code></pre>
+<pre><code>
+     Level 2:   16 nodes to be scored   (2606 eliminated genes)</code></pre>
+<pre><code>
+     Level 1:   1 nodes to be scored    (2606 eliminated genes)</code></pre>
+<pre class="r"><code>GenTable(GOdata, elimFisher = resultElim, topNodes = 30)</code></pre>
+<pre><code>        GO.ID                                        Term Annotated Significant
+1  GO:0050907 detection of chemical stimulus involved ...        13           8
+2  GO:0030317                  flagellated sperm motility       135          33
+3  GO:0006958    complement activation, classical pathway        17           8
+4  GO:0045087                      innate immune response       667          83
+5  GO:0035082                            axoneme assembly        80          23
+6  GO:0032760 positive regulation of tumor necrosis fa...        79          16
+7  GO:0007601                           visual perception        84          16
+8  GO:0030593                       neutrophil chemotaxis        53          12
+9  GO:0001774                  microglial cell activation        32           9
+10 GO:0002495 antigen processing and presentation of p...        14           6
+11 GO:0072376                  protein activation cascade        14           6
+12 GO:0007338                        single fertilization       110          18
+13 GO:0006954                       inflammatory response       559          66
+14 GO:0048246                       macrophage chemotaxis        34           9
+15 GO:0002291 T cell activation via T cell receptor co...        10           5
+16 GO:0006911                    phagocytosis, engulfment        39          13
+17 GO:0032722 positive regulation of chemokine product...        43          10
+18 GO:0007288                      sperm axoneme assembly        22           7
+19 GO:0002478 antigen processing and presentation of e...        16           6
+20 GO:0002888 positive regulation of myeloid leukocyte...        16           6
+21 GO:0060100 positive regulation of phagocytosis, eng...        11           5
+22 GO:0120316                    sperm flagellum assembly        46          14
+23 GO:0006910                   phagocytosis, recognition        24           7
+24 GO:0032733 positive regulation of interleukin-10 pr...        24           7
+25 GO:0003351 epithelial cilium movement involved in e...        38          11
+26 GO:0002250                    adaptive immune response       259          40
+27 GO:0097242                      amyloid-beta clearance        33           8
+28 GO:0002704 negative regulation of leukocyte mediate...        49          10
+29 GO:0002577 regulation of antigen processing and pre...        13           5
+30 GO:0002283 neutrophil activation involved in immune...        15           7
+   Expected elimFisher
+1      0.82    2.4e-07
+2      8.52    1.8e-06
+3      1.07    3.6e-06
+4     42.12    7.2e-06
+5      5.05    1.1e-05
+6      4.99    2.8e-05
+7      5.30    6.1e-05
+8      3.35    8.9e-05
+9      2.02    0.00011
+10     0.88    0.00012
+11     0.88    0.00012
+12     6.95    0.00017
+13    35.30    0.00019
+14     2.15    0.00019
+15     0.63    0.00019
+16     2.46    0.00024
+17     2.72    0.00027
+18     1.39    0.00029
+19     1.01    0.00029
+20     1.01    0.00029
+21     0.69    0.00033
+22     2.90    0.00050
+23     1.52    0.00052
+24     1.52    0.00052
+25     2.40    0.00067
+26    16.35    0.00077
+27     2.08    0.00082
+28     3.09    0.00082
+29     0.82    0.00083
+30     0.95    0.00095</code></pre>
+<pre class="r"><code>################################################################################
+# Reproduction: Lin et al., Cell Reports 2026 (GSE295221 / GSE295222 / GSE210437)
+#
+# Claim chain:
+#   1. Upf2 cKO -&gt; predominantly UP-regulated DE profile (NMD loss stabilises targets)
+#   2. Ciliary program enriched among UP genes; neuron migration among DOWN genes
+#   3. Foxj1 = direct NMD target (long 3&#39;UTR + UPF1 eCLIP peak), itself upregulated
+#   4. FOXJ1-coexpressed genes enriched among UP genes
+#
+# Genome build: mm10 / GRCm38, Ensembl v102. DO NOT mix GRCm39 annotation.
+################################################################################
+
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(DESeq2)
+  library(fgsea)
+  library(rtracklayer)
+  library(GenomicRanges)
+  library(AnnotationHub)
+  library(ensembldb)
+  library(org.Mm.eg.db)
+  library(AnnotationDbi)
+})
+
+# ── PATHS — edit these ────────────────────────────────────────────────────────
+COUNTS       &lt;- &quot;data/Upf2/GSE295221_TPM_CPM.xlsx&quot;        # genes x samples, raw counts
+ECLIP_PEAKS  &lt;- &quot;data/Upf2/GSM6430256_mm10.UPF1_MOCK_IP.umi.r1.fq.genome-mappedSoSo.rmDupSo.peakClusters.normed.compressed.bed.gz&quot;
+CHEA3_GMT    &lt;- &quot;data/Upf2/GTEx_Coexpression.gmt.txt&quot;       
+
+set.seed(42)
+
+################################################################################
+# 1. ANNOTATION (mm10 / Ensembl 102)
+################################################################################
+
+ah &lt;- AnnotationHub()
+# Inspect once, then hardcode for reproducibility and record in methods:
+#   query(ah, c(&quot;EnsDb&quot;, &quot;Mus musculus&quot;, &quot;GRCm38&quot;))
+ensDb &lt;- ah[[&quot;AH78811&quot;]]   # Ensembl 102, last GRCm38 release — matches the paper</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre class="r"><code>genesGR &lt;- ensembldb::genes(ensDb)
+
+id2name &lt;- structure(genesGR$gene_name, names = genesGR$gene_id)
+id2name &lt;- id2name[!duplicated(names(id2name))]
+
+################################################################################
+# 2. BULK DE — DESeq2, Ctrl vs Upf2 cKO
+################################################################################
+
+cts &lt;- read_xlsx(here::here(COUNTS)) %&gt;% 
+  as.data.frame() %&gt;% 
+  column_to_rownames(&quot;gene_name&quot;) 
+
+
+# Sample sheet derived from GEO &quot;Library name: Ctrl_n / KO_n&quot;
+coldata &lt;- tibble(sample = colnames(cts)) %&gt;%
+  mutate(
+    condition = if_else(str_detect(sample, regex(&quot;^KO|cKO|Upf2&quot;, ignore_case = TRUE)),
+                        &quot;KO&quot;, &quot;Ctrl&quot;),
+    condition = factor(condition, levels = c(&quot;Ctrl&quot;, &quot;KO&quot;))   # Ctrl = reference
+  ) %&gt;%
+  column_to_rownames(&quot;sample&quot;)</code></pre>
+<pre class="r"><code>library(limma)
+library(edgeR)
+
+tpm &lt;- read_excel(here::here(COUNTS), sheet = 1)%&gt;%
+  column_to_rownames(&quot;gene_name&quot;) %&gt;%   # adjust to actual ID column name
+  as.matrix()
+
+# Filter before transforming — low-TPM genes carry the noise that drives false trends
+keep &lt;- rowSums(tpm &gt; 1) &gt;= 4          # expressed in at least one full group
+tpm  &lt;- tpm[keep, ]
+message(&quot;Genes retained: &quot;, nrow(tpm))</code></pre>
+<pre><code>Genes retained: 17605</code></pre>
+<pre class="r"><code>lg &lt;- log2(tpm + 1)
+
+condition &lt;- factor(
+  if_else(str_detect(colnames(lg), regex(&quot;KO|cKO&quot;, ignore_case = TRUE)), &quot;KO&quot;, &quot;Ctrl&quot;),
+  levels = c(&quot;Ctrl&quot;, &quot;KO&quot;)
+)
+design &lt;- model.matrix(~ condition)
+
+fit &lt;- lmFit(lg, design) %&gt;%
+  eBayes(trend = TRUE, robust = TRUE)   # trend=TRUE is the point — models mean-variance
+
+res &lt;- topTable(fit, coef = &quot;conditionKO&quot;, number = Inf, sort.by = &quot;P&quot;) %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  as_tibble() %&gt;%
+  mutate(
+    gene           = str_remove(gene, &quot;\\.\\d+$&quot;),
+    symbol         = unname(id2name[gene]),
+    log2FoldChange = logFC,
+    padj           = adj.P.Val
+  ) %&gt;%
+  filter(!is.na(padj))</code></pre>
+<pre class="r"><code>################################################################################
+# 3. TWO DEG SETS — this is the step that silently breaks reproductions
+#
+#    STRICT  (padj&lt;0.05, |log2FC|&gt;1  ) -&gt; headline counts: 2844 up / 422 down
+#    LOOSE   (padj&lt;0.05,  log2FC &gt;0.5) -&gt; used for the eCLIP intersections: 4535 up
+#
+#    Foxj1 (log2FC 0.558) and Ino80 (log2FC 0.891) are BELOW the strict cutoff.
+#    Using |log2FC|&gt;1 throughout drops both central genes and the analysis fails.
+################################################################################
+
+res &lt;- res %&gt;%
+  mutate(
+    deg_strict = case_when(
+      padj &lt; 0.05 &amp; log2FoldChange &gt;  1 ~ &quot;Up&quot;,
+      padj &lt; 0.05 &amp; log2FoldChange &lt; -1 ~ &quot;Down&quot;,
+      TRUE                              ~ &quot;NotSig&quot;
+    ),
+    deg_loose = case_when(
+      padj &lt; 0.05 &amp; log2FoldChange &gt;  0.5 ~ &quot;Up&quot;,
+      padj &lt; 0.05 &amp; log2FoldChange &lt; -0.5 ~ &quot;Down&quot;,
+      TRUE                                ~ &quot;NotSig&quot;
+    )
+  )
+
+deg_counts &lt;- dplyr::count(res, deg_strict)
+print(deg_counts)                       # target: Up 2844, Down 422</code></pre>
+<pre><code># A tibble: 3 × 2
+  deg_strict     n
+  &lt;chr&gt;      &lt;int&gt;
+1 Down          70
+2 NotSig     16189
+3 Up          1346</code></pre>
+<pre class="r"><code>message(&quot;Up:Down ratio = &quot;, round(sum(res$deg_strict == &quot;Up&quot;) /
+                                  sum(res$deg_strict == &quot;Down&quot;), 2))</code></pre>
+<pre><code>Up:Down ratio = 19.23</code></pre>
+<pre class="r"><code>up_loose &lt;- res %&gt;% filter(deg_loose == &quot;Up&quot;) %&gt;% pull(gene)
+message(&quot;Up at log2FC&gt;0.5: &quot;, length(up_loose))   # target: 4535</code></pre>
+<pre><code>Up at log2FC&gt;0.5: 3674</code></pre>
+<pre class="r"><code>################################################################################
+# 4. RANKED METRIC — the paper&#39;s custom statistic, NOT the t-stat
+#
+#      r_g = log2(FC_g) * sqrt( -log10(padj_g) )
+#
+#    Sign comes from log2FC; the sqrt term is always positive and only weights.
+################################################################################
+
+res_rank &lt;- res %&gt;%
+  filter(!is.na(log2FoldChange), !is.na(padj)) %&gt;%
+  mutate(
+    padj_floor = pmax(padj, .Machine$double.xmin),      # padj can be exactly 0
+    r = log2FoldChange * sqrt(-log10(padj_floor))
+  ) %&gt;%
+  filter(!duplicated(gene), is.finite(r)) %&gt;%
+  arrange(r)                                            # ascending, as in the paper
+
+ranks &lt;- setNames(res_rank$r, res_rank$gene)
+
+################################################################################
+# 5. GENE SETS
+################################################################################
+
+# ── GO terms via org.Mm.eg.db. GOALL propagates descendant terms, which is what
+#    AmiGO2 returns. Using &quot;GO&quot; instead of &quot;GOALL&quot; gives direct annotations only
+#    and will undercount badly.
+go_genes &lt;- function(goid) {
+  AnnotationDbi::select(org.Mm.eg.db, keys = goid, keytype = &quot;GOALL&quot;,
+                        columns = &quot;ENSEMBL&quot;) %&gt;%
+    pull(ENSEMBL) %&gt;% unique() %&gt;% na.omit() %&gt;% as.character()
+}
+
+GO_MIGRATION     &lt;- &quot;GO:0001764&quot;   # neuron migration
+GO_CILIUM_MOVE   &lt;- &quot;GO:0003341&quot;   # cilium movement
+GO_CILIUM        &lt;- &quot;GO:0005929&quot;   # cilium
+GO_CILIUM_ASSEM  &lt;- &quot;GO:0060271&quot;   # cilium assembly
+
+sets_go &lt;- list(
+  neuron_migration = go_genes(GO_MIGRATION),
+  cilium_movement  = go_genes(GO_CILIUM_MOVE)
+)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns
+&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>str(map(sets_go, length))</code></pre>
+<pre><code>List of 2
+ $ neuron_migration: int 219
+ $ cilium_movement : int 320</code></pre>
+<pre class="r"><code># ── FOXJ1 coexpressed: ChEA3 GTEx_Coexpression.gmt, top 300 human -&gt; 244 mouse
+gmt &lt;- gmtPathways(here::here(CHEA3_GMT))
+foxj1_key &lt;- grep(&quot;^FOXJ1&quot;, names(gmt), value = TRUE)
+stopifnot(length(foxj1_key) &gt;= 1)
+foxj1_human &lt;- head(gmt[[foxj1_key[1]]], 300)
+
+# Human -&gt; mouse homologs. babelgene is offline (bundled HCOP data).
+suppressPackageStartupMessages(library(babelgene))
+foxj1_mouse &lt;- orthologs(genes = foxj1_human, species = &quot;mouse&quot;, human = TRUE) %&gt;%
+  pull(symbol) %&gt;% unique()
+message(&quot;FOXJ1 coexpressed mouse homologs: &quot;, length(foxj1_mouse))  # target: 244</code></pre>
+<pre><code>FOXJ1 coexpressed mouse homologs: 250</code></pre>
+<pre class="r"><code>sym2ens &lt;- structure(names(id2name), names = id2name)
+sets_go$foxj1_coexpressed &lt;- unname(na.omit(sym2ens[foxj1_mouse]))
+
+################################################################################
+# 6. GSEA (fgsea preranked; equivalent to GSEApy prerank)
+################################################################################
+
+gsea &lt;- fgsea(pathways = sets_go, stats = ranks,
+              minSize = 15, maxSize = 2000, eps = 0, nPermSimple = 10000)</code></pre>
+<pre class="r"><code>gsea %&gt;%
+  dplyr::select(pathway, NES, pval, padj, size) %&gt;%
+  dplyr::arrange(desc(NES)) %&gt;%
+  print()</code></pre>
+<pre><code>             pathway       NES         pval         padj  size
+              &lt;char&gt;     &lt;num&gt;        &lt;num&gt;        &lt;num&gt; &lt;int&gt;
+1: foxj1_coexpressed 1.5909490 5.793226e-12 8.689840e-12   143
+2:   cilium_movement 1.5604867 1.217117e-12 3.651352e-12   179
+3:  neuron_migration 0.6119618 9.995000e-01 9.995000e-01   189</code></pre>
+<pre class="r"><code>################################################################################
+# 7. UPF1 eCLIP — strand-aware overlap
+################################################################################
+
+peaks &lt;- import(here::here(ECLIP_PEAKS), format = &quot;BED&quot;)
+
+# Yeo-pipeline peakClusters: col4 = -log10(p), col5 = log2(fold enrichment).
+# VERIFY before trusting — column semantics vary by pipeline version:
+#   zcat &lt;file&gt; | head
+print(head(peaks))</code></pre>
+<pre><code>GRanges object with 6 ranges and 2 metadata columns:
+      seqnames            ranges strand |        name     score
+         &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt; &lt;numeric&gt;
+  [1]     chr7 24504293-24504337      + |         400   6.66359
+  [2]     chr7 24504258-24504279      + |         400   6.61523
+  [3]     chr7 24504280-24504292      + |         400   6.52331
+  [4]     chr7 24504242-24504257      + |         400   6.45560
+  [5]     chr7 73418741-73418838      + |         400   6.44668
+  [6]     chr7   4135060-4135073      + |         400   6.44016
+  -------
+  seqinfo: 21 sequences from an unspecified genome; no seqlengths</code></pre>
+<pre class="r"><code>mcols(peaks)$log10p &lt;- suppressWarnings(as.numeric(mcols(peaks)$name))
+mcols(peaks)$log2FC &lt;- mcols(peaks)$score
+print(summary(mcols(peaks)$log10p))   # must be POSITIVE (-log10 p), not negative</code></pre>
+<pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+  0.0000   0.0000   0.0000   2.7766   0.7416 400.0000 </code></pre>
+<pre class="r"><code>print(summary(mcols(peaks)$log2FC))</code></pre>
+<pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+-8.41268 -0.02418  0.71278  1.08946  1.78317  8.24728 </code></pre>
+<pre class="r"><code>peaks_sig &lt;- peaks[peaks$log10p &gt;= 3 &amp; peaks$log2FC &gt;= 1]   # p&lt;0.001, 2-fold
+message(&quot;Significant peaks: &quot;, length(peaks_sig))</code></pre>
+<pre><code>Significant peaks: 16220</code></pre>
+<pre class="r"><code># 3&#39;UTRs, UCSC seqlevel style to match the BED
+utr3 &lt;- ensembldb::threeUTRsByTranscript(ensDb)
+utr3_gr &lt;- unlist(utr3)
+seqlevelsStyle(utr3_gr) &lt;- &quot;UCSC&quot;</code></pre>
+<pre><code>Warning in (function (seqlevels, genome, new_style) : cannot switch some
+GRCm38&#39;s seqlevels from NCBI to UCSC style</code></pre>
+<pre class="r"><code>tx2gene &lt;- AnnotationDbi::select(ensDb, keys = names(utr3_gr),
+                                 keytype = &quot;TXNAME&quot;, columns = c(&quot;TXNAME&quot;, &quot;GENEID&quot;))
+mcols(utr3_gr)$gene_id &lt;- tx2gene$GENEID[match(names(utr3_gr), tx2gene$TXNAME)]
+
+genes_ucsc &lt;- genesGR
+seqlevelsStyle(genes_ucsc) &lt;- &quot;UCSC&quot;</code></pre>
+<pre><code>Warning in (function (seqlevels, genome, new_style) : cannot switch some
+GRCm38&#39;s seqlevels from NCBI to UCSC style</code></pre>
+<pre class="r"><code># ignore.strand = FALSE is mandatory — eCLIP is strand-specific
+ov_gene &lt;- findOverlaps(peaks_sig, genes_ucsc, ignore.strand = FALSE)
+ov_utr3 &lt;- findOverlaps(peaks_sig, utr3_gr,    ignore.strand = FALSE)
+
+eclip_gene &lt;- unique(genes_ucsc$gene_id[subjectHits(ov_gene)])
+eclip_utr3 &lt;- unique(utr3_gr$gene_id[subjectHits(ov_utr3)])
+
+message(&quot;Genes with UPF1 peak (any): &quot;, length(eclip_gene))</code></pre>
+<pre><code>Genes with UPF1 peak (any): 3721</code></pre>
+<pre class="r"><code>message(&quot;Genes with UPF1 peak (3&#39;UTR): &quot;, length(eclip_utr3))</code></pre>
+<pre><code>Genes with UPF1 peak (3&#39;UTR): 3488</code></pre>
+<pre class="r"><code>################################################################################
+# 8. TRIPLE INTERSECT -&gt; 19 high-confidence NMD-targeted ciliary genes (Fig 6C/6D)
+#
+#    (upregulated at log2FC&gt;0.5) INTERSECT (cilium GO) INTERSECT (UPF1 eCLIP peak)
+################################################################################
+
+cilium_related &lt;- union(go_genes(GO_CILIUM), go_genes(GO_CILIUM_ASSEM))</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns
+&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>hi_conf &lt;- Reduce(intersect, list(up_loose, cilium_related, eclip_gene))
+message(&quot;High-confidence NMD-targeted ciliary genes: &quot;, length(hi_conf))  # target: 19</code></pre>
+<pre><code>High-confidence NMD-targeted ciliary genes: 23</code></pre>
+<pre class="r"><code>hi_conf_tab &lt;- res %&gt;%
+  dplyr::filter(gene %in% hi_conf) %&gt;%
+  dplyr::select(gene, symbol, log2FoldChange, padj) %&gt;%
+  dplyr::arrange(desc(log2FoldChange))
+print(hi_conf_tab)   # expect Foxj1, Cdk5rap2, Fbf1, Iqcg among them</code></pre>
+<pre><code># A tibble: 23 × 4
+   gene               symbol   log2FoldChange          padj
+   &lt;chr&gt;              &lt;chr&gt;             &lt;dbl&gt;         &lt;dbl&gt;
+ 1 ENSMUSG00000022711 Pmm2              1.87  0.00000000367
+ 2 ENSMUSG00000020776 Fbf1              1.37  0.0000000978 
+ 3 ENSMUSG00000030276 Ttll3             1.27  0.000000190  
+ 4 ENSMUSG00000039298 Cdk5rap2          1.22  0.0000000794 
+ 5 ENSMUSG00000053070 Cfap300           1.09  0.000000130  
+ 6 ENSMUSG00000002486 Tchp              1.04  0.000000110  
+ 7 ENSMUSG00000033282 Rpgrip1l          1.04  0.00000235   
+ 8 ENSMUSG00000036555 Iqce              0.991 0.000000305  
+ 9 ENSMUSG00000015087 Rabl6             0.934 0.0000000467 
+10 ENSMUSG00000043411 Usp48             0.910 0.000000112  
+# ℹ 13 more rows</code></pre>
+<pre class="r"><code>################################################################################
+# 9. 3&#39;UTR LENGTH (Fig 6E)
+#
+#    NOTE: 3&#39;UTR length is a MEDIATOR of UPF1 recruitment (Hogg &amp; Goff 2010),
+#    not a confounder. Do not regress it out — that would erase the mechanism.
+################################################################################
+
+utr3_len &lt;- as_tibble(utr3_gr) %&gt;%
+  group_by(gene_id) %&gt;%
+  dplyr::summarise(utr3_len = sum(width), .groups = &quot;drop&quot;) %&gt;%   # per transcript summed
+  group_by(gene_id) %&gt;%
+  dplyr::summarise(utr3_len = max(utr3_len), .groups = &quot;drop&quot;)    # longest per gene
+
+utr_df &lt;- utr3_len %&gt;%
+  mutate(class = if_else(gene_id %in% hi_conf, &quot;NMD-targeted ciliary&quot;, &quot;Others&quot;))
+
+utr_df %&gt;%
+  group_by(class) %&gt;%
+  dplyr::summarise(n = n(), mean = mean(utr3_len), median = median(utr3_len)) %&gt;%
+  print()</code></pre>
+<pre><code># A tibble: 2 × 4
+  class                    n  mean median
+  &lt;chr&gt;                &lt;int&gt; &lt;dbl&gt;  &lt;int&gt;
+1 NMD-targeted ciliary    23 3265.   2588
+2 Others               22843 2631.   1466</code></pre>
+<pre class="r"><code># Targets: 19 genes mean 1767.95 / median 1012 ; others mean 1133.96 / median 627
+
+message(&quot;Genes with 3&#39;UTR &gt; 1kb: &quot;,
+        sum(utr_df$utr3_len[utr_df$class == &quot;NMD-targeted ciliary&quot;] &gt; 1000),
+        &quot; / &quot;, sum(utr_df$class == &quot;NMD-targeted ciliary&quot;))   # target: 11/19</code></pre>
+<pre><code>Genes with 3&#39;UTR &gt; 1kb: 17 / 23</code></pre>
+<pre class="r"><code>wt &lt;- wilcox.test(utr3_len ~ class, data = utr_df, alternative = &quot;greater&quot;)
+ks &lt;- ks.test(utr_df$utr3_len[utr_df$class == &quot;NMD-targeted ciliary&quot;],
+              utr_df$utr3_len[utr_df$class == &quot;Others&quot;])</code></pre>
+<pre><code>Warning in ks.test.default(utr_df$utr3_len[utr_df$class == &quot;NMD-targeted
+ciliary&quot;], : p-value will be approximate in the presence of ties</code></pre>
+<pre class="r"><code>print(wt); print(ks)</code></pre>
+<pre><code>
+    Wilcoxon rank sum test with continuity correction
+
+data:  utr3_len by class
+W = 325506, p-value = 0.02355
+alternative hypothesis: true location shift is greater than 0</code></pre>
+<pre><code>
+    Asymptotic two-sample Kolmogorov-Smirnov test
+
+data:  utr_df$utr3_len[utr_df$class == &quot;NMD-targeted ciliary&quot;] and utr_df$utr3_len[utr_df$class == &quot;Others&quot;]
+D = 0.25713, p-value = 0.09582
+alternative hypothesis: two-sided</code></pre>
+<pre class="r"><code>p_utr &lt;- ggplot(utr_df, aes(utr3_len, fill = class)) +
+  geom_density(alpha = 0.5) +
+  scale_x_log10() +
+  scale_fill_manual(values = c(&quot;Others&quot; = &quot;grey60&quot;, &quot;NMD-targeted ciliary&quot; = &quot;#F5A623&quot;)) +
+  labs(x = &quot;3&#39; UTR length (nt)&quot;, y = &quot;Density&quot;) +
+  theme_bw()
+
+################################################################################
+# 10. Foxj1 and Ino80 — the two anchor genes
+################################################################################
+
+anchors &lt;- res %&gt;% filter(symbol %in% c(&quot;Foxj1&quot;, &quot;Ino80&quot;))
+print(anchors)</code></pre>
+<pre><code># A tibble: 2 × 12
+  gene        logFC AveExpr     t  P.Value adj.P.Val     B symbol log2FoldChange
+  &lt;chr&gt;       &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;           &lt;dbl&gt;
+1 ENSMUSG000… 1.01     5.09 26.9  3.90e-10   3.59e-8 14.0  Ino80           1.01 
+2 ENSMUSG000… 0.669    3.85  6.87 6.27e- 5   2.63e-4  1.18 Foxj1           0.669
+# ℹ 3 more variables: padj &lt;dbl&gt;, deg_strict &lt;chr&gt;, deg_loose &lt;chr&gt;</code></pre>
+<pre class="r"><code># Targets: Foxj1 log2FC 0.558, padj 9.52e-17 -&gt; reported 9.52e-7
+#          Ino80 log2FC 0.891, padj 3.75e-85
+
+foxj1_id &lt;- names(id2name)[id2name == &quot;Foxj1&quot;][1]
+ino80_id &lt;- names(id2name)[id2name == &quot;Ino80&quot;][1]
+
+# 3&#39;UTR lengths — Foxj1 1006 nt, Ino80 1322 nt
+utr3_len %&gt;% filter(gene_id %in% c(foxj1_id, ino80_id)) %&gt;% print()</code></pre>
+<pre><code># A tibble: 2 × 2
+  gene_id            utr3_len
+  &lt;chr&gt;                 &lt;int&gt;
+1 ENSMUSG00000034154     1546
+2 ENSMUSG00000034227     1006</code></pre>
+<pre class="r"><code># UPF1 peaks on the Foxj1 / Ino80 3&#39;UTR (Fig 4H, S7B)
+for (g in c(foxj1_id, ino80_id)) {
+  u &lt;- utr3_gr[utr3_gr$gene_id %in% g]
+  hits &lt;- subsetByOverlaps(peaks_sig, u, ignore.strand = FALSE)
+  message(id2name[g], &quot; — UPF1 3&#39;UTR peaks: &quot;, length(hits))
+  if (length(hits)) print(hits)
+}</code></pre>
+<pre><code>Foxj1 — UPF1 3&#39;UTR peaks: 2</code></pre>
+<pre><code>GRanges object with 2 ranges and 4 metadata columns:
+      seqnames              ranges strand |             name     score
+         &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |      &lt;character&gt; &lt;numeric&gt;
+  [1]    chr11 116331165-116331332      - | 8.28255185944165   3.95310
+  [2]    chr11 116330868-116331024      - | 6.26671155065302   4.43525
+         log10p    log2FC
+      &lt;numeric&gt; &lt;numeric&gt;
+  [1]   8.28255   3.95310
+  [2]   6.26671   4.43525
+  -------
+  seqinfo: 21 sequences from an unspecified genome; no seqlengths</code></pre>
+<pre><code>Ino80 — UPF1 3&#39;UTR peaks: 0</code></pre>
+<pre class="r"><code>################################################################################
+# 11. ENRICHMENT TEST — are UPF1 peaks over-represented in up genes?
+#     The paper asserts overlap; this is the test that makes it a claim.
+################################################################################
+
+fisher_df &lt;- res %&gt;%
+  mutate(up = deg_loose == &quot;Up&quot;, bound = gene %in% eclip_gene)
+
+tab &lt;- table(up = fisher_df$up, bound = fisher_df$bound)
+print(tab)</code></pre>
+<pre><code>       bound
+up      FALSE  TRUE
+  FALSE 10702  3229
+  TRUE   3283   391</code></pre>
+<pre class="r"><code>print(fisher.test(tab))</code></pre>
+<pre><code>
+    Fisher&#39;s Exact Test for Count Data
+
+data:  tab
+p-value &lt; 2.2e-16
+alternative hypothesis: true odds ratio is not equal to 1
+95 percent confidence interval:
+ 0.3520062 0.4418145
+sample estimates:
+odds ratio 
+ 0.3947508 </code></pre>
+<pre class="r"><code># Sensitivity across eCLIP thresholds — report this, don&#39;t pick one cutoff.
+sens &lt;- expand_grid(p_cut = c(2, 3, 5), fc_cut = c(0, 1, 2, 3)) %&gt;%
+  pmap_dfr(function(p_cut, fc_cut) {
+    ps &lt;- peaks[peaks$log10p &gt;= p_cut &amp; peaks$log2FC &gt;= fc_cut]
+    if (!length(ps)) return(tibble(p_cut, fc_cut, n_peaks = 0L))
+    o  &lt;- findOverlaps(ps, genes_ucsc, ignore.strand = FALSE)
+    bd &lt;- unique(genes_ucsc$gene_id[subjectHits(o)])
+    d  &lt;- fisher_df %&gt;% mutate(bound = gene %in% bd)
+    ft &lt;- fisher.test(table(d$up, d$bound))
+    tibble(p_cut, fc_cut, n_peaks = length(ps), n_bound = length(bd),
+           OR = unname(ft$estimate), p = ft$p.value)
+  })
+print(sens)</code></pre>
+<pre><code># A tibble: 12 × 6
+   p_cut fc_cut n_peaks n_bound    OR        p
+   &lt;dbl&gt;  &lt;dbl&gt;   &lt;int&gt;   &lt;int&gt; &lt;dbl&gt;    &lt;dbl&gt;
+ 1     2      0   20040    4486 0.407 2.12e-77
+ 2     2      1   19946    4485 0.407 3.01e-77
+ 3     2      2   19309    4401 0.405 4.59e-77
+ 4     2      3   16460    4021 0.408 1.65e-70
+ 5     3      0   16288    3723 0.395 3.56e-70
+ 6     3      1   16220    3721 0.395 3.58e-70
+ 7     3      2   15964    3675 0.396 7.98e-69
+ 8     3      3   14330    3454 0.391 6.49e-67
+ 9     5      0   11577    2762 0.372 2.47e-59
+10     5      1   11522    2762 0.372 2.47e-59
+11     5      2   11411    2744 0.375 3.77e-58
+12     5      3   10860    2660 0.376 2.20e-56</code></pre>
+<pre class="r"><code>################################################################################
+# 12. SUMMARY
+################################################################################
+
+summary_tbl &lt;- tibble(
+  metric = c(&quot;Up (|lfc|&gt;1)&quot;, &quot;Down (|lfc|&gt;1)&quot;, &quot;Up (lfc&gt;0.5)&quot;,
+             &quot;NES neuron_migration&quot;, &quot;NES cilium_movement&quot;, &quot;NES foxj1_coexpressed&quot;,
+             &quot;Foxj1 log2FC&quot;, &quot;High-conf ciliary targets&quot;),
+  observed = c(
+    sum(res$deg_strict == &quot;Up&quot;),
+    sum(res$deg_strict == &quot;Down&quot;),
+    length(up_loose),
+    round(gsea$NES[gsea$pathway == &quot;neuron_migration&quot;], 3),
+    round(gsea$NES[gsea$pathway == &quot;cilium_movement&quot;], 3),
+    round(gsea$NES[gsea$pathway == &quot;foxj1_coexpressed&quot;], 3),
+    round(anchors$log2FoldChange[anchors$symbol == &quot;Foxj1&quot;], 3),
+    length(hi_conf)
+  ),
+  expected = c(2844, 422, 4535, -1.115, 1.486, 1.527, 0.558, 19)
+)
+print(summary_tbl)</code></pre>
+<pre><code># A tibble: 8 × 3
+  metric                    observed expected
+  &lt;chr&gt;                        &lt;dbl&gt;    &lt;dbl&gt;
+1 Up (|lfc|&gt;1)              1346     2844    
+2 Down (|lfc|&gt;1)              70      422    
+3 Up (lfc&gt;0.5)              3674     4535    
+4 NES neuron_migration         0.612   -1.12 
+5 NES cilium_movement          1.56     1.49 
+6 NES foxj1_coexpressed        1.59     1.53 
+7 Foxj1 log2FC                 0.669    0.558
+8 High-conf ciliary targets   23       19    </code></pre>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.6.1 (2026-06-24)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.5 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.10.0 
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.10.0  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_AU.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_AU.UTF-8        LC_COLLATE=en_AU.UTF-8    
+ [5] LC_MONETARY=en_AU.UTF-8    LC_MESSAGES=en_AU.UTF-8   
+ [7] LC_PAPER=en_AU.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_AU.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Australia/Adelaide
+tzcode source: system (glibc)
+
+attached base packages:
+ [1] grid      tools     stats4    stats     graphics  grDevices utils    
+ [8] datasets  methods   base     
+
+other attached packages:
+ [1] babelgene_22.9               rtracklayer_1.72.0          
+ [3] topGO_2.64.0                 SparseM_1.84-2              
+ [5] GO.db_3.23.1                 GEOquery_2.80.0             
+ [7] IsoformSwitchAnalyzeR_2.12.0 pfamAnalyzeR_1.12.0         
+ [9] sva_3.60.0                   genefilter_1.94.0           
+[11] mgcv_1.9-4                   nlme_3.1-169                
+[13] satuRn_1.20.0                DEXSeq_1.58.0               
+[15] BiocParallel_1.46.0          ggrepel_0.9.8               
+[17] pander_0.6.6                 msigdbr_26.1.0              
+[19] cowplot_1.2.0                ngsReports_2.14.0           
+[21] patchwork_1.3.2              VennDiagram_1.8.2           
+[23] futile.logger_1.4.9          UpSetR_1.4.0                
+[25] fgsea_1.38.0                 GOplot_1.0.2                
+[27] RColorBrewer_1.1-3           ggdendro_0.2.0              
+[29] AnnotationHub_4.2.0          BiocFileCache_3.2.0         
+[31] dbplyr_2.6.0                 openxlsx_4.2.8.1            
+[33] ggiraph_0.9.6                wasabi_1.0.1                
+[35] sleuth_0.30.1                DT_0.34.0                   
+[37] VennDetail_1.28.0            msigdb_1.20.0               
+[39] GSEABase_1.74.0              graph_1.90.0                
+[41] annotate_1.90.0              XML_3.99-0.23               
+[43] ggvenn_0.1.19                MetBrewer_0.2.0             
+[45] ggpubr_0.6.3                 venn_1.13                   
+[47] viridis_0.6.5                viridisLite_0.4.3           
+[49] tximeta_1.30.0               goseq_1.64.0                
+[51] geneLenDataBase_1.48.0       BiasedUrn_2.0.12            
+[53] biomaRt_2.68.0               DESeq2_1.52.0               
+[55] SummarizedExperiment_1.42.0  MatrixGenerics_1.24.0       
+[57] matrixStats_1.5.0            corrplot_0.95               
+[59] data.table_1.18.4            readxl_1.5.0                
+[61] pheatmap_1.0.13              gridExtra_2.3.1             
+[63] reshape2_1.4.5               scales_1.4.0                
+[65] magrittr_2.0.5               lubridate_1.9.5             
+[67] forcats_1.0.1                stringr_1.6.0               
+[69] dplyr_1.2.1                  purrr_1.2.2                 
+[71] readr_2.2.0                  tidyr_1.3.2                 
+[73] tibble_3.3.1                 ggplot2_4.0.3               
+[75] tidyverse_2.0.0              org.Mm.eg.db_3.23.0         
+[77] EnsDb.Mmusculus.v79_2.99.0   ensembldb_2.36.0            
+[79] AnnotationFilter_1.36.0      GenomicFeatures_1.64.0      
+[81] AnnotationDbi_1.74.0         Biobase_2.72.0              
+[83] GenomicRanges_1.64.0         Seqinfo_1.2.0               
+[85] IRanges_2.46.0               S4Vectors_0.50.0            
+[87] BiocGenerics_0.58.1          generics_0.1.4              
+[89] edgeR_4.10.0                 limma_3.68.4                
+[91] tximport_1.40.0             
+
+loaded via a namespace (and not attached):
+  [1] fs_2.1.0                 ProtGenerics_1.44.0      bitops_1.0-9            
+  [4] httr_1.4.8               backports_1.5.1          utf8_1.2.6              
+  [7] R6_2.6.1                 lazyeval_0.2.3           rhdf5filters_1.24.0     
+ [10] withr_3.0.3              prettyunits_1.2.0        cli_3.6.6               
+ [13] formatR_1.14             labeling_0.4.3           sass_0.4.10             
+ [16] S7_0.2.2                 pbapply_1.7-4            Rsamtools_2.28.0        
+ [19] systemfonts_1.3.2        txdbmaker_1.8.0          R.utils_2.13.0          
+ [22] rentrez_1.2.4            dichromat_2.0-0.1        BSgenome_1.80.0         
+ [25] rstudioapi_0.19.0        RSQLite_3.53.3           BiocIO_1.22.0           
+ [28] hwriter_1.3.2.1          car_3.1-5                zip_3.0.1               
+ [31] Matrix_1.7-5             abind_1.4-8              R.methodsS3_1.8.2       
+ [34] lifecycle_1.0.5          yaml_2.3.12              carData_3.0-6           
+ [37] rhdf5_2.56.0             SparseArray_1.12.2       blob_1.3.0              
+ [40] promises_1.5.0           pwalign_1.8.0            crayon_1.5.3            
+ [43] lattice_0.22-9           cigarillo_1.2.0          KEGGREST_1.52.0         
+ [46] pillar_1.11.1            knitr_1.51               boot_1.3-32             
+ [49] rjson_0.2.23             admisc_0.40              codetools_0.2-20        
+ [52] fastmatch_1.1-8          glue_1.8.1               fontLiberation_0.1.0    
+ [55] vctrs_0.7.3              png_0.1-9                locfdr_1.1-8            
+ [58] cellranger_1.1.0         gtable_0.3.6             assertthat_0.2.1        
+ [61] cachem_1.1.0             xfun_0.60                S4Arrays_1.12.0         
+ [64] mime_0.13                survival_3.8-9           statmod_1.5.2           
+ [67] bit64_4.8.2              fontquiver_0.2.1         progress_1.2.3          
+ [70] filelock_1.0.3           GenomeInfoDb_1.48.0      rprojroot_2.1.1         
+ [73] bslib_0.11.0             otel_0.2.0               DBI_1.3.0               
+ [76] tidyselect_1.2.1         bit_4.6.0                compiler_4.6.1          
+ [79] curl_7.1.0               git2r_0.36.2             httr2_1.3.0             
+ [82] xml2_1.5.2               fontBitstreamVera_0.1.1  DelayedArray_0.38.1     
+ [85] plotly_4.12.0            rappdirs_0.3.4           digest_0.6.39           
+ [88] rmarkdown_2.31           XVector_0.52.0           htmltools_0.5.9         
+ [91] pkgconfig_2.0.3          fastmap_1.2.0            rlang_1.3.0             
+ [94] htmlwidgets_1.6.4        UCSC.utils_1.8.0         shiny_1.13.0            
+ [97] farver_2.1.2             jquerylib_0.1.4          zoo_1.8-15              
+[100] jsonlite_2.0.0           R.oo_1.27.1              RCurl_1.98-1.19         
+[103] Formula_1.2-5            Rhdf5lib_2.0.0           Rcpp_1.1.2              
+[106] gdtools_0.5.1            stringi_1.8.7            MASS_7.3-65             
+[109] plyr_1.8.9               parallel_4.6.1           Biostrings_2.80.0       
+[112] splines_4.6.1            hms_1.1.4                locfit_1.5-9.12         
+[115] ggsignif_0.6.4           geneplotter_1.90.0       futile.options_1.0.1    
+[118] BiocVersion_3.23.1       evaluate_1.0.5           lambda.r_1.2.4          
+[121] BiocManager_1.30.27      tzdb_0.5.0               httpuv_1.6.17           
+[124] broom_1.0.13             xtable_1.8-8             restfulr_0.0.16         
+[127] rstatix_1.0.0            later_1.4.8              memoise_2.0.1           
+[130] GenomicAlignments_1.48.0 workflowr_1.7.2          timechange_0.4.0        
+[133] here_1.0.2              </code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.6.1 (2026-06-24)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.5 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.10.0 
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.10.0  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_AU.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_AU.UTF-8        LC_COLLATE=en_AU.UTF-8    
+ [5] LC_MONETARY=en_AU.UTF-8    LC_MESSAGES=en_AU.UTF-8   
+ [7] LC_PAPER=en_AU.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_AU.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Australia/Adelaide
+tzcode source: system (glibc)
+
+attached base packages:
+ [1] grid      tools     stats4    stats     graphics  grDevices utils    
+ [8] datasets  methods   base     
+
+other attached packages:
+ [1] babelgene_22.9               rtracklayer_1.72.0          
+ [3] topGO_2.64.0                 SparseM_1.84-2              
+ [5] GO.db_3.23.1                 GEOquery_2.80.0             
+ [7] IsoformSwitchAnalyzeR_2.12.0 pfamAnalyzeR_1.12.0         
+ [9] sva_3.60.0                   genefilter_1.94.0           
+[11] mgcv_1.9-4                   nlme_3.1-169                
+[13] satuRn_1.20.0                DEXSeq_1.58.0               
+[15] BiocParallel_1.46.0          ggrepel_0.9.8               
+[17] pander_0.6.6                 msigdbr_26.1.0              
+[19] cowplot_1.2.0                ngsReports_2.14.0           
+[21] patchwork_1.3.2              VennDiagram_1.8.2           
+[23] futile.logger_1.4.9          UpSetR_1.4.0                
+[25] fgsea_1.38.0                 GOplot_1.0.2                
+[27] RColorBrewer_1.1-3           ggdendro_0.2.0              
+[29] AnnotationHub_4.2.0          BiocFileCache_3.2.0         
+[31] dbplyr_2.6.0                 openxlsx_4.2.8.1            
+[33] ggiraph_0.9.6                wasabi_1.0.1                
+[35] sleuth_0.30.1                DT_0.34.0                   
+[37] VennDetail_1.28.0            msigdb_1.20.0               
+[39] GSEABase_1.74.0              graph_1.90.0                
+[41] annotate_1.90.0              XML_3.99-0.23               
+[43] ggvenn_0.1.19                MetBrewer_0.2.0             
+[45] ggpubr_0.6.3                 venn_1.13                   
+[47] viridis_0.6.5                viridisLite_0.4.3           
+[49] tximeta_1.30.0               goseq_1.64.0                
+[51] geneLenDataBase_1.48.0       BiasedUrn_2.0.12            
+[53] biomaRt_2.68.0               DESeq2_1.52.0               
+[55] SummarizedExperiment_1.42.0  MatrixGenerics_1.24.0       
+[57] matrixStats_1.5.0            corrplot_0.95               
+[59] data.table_1.18.4            readxl_1.5.0                
+[61] pheatmap_1.0.13              gridExtra_2.3.1             
+[63] reshape2_1.4.5               scales_1.4.0                
+[65] magrittr_2.0.5               lubridate_1.9.5             
+[67] forcats_1.0.1                stringr_1.6.0               
+[69] dplyr_1.2.1                  purrr_1.2.2                 
+[71] readr_2.2.0                  tidyr_1.3.2                 
+[73] tibble_3.3.1                 ggplot2_4.0.3               
+[75] tidyverse_2.0.0              org.Mm.eg.db_3.23.0         
+[77] EnsDb.Mmusculus.v79_2.99.0   ensembldb_2.36.0            
+[79] AnnotationFilter_1.36.0      GenomicFeatures_1.64.0      
+[81] AnnotationDbi_1.74.0         Biobase_2.72.0              
+[83] GenomicRanges_1.64.0         Seqinfo_1.2.0               
+[85] IRanges_2.46.0               S4Vectors_0.50.0            
+[87] BiocGenerics_0.58.1          generics_0.1.4              
+[89] edgeR_4.10.0                 limma_3.68.4                
+[91] tximport_1.40.0             
+
+loaded via a namespace (and not attached):
+  [1] fs_2.1.0                 ProtGenerics_1.44.0      bitops_1.0-9            
+  [4] httr_1.4.8               backports_1.5.1          utf8_1.2.6              
+  [7] R6_2.6.1                 lazyeval_0.2.3           rhdf5filters_1.24.0     
+ [10] withr_3.0.3              prettyunits_1.2.0        cli_3.6.6               
+ [13] formatR_1.14             labeling_0.4.3           sass_0.4.10             
+ [16] S7_0.2.2                 pbapply_1.7-4            Rsamtools_2.28.0        
+ [19] systemfonts_1.3.2        txdbmaker_1.8.0          R.utils_2.13.0          
+ [22] rentrez_1.2.4            dichromat_2.0-0.1        BSgenome_1.80.0         
+ [25] rstudioapi_0.19.0        RSQLite_3.53.3           BiocIO_1.22.0           
+ [28] hwriter_1.3.2.1          car_3.1-5                zip_3.0.1               
+ [31] Matrix_1.7-5             abind_1.4-8              R.methodsS3_1.8.2       
+ [34] lifecycle_1.0.5          yaml_2.3.12              carData_3.0-6           
+ [37] rhdf5_2.56.0             SparseArray_1.12.2       blob_1.3.0              
+ [40] promises_1.5.0           pwalign_1.8.0            crayon_1.5.3            
+ [43] lattice_0.22-9           cigarillo_1.2.0          KEGGREST_1.52.0         
+ [46] pillar_1.11.1            knitr_1.51               boot_1.3-32             
+ [49] rjson_0.2.23             admisc_0.40              codetools_0.2-20        
+ [52] fastmatch_1.1-8          glue_1.8.1               fontLiberation_0.1.0    
+ [55] vctrs_0.7.3              png_0.1-9                locfdr_1.1-8            
+ [58] cellranger_1.1.0         gtable_0.3.6             assertthat_0.2.1        
+ [61] cachem_1.1.0             xfun_0.60                S4Arrays_1.12.0         
+ [64] mime_0.13                survival_3.8-9           statmod_1.5.2           
+ [67] bit64_4.8.2              fontquiver_0.2.1         progress_1.2.3          
+ [70] filelock_1.0.3           GenomeInfoDb_1.48.0      rprojroot_2.1.1         
+ [73] bslib_0.11.0             otel_0.2.0               DBI_1.3.0               
+ [76] tidyselect_1.2.1         bit_4.6.0                compiler_4.6.1          
+ [79] curl_7.1.0               git2r_0.36.2             httr2_1.3.0             
+ [82] xml2_1.5.2               fontBitstreamVera_0.1.1  DelayedArray_0.38.1     
+ [85] plotly_4.12.0            rappdirs_0.3.4           digest_0.6.39           
+ [88] rmarkdown_2.31           XVector_0.52.0           htmltools_0.5.9         
+ [91] pkgconfig_2.0.3          fastmap_1.2.0            rlang_1.3.0             
+ [94] htmlwidgets_1.6.4        UCSC.utils_1.8.0         shiny_1.13.0            
+ [97] farver_2.1.2             jquerylib_0.1.4          zoo_1.8-15              
+[100] jsonlite_2.0.0           R.oo_1.27.1              RCurl_1.98-1.19         
+[103] Formula_1.2-5            Rhdf5lib_2.0.0           Rcpp_1.1.2              
+[106] gdtools_0.5.1            stringi_1.8.7            MASS_7.3-65             
+[109] plyr_1.8.9               parallel_4.6.1           Biostrings_2.80.0       
+[112] splines_4.6.1            hms_1.1.4                locfit_1.5-9.12         
+[115] ggsignif_0.6.4           geneplotter_1.90.0       futile.options_1.0.1    
+[118] BiocVersion_3.23.1       evaluate_1.0.5           lambda.r_1.2.4          
+[121] BiocManager_1.30.27      tzdb_0.5.0               httpuv_1.6.17           
+[124] broom_1.0.13             xtable_1.8-8             restfulr_0.0.16         
+[127] rstatix_1.0.0            later_1.4.8              memoise_2.0.1           
+[130] GenomicAlignments_1.48.0 workflowr_1.7.2          timechange_0.4.0        
+[133] here_1.0.2              </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

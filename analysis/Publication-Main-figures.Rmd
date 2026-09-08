@@ -8,7 +8,7 @@ output:
     code_folding: hide
 editor_options:
   
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 
@@ -27,9 +27,9 @@ knitr::opts_chunk$set(
 # Introduction
 
 ```{r load}
-source("code/plots.R") 
-source("code/functions.R")
-source("code/libraries.R")
+source(here::here("code/plots.R"))
+source(here::here("code/functions.R"))
+source(here::here("code/libraries.R"))
 library(biomaRt)
 library(nVennR)
 library(eulerr)
@@ -51,7 +51,7 @@ tx2gene = as.data.frame(txdf[,c("tx_id","gene_id", "tx_biotype")])
 ## Figure 2 
 
 ```{r}
-load("output/DEG-list.Rda")
+load(here::here("output/DEG-list.Rda"))
 ```
 
 
@@ -127,6 +127,23 @@ deg_volcano_plot
 ggsave(plot = deg_volcano_plot, filename = here::here("output/Figures/Main/DEG_volcano_fig2a.png"),
        dpi =1200, height = 6, width =18)
 
+```
+
+```{r}
+deg_summary <- res %>%
+  do.call("rbind", .) %>%
+  mutate(Result = ifelse(adj.P.Val < 0.05 & logFC > log2(1.5), "Upregulated",
+                   ifelse(adj.P.Val < 0.05 & logFC < -log2(1.5), "Downregulated", "Not Sig"))) %>%
+  dplyr::filter(Result != "Not Sig") %>%
+  dplyr::count(contrast, Result) %>%
+  tidyr::pivot_wider(names_from = Result, values_from = n, values_fill = 0) %>%
+  dplyr::mutate(Total_DEGs = Upregulated + Downregulated) %>%
+  dplyr::arrange(match(contrast, c(
+    "UPF3B_vs_Control", "UPF3A_vs_Control", "UPF3A_OE_vs_Control",
+    "DoubleKD_vs_Control", "UPF3A_OE_UPF3B_KD_vs_Control"
+  )))
+
+DT::datatable(deg_summary, caption = "Number of DEGs per comparison (FDR < 0.05, |log2FC| > log2(1.5))")
 ```
 
 ### Figure 2b
@@ -293,7 +310,7 @@ enrichment_DEGs_OR %>% do.call(rbind,.) %>%
 
 ### Figure 2c
 
-```{r}
+```{r fig.height=4, fig.width=8}
 cor_upf3a_upf3b =  DEGenes$UPF3B_vs_Control %>% 
   
   inner_join(DEGenes$UPF3A_vs_Control,  by = "EnsID") %>% 
@@ -327,11 +344,7 @@ xlab(expression(italic("Upf3b") ~ "KD (LFC)")) +
         size = 10, family = "serif"
         )) + labs(color = "Expression")
 
-cor_upf3a_upf3b 
 
-
-ggsave(filename = here::here("output/Figures/Main/Upf3b-Upf3a-cor-fig2c.png"), plot = cor_upf3a_upf3b , dpi = 1200,
-       units = c("in"), height = 7.5, width = 4)
 
 cor_upf3b_upf3d =  DEGenes$UPF3B_vs_Control %>% 
   
@@ -366,10 +379,9 @@ xlab(expression(italic("Upf3b") ~ "KD (LFC)")) +
         size = 10, family = "serif"
         )) + labs(color = "Expression")
 
-cor_upf3b_upf3d
 
-ggsave(filename = here::here("output/Figures/Main/Upf3b-Upf3dKD-cor-fig2c.png"), plot = cor_upf3b_upf3d , dpi = 1200,
-       units = c("in"), height = 7.5, width = 4)
+
+
 
 
 cor_upf3a_upf3d =  DEGenes$UPF3A_vs_Control %>% 
@@ -406,10 +418,6 @@ xlab(expression(italic("Upf3a") ~ "KD (LFC)")) +
         )) + labs(color = "Expression")
 
 
-cor_upf3a_upf3d
-
-ggsave(filename = here::here("output/Figures/Main/Upf3a-Upf3dKD-cor-fig2c.png"), plot = cor_upf3a_upf3d , dpi = 1200,
-       units = c("in"), height = 7.5, width = 4)
 
 
 Upf3b_oR_cor = DEGenes$UPF3B_vs_Control %>% 
@@ -449,14 +457,29 @@ Upf3b_oR_cor = DEGenes$UPF3B_vs_Control %>%
         size = 10, family = "serif"
         )) + labs(color = "Expression")
 
-Upf3b_oR_cor
+
+
+
+
+ggarrange(cor_upf3a_upf3b, cor_upf3b_upf3d,
+          cor_upf3a_upf3d, Upf3b_oR_cor, ncol =4, common.legend = TRUE)
+
+```
+
+```{r}
+
+ggsave(filename = here::here("output/Figures/Main/Upf3b-Upf3a-cor-fig2c.png"), plot = cor_upf3a_upf3b , dpi = 1200,
+       units = c("in"), height = 7.5, width = 4)
+
+
+ggsave(filename = here::here("output/Figures/Main/Upf3b-Upf3dKD-cor-fig2c.png"), plot = cor_upf3b_upf3d , dpi = 1200,
+       units = c("in"), height = 7.5, width = 4)
+ggsave(filename = here::here("output/Figures/Main/Upf3a-Upf3dKD-cor-fig2c.png"), plot = cor_upf3a_upf3d , dpi = 1200,
+       units = c("in"), height = 7.5, width = 4)
+
 
 ggsave(filename = here::here("output/Figures/Main/Upf3b-Upf3aOEUpf3bKD-cor-fig2c.png"), plot = Upf3b_oR_cor , dpi = 1200,
        units = c("in"), height = 7.5, width = 4)
-
-ggarrange(cor_upf3a_upf3b, cor_upf3b_upf3d,
-          cor_upf3a_upf3d, Upf3a_oR_cor, ncol =4, common.legend = TRUE)
-
 ```
 
 ### Figure 2e
@@ -466,7 +489,7 @@ load(file=here::here("output/DET-list.Rda"))
 ```
 
 ```{r}
-NMD_features = read.table("data/nif_output/Mus_musculus__nifs.tsv", sep = "\t", skip =1)
+NMD_features = read.table(here::here("data/nif_output/Mus_musculus__nifs.tsv"), sep = "\t", skip =1)
 
 colnames(NMD_features)[1:4] = c("EnsID", "NIF_dEJ", "NIF_uORF", "NIF_long-3'utr")
 NMD_features = NMD_features[,1:4]
@@ -614,13 +637,21 @@ ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/outp
        plot = nif_number  ,  units = c("in"), height = 5, width = 14)
 ```
 
+```{r}
+nif_features %>%
+  mutate(NIF_feature = gsub("utr", "Long 3'UTR", NIF_feature), 
+         NIF_feature = gsub("uorf", "Upstream ORF", NIF_feature), 
+         NIF_feature = gsub("dej", "Downstream exon junction", NIF_feature), 
+         Condition = gsub("_Control", "", Condition))
+```
+
 ## Figure 3
 
 
 ### Figure 3a
 
 ```{r}
-load("output/Stability/differential-stability.Rda")
+load(here::here("output/Stability/differential-stability.Rda"))
 ```
 
 ```{r}
@@ -792,6 +823,7 @@ nif_overlap = overlapping_upf3b %>%
 nif_overlap
 
  ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/Upf3b-bf-NIF-proportion.png", plot = nif_overlap ,  units = c("in"), height = 6, width = 5, dpi =1200)
+ 
 ```
 
 

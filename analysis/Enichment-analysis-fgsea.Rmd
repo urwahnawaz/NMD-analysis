@@ -939,8 +939,257 @@ heatmap_2
 
 
 ```{r}
-save(all_heatmap, file= "output/fgsea-heatmap-data.Rda")
+#save(all_heatmap, file= "output/fgsea-heatmap-data.Rda")
 ```
+
+
+```{r}
+upf3a_KD_apoptosis = fgsea_res$UPF3A_vs_Control %>% as.data.frame 
+
+
+upf3a_KD_apoptosis_react = fgsea_res_c2$UPF3A_vs_Control %>% as.data.frame
+```
+
+```{r fig.height =6, fig.width=10}
+apoptosis_pathways = upf3a_KD_apoptosis %>%
+  mutate(Geneset = c("Hallmark")) %>%
+  rbind(upf3a_KD_apoptosis_react %>%
+          mutate(Geneset = c("Reactome"))) %>%
+  dplyr::filter(fgsea.Geneset %in% c("HALLMARK_APOPTOSIS", "HALLMARK_P53_PATHWAY", 
+                                      "REACTOME_APOPTOSIS", "REACTOME_PROGRAMMED_CELL_DEATH", 
+                                      "REACTOME_INTRINSIC_PATHWAY_FOR_APOPTOSIS")) %>%
+  dplyr::mutate(
+    sig_label = dplyr::case_when(
+      fgsea.padj < 0.001 ~ "***",
+      fgsea.padj < 0.01  ~ "**",
+      fgsea.padj < 0.05  ~ "*",
+      TRUE ~ "ns"
+    ),
+    bar_colour = ifelse(fgsea.NES > 0, "positive", "negative"),
+    fgsea.Geneset = fgsea.Geneset %>%
+      gsub("^HALLMARK_", "", .) %>%
+      gsub("^REACTOME_", "", .) %>%
+      gsub("_", " ", .) %>%
+      stringr::str_to_title()
+  ) %>%
+  ggplot(aes(x = fgsea.Geneset, y = fgsea.NES, fill = bar_colour)) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "black") +
+  geom_bar(stat = "identity", width = 0.5) +
+  geom_text(aes(
+    label = sig_label,
+    y = ifelse(fgsea.NES > 0, fgsea.NES + 0.05, fgsea.NES - 0.05)
+  ), size = 4) +
+  scale_fill_manual(values = c("positive" = "red", "negative" = "blue")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 12, colour = "black"),
+        axis.text.y = element_text(size = 12, colour = "black"), 
+        legend.position = "none") +
+  facet_grid(~Geneset, scales = "free_x", space = "free_x") +
+  labs(y = "Normalised enrichment score", x = "")
+
+
+#ggsave(apoptosis_pathways, filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/DEG/Thesis_figures/Apoptosis-pathways.png", 
+#,       height = 5, width = 9, units = "in")
+
+
+library(ragg)
+agg_png("/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/DEG/Thesis_figures/Apoptosis-pathways.png",
+         height = 5, width = 9, units = "in", res = 300)
+print(apoptosis_pathways)
+dev.off()
+
+```
+
+
+```{r}
+ApopRes = list()
+
+ApopRes[["UPF3B_KD_vs_Control"]] = fgsea_res$UPF3B_vs_Control %>% as.data.frame %>%
+  mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj) 
+  
+
+ApopRes[["UPF3A_KD_vs_Control"]] = fgsea_res$UPF3A_vs_Control %>% as.data.frame %>%
+  mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj)
+
+ApopRes[["UPF3A_OE_vs_Control"]] = fgsea_res$UPF3A_OE_vs_Control %>% as.data.frame %>%
+ mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj)
+
+ApopRes[["DoubleKD_vs_Control"]] = fgsea_res$DoubleKD_vs_Control %>% as.data.frame %>%
+ mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj)
+
+ApopRes[["UPF3A_OE_UPF3B_KD_vs_Control"]] = fgsea_res$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>%
+mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) %>% 
+  dplyr::arrange(fgsea.padj)
+```
+
+
+```{r}
+AposRes_c2 = list()
+
+AposRes_c2[["UPF3B_KD_vs_Control"]] = fgsea_res_c2$UPF3B_vs_Control %>% as.data.frame %>%
+  mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) 
+
+AposRes_c2[["UPF3A_KD_vs_Control"]] = fgsea_res_c2$UPF3A_vs_Control %>% as.data.frame %>%
+  mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) 
+
+AposRes_c2[["UPF3A_OE_vs_Control"]] = fgsea_res_c2$UPF3A_OE_vs_Control %>% as.data.frame %>%
+ mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) 
+
+AposRes_c2[["DoubleKD_vs_Control"]] = fgsea_res_c2$DoubleKD_vs_Control %>% as.data.frame %>%
+ mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  ) 
+
+AposRes_c2[["UPF3A_OE_UPF3B_KD_vs_Control"]] = fgsea_res_c2$UPF3A_OE_UPF3B_KD_vs_Control %>% as.data.frame %>%
+mutate(padj = p.adjust(fgsea.pval, "bonf")) %>%
+  mutate(
+    leSize = vapply(fgsea.leadingEdge, length, integer(1)),
+   fgsea.leadingEdge_genes = vapply(
+     fgsea.leadingEdge,
+     function(x) paste(id2Name[x], collapse = "; "),
+     character(1)
+   ) 
+  )
+
+
+
+apop_all =ApopRes %>% 
+  do.call("rbind", .) %>%
+  mutate(Geneset = c("Hallmark")) %>%
+  rbind(AposRes_c2 %>% 
+           do.call("rbind", .) %>% 
+          mutate(Geneset = c("Reactome"))) %>%
+
+dplyr::filter(fgsea.Geneset %in% c("HALLMARK_APOPTOSIS", "HALLMARK_P53_PATHWAY", 
+                                      "REACTOME_APOPTOSIS", "REACTOME_PROGRAMMED_CELL_DEATH", 
+                                      "REACTOME_INTRINSIC_PATHWAY_FOR_APOPTOSIS")) %>% 
+  rownames_to_column("Comparsion") %>% 
+  mutate(Comparison = sub("\\.\\d+$", "", Comparsion)) %>%
+    mutate(Comparison = Comparison %>%
+    sub("_vs_Control", " vs Control", .) %>%
+    sub("_KD", " KD", .) %>%
+    gsub("_", " ", .) %>%
+    tools::toTitleCase() %>%
+    gsub("\\bKd\\b", "KD", .)) %>%
+mutate(Comparison = factor(Comparison, levels = c("UPF3B KD vs Control", 
+                                                   "UPF3A KD vs Control", 
+                                                   "DoubleKD vs Control", 
+                                                   "UPF3A OE vs Control", 
+                                                   "UPF3A OE UPF3B KD vs Control")))%>%
+    dplyr::mutate(
+    sig_label = dplyr::case_when(
+      fgsea.padj < 0.001 ~ "***",
+      fgsea.padj < 0.01  ~ "**",
+      fgsea.padj < 0.05  ~ "*",
+      TRUE ~ "ns"
+    ),
+    bar_colour = ifelse(fgsea.NES > 0, "positive", "negative"),
+    fgsea.Geneset = fgsea.Geneset %>%
+      gsub("^HALLMARK_", "", .) %>%
+      gsub("^REACTOME_", "", .) %>%
+      gsub("_", " ", .) %>%
+      stringr::str_to_title()
+  ) %>%
+  ggplot(aes(x = fgsea.Geneset, y = fgsea.NES, fill = bar_colour)) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "black") +
+  geom_bar(stat = "identity", width = 0.5) +
+  geom_text(aes(
+    label = sig_label,
+    y = ifelse(fgsea.NES > 0, fgsea.NES + 0.05, fgsea.NES - 0.05)
+  ), size = 4) +
+  scale_fill_manual(values = c("positive" = "red", "negative" = "blue")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 12, colour = "black"),
+        axis.text.y = element_text(size = 12, colour = "black"), 
+        legend.position = "none") +
+  facet_grid(Comparison ~Geneset , scales = "free_x", space = "free_x") +
+  labs(y = "Normalised enrichment score", x = "")
+
+
+library(ragg)
+agg_png("/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/DEG/Thesis_figures/Apoptosis-pathways_all.png",
+         height = 12, width = 9, units = "in", res = 300)
+
+print(apop_all)
+
+dev.off()
+```
+
+
 
 ```{r}
 #ggsave(heatmap_1, filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/DEG/Thesis_figures/fgsea-plots-1.svg",# 
