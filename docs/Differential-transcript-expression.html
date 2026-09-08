@@ -15,7 +15,7 @@
 
 <title>Differential transcript expression analysis</title>
 
-<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -332,7 +332,7 @@ div.tocify {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">NMD-analysis</a>
+      <a class="navbar-brand" href="index.html">Analysis of UPF3 paralogs</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -353,9 +353,6 @@ div.tocify {
       <a href="DEG-analysis.html">DEG analysis</a>
     </li>
     <li>
-      <a href="Enichment-analysis-goseq.html">Enrichment analysis using goseq</a>
-    </li>
-    <li>
       <a href="Enichment-analysis-fgsea.html">Enrichment analysis using fgsea</a>
     </li>
   </ul>
@@ -374,6 +371,18 @@ div.tocify {
 </li>
 <li>
   <a href="RNA-stability.html">RNA Stability analysis</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Figures
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Publication-Main-figures.Rmd">Main Figures</a>
+    </li>
+  </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -433,7 +442,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-03-05
+<strong>Last updated:</strong> 2026-09-08
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -579,14 +588,6 @@ relative
 <tbody>
 <tr>
 <td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/ratio_DET.svg
-</td>
-<td style="text-align:left;">
-output/Thesis_plots/ratio_DET.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
 /home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/all_overlaps-transcript.svg
 </td>
 <td style="text-align:left;">
@@ -713,278 +714,6 @@ output/Thesis_plots/overlaps/DEGs-DETs/Upf3a_Upf3b_kD_cor.png
 output/Thesis_plots/all_overlaps-transcript-DEGs.svg
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/data/nif_output/Mus_musculus__nifs.tsv
-</td>
-<td style="text-align:left;">
-data/nif_output/Mus_musculus__nifs.tsv
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/total_exp_up.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/total_exp_up.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/total_exp_down.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/total_exp_down.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/DET-analysis.xlsx
-</td>
-<td style="text-align:left;">
-output/DET-analysis.xlsx
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Figures/Main/Count_NIF_2f.png
-</td>
-<td style="text-align:left;">
-output/Figures/Main/Count_NIF_2f.png
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/Proprotion_NIF.svg
-</td>
-<td style="text-align:left;">
-output/Thesis_plots/Proprotion_NIF.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/All_OR.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/All_OR.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIF_feature_OR.svg
-</td>
-<td style="text-align:left;">
-output/Thesis_plots/NIF_feature_OR.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/transcript_det_ma.pdf
-</td>
-<td style="text-align:left;">
-output/Thesis_plots/transcript_det_ma.pdf
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/UPF3B_NIF_dist.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/UPF3B_NIF_dist.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/UPF3A_NIF_dist.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/UPF3A_NIF_dist.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3b_KD_utr_length.svg
-</td>
-<td style="text-align:left;">
-output/Thesis_plots/NIFs/upf3b_KD_utr_length.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3b_KD_utr_length_DET.svg
-</td>
-<td style="text-align:left;">
-output/Thesis_plots/NIFs/upf3b_KD_utr_length_DET.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3a_KD_utr_length.svg
-</td>
-<td style="text-align:left;">
-output/Thesis_plots/NIFs/upf3a_KD_utr_length.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3a_KD_utr_length_DET.svg
-</td>
-<td style="text-align:left;">
-output/Thesis_plots/NIFs/upf3a_KD_utr_length_DET.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3_dKD_utr_length.svg
-</td>
-<td style="text-align:left;">
-output/Thesis_plots/NIFs/upf3_dKD_utr_length.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3_dKD_utr_length_DET.svg
-</td>
-<td style="text-align:left;">
-output/Thesis_plots/NIFs/upf3_dKD_utr_length_DET.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3a_OE_upf3b_KD_utr_length.svg
-</td>
-<td style="text-align:left;">
-output/Thesis_plots/NIFs/upf3a_OE_upf3b_KD_utr_length.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Thesis_plots/NIFs/upf3a_OE_upf3b_KD_utr_length_DET.svg
-</td>
-<td style="text-align:left;">
-output/Thesis_plots/NIFs/upf3a_OE_upf3b_KD_utr_length_DET.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3b_3utr.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/upf3b_3utr.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/UPF3B_trans_overlap.csv
-</td>
-<td style="text-align:left;">
-output/Transcript/UPF3B_trans_overlap.csv
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/UPF3A_trans_overlap.csv
-</td>
-<td style="text-align:left;">
-output/Transcript/UPF3A_trans_overlap.csv
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/transcript_types_all.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/transcript_types_all.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/transcript_types_up.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/transcript_types_up.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/cf_upf3a.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/cf_upf3a.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/cf_upf3b.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/cf_upf3b.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3b_5utr.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/upf3b_5utr.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3a_3utr.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/upf3a_3utr.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3a_5utr.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/upf3a_5utr.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3a_3utr_gc.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/upf3a_3utr_gc.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3a.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3a.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3a_total.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3a_total.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3b.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3b.svg
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3b_total.svg
-</td>
-<td style="text-align:left;">
-output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3b_total.svg
-</td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -993,15 +722,15 @@ output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3b_total.svg
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996NMDanalysistree08bbafdab99816f40a57c3c5dd83827d85201f53targetblank08bbafda">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomurwahnawazNMDanalysistree68b627990f84e32cf092d6b86729b1ff25c1fafatargetblank68b6279a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/unawaz1996/NMD-analysis/tree/08bbafdab99816f40a57c3c5dd83827d85201f53" target="_blank">08bbafd</a>
+<a href="https://github.com/urwahnawaz/NMD-analysis/tree/68b627990f84e32cf092d6b86729b1ff25c1fafa" target="_blank">68b6279</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomunawaz1996NMDanalysistree08bbafdab99816f40a57c3c5dd83827d85201f53targetblank08bbafda"
+id="strongRepositoryversionstrongahrefhttpsgithubcomurwahnawazNMDanalysistree68b627990f84e32cf092d6b86729b1ff25c1fafatargetblank68b6279a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -1011,7 +740,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/unawaz1996/NMD-analysis/tree/08bbafdab99816f40a57c3c5dd83827d85201f53" target="_blank">08bbafd</a>.
+<a href="https://github.com/urwahnawaz/NMD-analysis/tree/68b627990f84e32cf092d6b86729b1ff25c1fafa" target="_blank">68b6279</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -1028,157 +757,24 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/Differential-transcript-usage.nb.html
+    Ignored:    analysis/Differential-transcript-expression.nb.html
     Ignored:    analysis/Enichment-analysis-fgsea.nb.html
-    Ignored:    analysis/Enichment-analysis-goseq.nb.html
+    Ignored:    analysis/Publication-Main-figures.nb.html
     Ignored:    analysis/figure/
+    Ignored:    code/external_code/out/
+    Ignored:    code/external_code/tmp/
+    Ignored:    data/fastq/
+    Ignored:    data/fastqc/
+    Ignored:    data/genewalk/
+    Ignored:    output/
     Ignored:    tmp/
 
-Untracked files:
-    Untracked:  Rplots.pdf
-    Untracked:  Upf3b-all-DEGs-genes.tsv
-    Untracked:  Upf3b-bf-genes.tsv
-    Untracked:  Upf3b-bf-genes.xlsx
-    Untracked:  analysis/Differential-transcript-usage.Rmd
-    Untracked:  analysis/Publication-Main-figures.Rmd
-    Untracked:  analysis/Stability-DD-NMD.Rmd
-    Untracked:  analysis/transcript-features.Rmd
-    Untracked:  analysis/transcript-preprocessing.Rmd
-    Untracked:  code/Archive/
-    Untracked:  code/eisaR.R
-    Untracked:  code/external_code/
-    Untracked:  data/LTK_Sample Metafile_V3.txt
-    Untracked:  data/Mus_musculus.GRCm39.105__nifs.tsv
-    Untracked:  data/data.txt
-    Untracked:  data/data2.txt
-    Untracked:  data/fastq/
-    Untracked:  data/fastqc/
-    Untracked:  data/geneLists/
-    Untracked:  data/genesets/
-    Untracked:  data/genewalk/
-    Untracked:  data/human_mouse_1to1_orthologs.csv
-    Untracked:  data/nif_output/
-    Untracked:  data/samples.txt
-    Untracked:  genesets.csv
-    Untracked:  output/Bona-fide-genes.xlsx
-    Untracked:  output/DEG-limma-results.Rda
-    Untracked:  output/DEG-list.Rda
-    Untracked:  output/DEG-results.xlsx
-    Untracked:  output/DEG/
-    Untracked:  output/DET-analysis.xlsx
-    Untracked:  output/DET-list.Rda
-    Untracked:  output/EISA/
-    Untracked:  output/Figures/
-    Untracked:  output/For_presentation/
-    Untracked:  output/GOseq-results.xlsx
-    Untracked:  output/ISAR/
-    Untracked:  output/Overlap-stability-DEG.xlsx
-    Untracked:  output/Poster_plots/
-    Untracked:  output/QC/
-    Untracked:  output/RNA-stability.xlsx
-    Untracked:  output/Stability/
-    Untracked:  output/Thesis_plots/DD-NMD-overlaps.pdf
-    Untracked:  output/Thesis_plots/DD-NMD/
-    Untracked:  output/Thesis_plots/DEG_ratios.svg
-    Untracked:  output/Thesis_plots/DEGs/
-    Untracked:  output/Thesis_plots/DETs/
-    Untracked:  output/Thesis_plots/GO-DEGs.png
-    Untracked:  output/Thesis_plots/GO-DEGs.svg
-    Untracked:  output/Thesis_plots/Gene-PCA.png
-    Untracked:  output/Thesis_plots/NIFs/
-    Untracked:  output/Thesis_plots/Proprotion_NIF.svg
-    Untracked:  output/Thesis_plots/Upf2.svg
-    Untracked:  output/Thesis_plots/Upf2_exp.png
-    Untracked:  output/Thesis_plots/Upf3-dKD-stability-overlap.svg
-    Untracked:  output/Thesis_plots/Upf3-dKD-stability.svg
-    Untracked:  output/Thesis_plots/Upf3KD-overlap-DSG-DEG.pdf
-    Untracked:  output/Thesis_plots/Upf3_cumulative.svg
-    Untracked:  output/Thesis_plots/Upf3_paralog_cor.png
-    Untracked:  output/Thesis_plots/Upf3_paralog_cor.svg
-    Untracked:  output/Thesis_plots/Upf3a-bf-NIF-proportion.png
-    Untracked:  output/Thesis_plots/Upf3a-bf-NIF-proportion.svg
-    Untracked:  output/Thesis_plots/Upf3a-bf-candidates-features.svg
-    Untracked:  output/Thesis_plots/Upf3a-bf-exp.svg
-    Untracked:  output/Thesis_plots/Upf3a-bf-features.svg
-    Untracked:  output/Thesis_plots/Upf3a-down-bf.svg
-    Untracked:  output/Thesis_plots/Upf3a-down-exp.svg
-    Untracked:  output/Thesis_plots/Upf3a-overlap-DSG-DEG.pdf
-    Untracked:  output/Thesis_plots/Upf3a-stability-overlap.png
-    Untracked:  output/Thesis_plots/Upf3a-stability-overlap.svg
-    Untracked:  output/Thesis_plots/Upf3a-stability.png
-    Untracked:  output/Thesis_plots/Upf3a-stability.svg
-    Untracked:  output/Thesis_plots/Upf3a-transcript-overlap.svg
-    Untracked:  output/Thesis_plots/Upf3a_OE_Upf3b_KD_cor.png
-    Untracked:  output/Thesis_plots/Upf3a_Upf3dKD_cor.png
-    Untracked:  output/Thesis_plots/Upf3a_bf_cumulative.svg
-    Untracked:  output/Thesis_plots/Upf3a_oR_cor.svg
-    Untracked:  output/Thesis_plots/Upf3a_specific_cumulative.svg
-    Untracked:  output/Thesis_plots/Upf3b-NIF-proportion.svg
-    Untracked:  output/Thesis_plots/Upf3b-bf-NIF-proportion.png
-    Untracked:  output/Thesis_plots/Upf3b-bf-NIF-proportion.svg
-    Untracked:  output/Thesis_plots/Upf3b-bf-candidates-features.svg
-    Untracked:  output/Thesis_plots/Upf3b-bf-exp.svg
-    Untracked:  output/Thesis_plots/Upf3b-bf-features.svg
-    Untracked:  output/Thesis_plots/Upf3b-stability-overlap.png
-    Untracked:  output/Thesis_plots/Upf3b-stability-overlap.svg
-    Untracked:  output/Thesis_plots/Upf3b-stability.png
-    Untracked:  output/Thesis_plots/Upf3b-stability.svg
-    Untracked:  output/Thesis_plots/Upf3b-transcript-overlap.svg
-    Untracked:  output/Thesis_plots/Upf3b_Upf3dKD_cor.png
-    Untracked:  output/Thesis_plots/Upf3b_bf_cumulative.svg
-    Untracked:  output/Thesis_plots/Upf3d-KD-candidates-features-1.svg
-    Untracked:  output/Thesis_plots/Upf3d-KD-candidates-features-2.svg
-    Untracked:  output/Thesis_plots/Upf3dKD-bf-NIF-features.svg
-    Untracked:  output/Thesis_plots/Upf3dKD-bf-NIF-proportion.png
-    Untracked:  output/Thesis_plots/Upf3dKD-bf-NIF-proportion.svg
-    Untracked:  output/Thesis_plots/Upf3dKD-bf-candidates-features.svg
-    Untracked:  output/Thesis_plots/Upf3dKD-stability-overlap.png
-    Untracked:  output/Thesis_plots/Upf3dKD-stability.png
-    Untracked:  output/Thesis_plots/Upf3dKD-transcript-overlap.svg
-    Untracked:  output/Thesis_plots/all_overlaps-transcript-DEGs.svg
-    Untracked:  output/Thesis_plots/all_overlaps-transcript.svg
-    Untracked:  output/Thesis_plots/all_overlaps.svg
-    Untracked:  output/Thesis_plots/all_overlaps_enrichment.svg
-    Untracked:  output/Thesis_plots/overlap-bf-exp.svg
-    Untracked:  output/Thesis_plots/overlapping-bf-features.svg
-    Untracked:  output/Thesis_plots/overlaps/
-    Untracked:  output/Thesis_plots/ratio_DET.svg
-    Untracked:  output/Thesis_plots/total_DEG.svg
-    Untracked:  output/Thesis_plots/trans-pca-final.svg
-    Untracked:  output/Thesis_plots/trans-pca.svg
-    Untracked:  output/Thesis_plots/transcript-gc-qc.pdf
-    Untracked:  output/Thesis_plots/transcript_det_ma.pdf
-    Untracked:  output/Thesis_plots/upf3a-check.svg
-    Untracked:  output/Thesis_plots/upf3b-DEG-DSA.pdf
-    Untracked:  output/Thesis_plots/upf3b-check.svg
-    Untracked:  output/Thesis_plots/venn-bona-fide.pdf
-    Untracked:  output/Transcript/
-    Untracked:  output/Upf3b-high-confident-genes.xlsx
-    Untracked:  output/fgsea-output.xlsx
-    Untracked:  output/fgsea_geneset_characterization.csv
-    Untracked:  output/isoformSwitchAnalyzeR_isoform_AA_complete.fasta
-    Untracked:  output/isoformSwitchAnalyzeR_isoform_AA_subset_1_of_3.fasta
-    Untracked:  output/isoformSwitchAnalyzeR_isoform_AA_subset_2_of_3.fasta
-    Untracked:  output/isoformSwitchAnalyzeR_isoform_AA_subset_3_of_3.fasta
-    Untracked:  output/isoformSwitchAnalyzeR_isoform_nt.fasta
-    Untracked:  output/limma-matrices.Rda
-    Untracked:  output/sequences/
-
 Unstaged changes:
-    Deleted:    .Rprofile
     Modified:   .gitignore
-    Modified:   NMD-analysis.Rproj
-    Modified:   analysis/DEG-analysis.Rmd
     Modified:   analysis/Differential-transcript-expression.Rmd
-    Modified:   analysis/Enichment-analysis-fgsea.Rmd
-    Modified:   analysis/Enichment-analysis-goseq.Rmd
-    Modified:   analysis/Quality-control.Rmd
-    Modified:   analysis/RNA-stability.Rmd
-    Modified:   analysis/_site.yml
-    Modified:   code/functions.R
-    Modified:   code/libraries.R
-    Modified:   output/Thesis_plots/Count_NIF.svg
-    Modified:   output/Thesis_plots/NIF_feature_OR.svg
+
+Staged changes:
+    Deleted:    analysis/transcript-features.Rmd
 
 </code></pre>
 <p>
@@ -1226,10 +822,61 @@ Message
 <tbody>
 <tr>
 <td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/68b627990f84e32cf092d6b86729b1ff25c1fafa/analysis/Differential-transcript-expression.Rmd" target="_blank">68b6279</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2026-09-08
+</td>
+<td>
+changes and code refactoring
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/5719ae528b658936a6d5dc53bfdca58a331514f7/analysis/Differential-transcript-expression.Rmd" target="_blank">5719ae5</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2026-03-07
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
 html
 </td>
 <td>
-<a href="https://rawcdn.githack.com/unawaz1996/NMD-analysis/8ecf3f05bc3ea43809aba8c617730e6c4efdbdaa/docs/Differential-transcript-expression.html" target="_blank">8ecf3f0</a>
+<a href="https://rawcdn.githack.com/urwahnawaz/NMD-analysis/5719ae528b658936a6d5dc53bfdca58a331514f7/docs/Differential-transcript-expression.html" target="_blank">5719ae5</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2026-03-07
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/urwahnawaz/NMD-analysis/8ecf3f05bc3ea43809aba8c617730e6c4efdbdaa/docs/Differential-transcript-expression.html" target="_blank">8ecf3f0</a>
 </td>
 <td>
 unawaz1996
@@ -1246,7 +893,7 @@ Build site.
 Rmd
 </td>
 <td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/6025d0f122145e8aa9183e34a37b3d227d06c202/analysis/Differential-transcript-expression.Rmd" target="_blank">6025d0f</a>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/6025d0f122145e8aa9183e34a37b3d227d06c202/analysis/Differential-transcript-expression.Rmd" target="_blank">6025d0f</a>
 </td>
 <td>
 unawaz1996
@@ -1264,7 +911,7 @@ wflow_publish(c("analysis/index.Rmd",
 html
 </td>
 <td>
-<a href="https://rawcdn.githack.com/unawaz1996/NMD-analysis/421e1d51ea318346c74449ce8462ec02c9e68d33/docs/Differential-transcript-expression.html" target="_blank">421e1d5</a>
+<a href="https://rawcdn.githack.com/urwahnawaz/NMD-analysis/421e1d51ea318346c74449ce8462ec02c9e68d33/docs/Differential-transcript-expression.html" target="_blank">421e1d5</a>
 </td>
 <td>
 unawaz1996
@@ -1281,7 +928,7 @@ Build site.
 Rmd
 </td>
 <td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/b963fdbe655c1c9545672b514ce96f809190280b/analysis/Differential-transcript-expression.Rmd" target="_blank">b963fdb</a>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/b963fdbe655c1c9545672b514ce96f809190280b/analysis/Differential-transcript-expression.Rmd" target="_blank">b963fdb</a>
 </td>
 <td>
 unawaz1996
@@ -1328,11 +975,85 @@ cell line (sample 223), seems to deviate from its condition group and
 the rest of the data, so needs to be further investigated</em>
 </p>
 </div>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/5719ae528b658936a6d5dc53bfdca58a331514f7/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-3-1.png" target="_blank">5719ae5</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2026-03-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-4-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/5719ae528b658936a6d5dc53bfdca58a331514f7/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-4-1.png" target="_blank">5719ae5</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2026-03-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="analysis" class="section level1">
 <h1>Analysis</h1>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-6-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
 Past versions of unnamed-chunk-6-1.png
@@ -1357,7 +1078,18 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/421e1d51ea318346c74449ce8462ec02c9e68d33/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-6-1.png" target="_blank">421e1d5</a>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/5719ae528b658936a6d5dc53bfdca58a331514f7/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-6-1.png" target="_blank">5719ae5</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2026-03-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/421e1d51ea318346c74449ce8462ec02c9e68d33/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-6-1.png" target="_blank">421e1d5</a>
 </td>
 <td>
 unawaz1996
@@ -1373,7 +1105,55 @@ unawaz1996
 <div id="checking-distribution-of-nifs-in-all-data"
 class="section level2">
 <h2>Checking distribution of NIFs in all data</h2>
-<pre><code>NULL</code></pre>
+<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-7-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/5719ae528b658936a6d5dc53bfdca58a331514f7/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-7-1.png" target="_blank">5719ae5</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2026-03-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/421e1d51ea318346c74449ce8462ec02c9e68d33/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-7-1.png" target="_blank">421e1d5</a>
+</td>
+<td>
+unawaz1996
+</td>
+<td>
+2023-05-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="differential-expression-analysis-using-edger"
 class="section level2">
@@ -1411,7 +1191,18 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/421e1d51ea318346c74449ce8462ec02c9e68d33/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-8-1.png" target="_blank">421e1d5</a>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/5719ae528b658936a6d5dc53bfdca58a331514f7/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-8-1.png" target="_blank">5719ae5</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2026-03-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/421e1d51ea318346c74449ce8462ec02c9e68d33/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-8-1.png" target="_blank">421e1d5</a>
 </td>
 <td>
 unawaz1996
@@ -1455,7 +1246,18 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/421e1d51ea318346c74449ce8462ec02c9e68d33/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-9-1.png" target="_blank">421e1d5</a>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/5719ae528b658936a6d5dc53bfdca58a331514f7/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-9-1.png" target="_blank">5719ae5</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2026-03-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/421e1d51ea318346c74449ce8462ec02c9e68d33/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-9-1.png" target="_blank">421e1d5</a>
 </td>
 <td>
 unawaz1996
@@ -1469,13 +1271,87 @@ unawaz1996
 </div>
 </div>
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  15.22   15.22   15.22   15.22   15.22   15.22 </code></pre>
+  15.25   15.25   15.25   15.25   15.25   15.25 </code></pre>
 <div id="checking-normalization-and-qc" class="section level3">
 <h3>Checking normalization and QC</h3>
 <pre><code>$Control_UPF3BKD</code></pre>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-13-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-13-1">
+Past versions of unnamed-chunk-13-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-13-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/5719ae528b658936a6d5dc53bfdca58a331514f7/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-13-1.png" target="_blank">5719ae5</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2026-03-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre><code>$Control_UPF3AOE</code></pre>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-14-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-14-1">
+Past versions of unnamed-chunk-14-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-14-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/5719ae528b658936a6d5dc53bfdca58a331514f7/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-14-1.png" target="_blank">5719ae5</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2026-03-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="distribution-of-results" class="section level3">
 <h3>Distribution of results</h3>
@@ -1489,6 +1365,44 @@ Distribution of p-values and log2Fold changes across conditions after
 running edgeR
 </p>
 </div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-17-1">
+Past versions of unnamed-chunk-17-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-17-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/urwahnawaz/NMD-analysis/blob/5719ae528b658936a6d5dc53bfdca58a331514f7/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-17-1.png" target="_blank">5719ae5</a>
+</td>
+<td>
+urwahnawaz
+</td>
+<td>
+2026-03-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>`</p>
 </div>
 <div id="concordance-and-discordance-of-results" class="section level3">
 <h3>Concordance and discordance of results</h3>
@@ -1503,1349 +1417,15 @@ running edgeR
     Pearson&#39;s product-moment correlation
 
 data:  .$logFC and .$gene.FC
-t = 46.934, df = 1865, p-value &lt; 2.2e-16
+t = 47.551, df = 1870, p-value &lt; 2.2e-16
 alternative hypothesis: true correlation is not equal to 0
 95 percent confidence interval:
- 0.7143662 0.7560106
+ 0.7186012 0.7596634
 sample estimates:
       cor 
-0.7358835 </code></pre>
-<pre><code>[1] 5.144041e-117</code></pre>
-<pre><code>[1] 14.41181</code></pre>
-</div>
-</div>
-<div id="det-statistics" class="section level2">
-<h2>DET statistics</h2>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-37-1.png" width="960" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-37-1">
-Past versions of unnamed-chunk-37-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-37-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/8ecf3f05bc3ea43809aba8c617730e6c4efdbdaa/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-37-1.png" target="_blank">8ecf3f0</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-05-11
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/421e1d51ea318346c74449ce8462ec02c9e68d33/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-37-1.png" target="_blank">421e1d5</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-05-10
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-38-1">
-Past versions of unnamed-chunk-38-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-38-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/8ecf3f05bc3ea43809aba8c617730e6c4efdbdaa/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-38-1.png" target="_blank">8ecf3f0</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-05-11
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/421e1d51ea318346c74449ce8462ec02c9e68d33/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-38-1.png" target="_blank">421e1d5</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-05-10
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-40-1.png" alt="Number of NIF features in differentially expressed transcripts per comparison" width="1152" />
-<p class="caption">
-Number of NIF features in differentially expressed transcripts per
-comparison
-</p>
-</div>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-40-1">
-Past versions of unnamed-chunk-40-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-40-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/8ecf3f05bc3ea43809aba8c617730e6c4efdbdaa/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-40-1.png" target="_blank">8ecf3f0</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-05-11
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<ul>
-<li>Enrichment analysis of NIF+ features</li>
-</ul>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-45-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-48-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="distribution-of-nifs" class="section level2">
-<h2>Distribution of NIFs</h2>
-<ul>
-<li>Distribution of any NIF + transcript</li>
-</ul>
-<pre><code>png 
-  2 </code></pre>
-<pre><code>sign.lfc
--1  1 
- 8  3 </code></pre>
-<ul>
-<li>Distribution of specific NIFs within Upf3b KD targets</li>
-</ul>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-52-1.png" width="768" style="display: block; margin: auto;" /></p>
-<ul>
-<li><p>Distribution of specific NIFs within Upf3a KD targets
-<img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-53-1.png" width="768" style="display: block; margin: auto;" /></p></li>
-<li><p>Distribution of specific NIFs within Upf3 dKD targets</p></li>
-</ul>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-54-1.png" width="768" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-54-1">
-Past versions of unnamed-chunk-54-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-54-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/8ecf3f05bc3ea43809aba8c617730e6c4efdbdaa/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-54-1.png" target="_blank">8ecf3f0</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-05-11
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<ul>
-<li><p>Distribution of specific NIFs within Upf3a OE targets
-<img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-55-1.png" width="768" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-55-1">
-<p>Past versions of unnamed-chunk-55-1.png</p>
-</button>
-</p>
-<div id="fig-unnamed-chunk-55-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/8ecf3f05bc3ea43809aba8c617730e6c4efdbdaa/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-55-1.png" target="_blank">8ecf3f0</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-05-11
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div></li>
-<li><p>Distribution of specific NIFs within Upf3a OE in Upf3b KD
-targets</p></li>
-</ul>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-56-1.png" width="768" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-56-1">
-Past versions of unnamed-chunk-56-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-56-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/unawaz1996/NMD-analysis/blob/8ecf3f05bc3ea43809aba8c617730e6c4efdbdaa/docs/figure/Differential-transcript-expression.Rmd/unnamed-chunk-56-1.png" target="_blank">8ecf3f0</a>
-</td>
-<td>
-unawaz1996
-</td>
-<td>
-2023-05-11
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="cumulative-frequency-of-nif" class="section level3">
-<h3>Cumulative frequency of NIF</h3>
-<ul>
-<li>3’UTR length</li>
-</ul>
-<p>Transcripts were divided into three groups: - Upregulated (FDR &lt;
-0.05, log2FC &gt; 0) - Downregulated (FDR &lt; 0.05, log2FC &lt; 0) -
-All (FDR &gt; 0.05)</p>
-</div>
-<div id="upf3b" class="section level3">
-<h3>UPF3B</h3>
-<ul>
-<li>3’UTR - length</li>
-</ul>
-<pre><code>
-    Pairwise comparisons using t tests with pooled SD 
-
-data:  significance_testing$LENGTH_3utr and significance_testing$sig 
-
-            Downregulated Not Sig
-Not Sig     7.1e-09       -      
-Upregulated 0.77          2.2e-07
-
-P value adjustment method: bonferroni </code></pre>
-<pre><code>
-    Pairwise comparisons using t tests with pooled SD 
-
-data:  significance_testing$LENGTH_3utr and significance_testing$sig 
-
-            Downregulated Not Sig
-Not Sig     1.8e-14       -      
-Upregulated 3.9e-05       0.00091
-
-P value adjustment method: bonferroni </code></pre>
-<pre><code>
-    Pairwise comparisons using t tests with pooled SD 
-
-data:  significance_testing$LENGTH_3utr and significance_testing$sig 
-
-            Downregulated Not Sig
-Not Sig     &lt; 2e-16       -      
-Upregulated 2.5e-09       0.0022 
-
-P value adjustment method: bonferroni </code></pre>
-<pre><code>
-    Pairwise comparisons using t tests with pooled SD 
-
-data:  significance_testing$LENGTH_3utr and significance_testing$sig 
-
-            Downregulated Not Sig
-Not Sig     &lt; 2e-16       -      
-Upregulated 2.7e-09       0.00099
-
-P value adjustment method: bonferroni </code></pre>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-65-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-66-1.png" width="672" style="display: block; margin: auto;" /></p>
-<ul>
-<li>GC content in 3’UTR</li>
-</ul>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-68-1.png" width="672" style="display: block; margin: auto;" /></p>
-<ul>
-<li>5’ UTR length</li>
-</ul>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-70-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-71-1.png" width="672" style="display: block; margin: auto;" /></p>
-<ul>
-<li>uORFs</li>
-</ul>
-<pre><code>&lt;theme&gt; List of 1
- $ legend.position: chr &quot;none&quot;
- @ complete: logi FALSE
- @ validate: logi TRUE</code></pre>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-72-1.png" width="672" style="display: block; margin: auto;" /></p>
-<!-- # UPF3B transcripts  -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3B_KD_Control %>%  -->
-<!--   as.data.frame() %>%  -->
-<!--   dplyr::filter(Results != 0) %>% -->
-<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
-<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
-<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%  -->
-<!--       DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
-<!--             options = list(scrollX = TRUE,  -->
-<!--                            scrollCollapse = TRUE,  -->
-<!--                            pageLength = 5, autoWidth = TRUE,  -->
-<!--                            dom = 'Blfrtip', -->
-<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
-<!--                            lengthMenu = list(c(10,25,50,-1), -->
-<!--                                              c(10,25,50,"All")))) -->
-<!-- ``` -->
-<!-- ## UPF3B transcripts with NMD features  -->
-<!-- ```{r fig.cap= "*NIF in upregulated transcripts in UPF3B*"} -->
-<!-- sig_res= res_dte$UPF3B_KD_Control  %>%  -->
-<!--   dplyr::filter(FDR < 0.05, abs(logFC) > log2(1)) -->
-<!-- dEJ = sig_res %>%  -->
-<!--   dplyr::filter(NIF_dEJ == 1) %>%  -->
-<!--   dplyr::select(tx_id) -->
-<!-- uORF = sig_res %>%  -->
-<!--   dplyr::filter(NIF_uORF == 1) %>%  -->
-<!--   dplyr::select(tx_id) -->
-<!-- UTR = sig_res %>%  -->
-<!--   dplyr::filter(NIF_long_3utr == 1) %>%  -->
-<!--   dplyr::select(tx_id) -->
-<!-- x = list( "dEJ" = dEJ$tx_id,  -->
-<!--           "uORF" = uORF$tx_id,  -->
-<!--           "Long 3'UTR" = UTR$tx_id,  -->
-<!--           "All transcript" = sig_res$tx_id) -->
-<!-- upset(fromList(x)) -->
-<!-- ``` -->
-<!-- ### Characteristics of 3'UTR -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05, NIF_long_3utr == 1) %>%  -->
-<!--   ggplot(aes(x=GC_3utr, y =logFC)) + geom_point() -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3B_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   mutate(Expression = ifelse(logFC > 1, "Up", "Down")) %>%  -->
-<!--   ggplot(aes(x=Expression, y =LENGTH_3utr)) + geom_boxplot() -->
-<!-- ``` -->
-<!-- ## Comparison of DEGs with DETs for UPF3B KD  -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3B_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
-<!--   inner_join(dplyr::rename(DEGenes$UPF3B_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
-<!--   ggscatter(y="logFC", x="Coef.UPF3B_vs_Control",  cor.coef = TRUE, add = "reg.line", color ="NIF_long_3utr", -->
-<!--               conf.int = TRUE, add.params = list(color = "blue", -->
-<!--                                                  fill = "lightgray"))  +  -->
-<!--   xlab("UPF3B KD (gene level logFC)") + ylab("UPF3B KD (transcript level logFC)") -->
-<!-- ``` -->
-<!-- ### Genes with NIFs -->
-<!-- ```{r} -->
-<!-- genes_nif = res_dte$UPF3B_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
-<!--   inner_join(dplyr::rename(DEGenes$UPF3B_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") -->
-<!-- dim(genes_nif) -->
-<!-- length(unique(genes_nif$gene.y)) -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- NIF_dist_hist(genes_nif) -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3B_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
-<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
-<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
-<!--    inner_join(tx2gene, by = "tx_id") %>% -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
-<!--   inner_join(DEGenes$UPF3B_vs_Control %>%  -->
-<!--               dplyr::rename("gene_id" = "ensembl_gene_id") %>%  -->
-<!--               dplyr::select(contains("UPF3B_vs_Control"), gene_id), by = "gene_id") %>%  -->
-<!--      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
-<!--             options = list(scrollX = TRUE,  -->
-<!--                            scrollCollapse = TRUE,  -->
-<!--                            pageLength = 5, autoWidth = TRUE,  -->
-<!--                            dom = 'Blfrtip', -->
-<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
-<!--                            lengthMenu = list(c(10,25,50,-1), -->
-<!--                                              c(10,25,50,"All")))) -->
-<!-- ``` -->
-<!-- # UPF3A transcripts  -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_KD_Control %>%  -->
-<!--   as.data.frame() %>%  -->
-<!--   dplyr::filter(Results != 0) %>% -->
-<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
-<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
-<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%  -->
-<!--       DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
-<!--             options = list(scrollX = TRUE,  -->
-<!--                            scrollCollapse = TRUE,  -->
-<!--                            pageLength = 5, autoWidth = TRUE,  -->
-<!--                            dom = 'Blfrtip', -->
-<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
-<!--                            lengthMenu = list(c(10,25,50,-1), -->
-<!--                                              c(10,25,50,"All")))) -->
-<!-- ``` -->
-<!-- ## UPF3A transcripts with NMD features  -->
-<!-- ```{r fig.cap= "*NIF in upregulated transcripts in UPF3B*"} -->
-<!-- sig_res= res_dte$UPF3A_KD_Control  %>%  -->
-<!--   dplyr::filter(FDR < 0.05, abs(logFC) > log2(1)) -->
-<!-- dEJ = sig_res %>%  -->
-<!--   dplyr::filter(NIF_dEJ == 1) %>%  -->
-<!--   dplyr::select(tx_id) -->
-<!-- uORF = sig_res %>%  -->
-<!--   dplyr::filter(NIF_uORF == 1) %>%  -->
-<!--   dplyr::select(tx_id) -->
-<!-- UTR = sig_res %>%  -->
-<!--   dplyr::filter(NIF_long_3utr == 1) %>%  -->
-<!--   dplyr::select(tx_id) -->
-<!-- x = list( "dEJ" = dEJ$tx_id,  -->
-<!--           "uORF" = uORF$tx_id,  -->
-<!--           "Long 3'UTR" = UTR$tx_id,  -->
-<!--           "All transcript" = sig_res$tx_id) -->
-<!-- upset(fromList(x)) -->
-<!-- ``` -->
-<!-- ### Comparison of DEGs with DETs -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
-<!--   inner_join(dplyr::rename(DEGenes$UPF3A_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
-<!--   ggscatter(y="logFC", x="Coef.UPF3A_vs_Control",  cor.coef = TRUE, add = "reg.line",  -->
-<!--               conf.int = TRUE, add.params = list(color = "blue", -->
-<!--                                                  fill = "lightgray"))  +  -->
-<!--   xlab("UPF3A KD (gene level logFC)") + ylab("UPF3A KD (transcript level logFC)") -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
-<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
-<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
-<!--    inner_join(tx2gene, by = "tx_id") %>% -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
-<!--   inner_join(DEGenes$UPF3A_vs_Control %>%  -->
-<!--               dplyr::rename("gene_id" = "ensembl_gene_id") %>%  -->
-<!--               dplyr::select(contains("UPF3A_vs_Control"), gene_id), by = "gene_id") %>%  -->
-<!--      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
-<!--             options = list(scrollX = TRUE,  -->
-<!--                            scrollCollapse = TRUE,  -->
-<!--                            pageLength = 5, autoWidth = TRUE,  -->
-<!--                            dom = 'Blfrtip', -->
-<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
-<!--                            lengthMenu = list(c(10,25,50,-1), -->
-<!--                                              c(10,25,50,"All")))) -->
-<!-- ``` -->
-<!-- # UPF3 dKD -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_KD_UPF3B_KD_Control %>%  -->
-<!--   as.data.frame() %>%  -->
-<!--   dplyr::filter(Results != 0) %>% -->
-<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
-<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
-<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%  -->
-<!--       DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
-<!--             options = list(scrollX = TRUE,  -->
-<!--                            scrollCollapse = TRUE,  -->
-<!--                            pageLength = 5, autoWidth = TRUE,  -->
-<!--                            dom = 'Blfrtip', -->
-<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
-<!--                            lengthMenu = list(c(10,25,50,-1), -->
-<!--                                              c(10,25,50,"All")))) -->
-<!-- ``` -->
-<!-- ### Comparison of DEGs with DETs -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_KD_UPF3B_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
-<!--   inner_join(dplyr::rename(DEGenes$DoubleKD_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
-<!--   ggscatter(y="logFC", x="Coef.DoubleKD_vs_Control",  cor.coef = TRUE, add = "reg.line",  -->
-<!--               conf.int = TRUE, add.params = list(color = "blue", -->
-<!--                                                  fill = "lightgray")) +  -->
-<!--   xlab("UPF3 dKD (gene level logFC)") + ylab("UPF3 dKD (transcript level logFC)") -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_KD_UPF3B_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
-<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
-<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
-<!--    inner_join(tx2gene, by = "tx_id") %>% -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
-<!--   inner_join(DEGenes$DoubleKD_vs_Control %>%  -->
-<!--               dplyr::rename("gene_id" = "ensembl_gene_id") %>%  -->
-<!--               dplyr::select(contains("DoubleKD_vs_Control"), gene_id), by = "gene_id") %>%  -->
-<!--      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
-<!--             options = list(scrollX = TRUE,  -->
-<!--                            scrollCollapse = TRUE,  -->
-<!--                            pageLength = 5, autoWidth = TRUE,  -->
-<!--                            dom = 'Blfrtip', -->
-<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
-<!--                            lengthMenu = list(c(10,25,50,-1), -->
-<!--                                              c(10,25,50,"All")))) -->
-<!-- ``` -->
-<!-- ## Transcripts with NIFs -->
-<!-- ```{r fig.cap= "*NIF in upregulated transcripts in UPF3B*"} -->
-<!-- sig_res= res_dte$UPF3A_KD_UPF3B_KD_Control  %>%  -->
-<!--   dplyr::filter(FDR < 0.05, abs(logFC) > log2(1)) -->
-<!-- dEJ = sig_res %>%  -->
-<!--   dplyr::filter(NIF_dEJ == 1) %>%  -->
-<!--   dplyr::select(tx_id) -->
-<!-- uORF = sig_res %>%  -->
-<!--   dplyr::filter(NIF_uORF == 1) %>%  -->
-<!--   dplyr::select(tx_id) -->
-<!-- UTR = sig_res %>%  -->
-<!--   dplyr::filter(NIF_long_3utr == 1) %>%  -->
-<!--   dplyr::select(tx_id) -->
-<!-- x = list( "dEJ" = dEJ$tx_id,  -->
-<!--           "uORF" = uORF$tx_id,  -->
-<!--           "Long 3'UTR" = UTR$tx_id,  -->
-<!--           "All transcript" = sig_res$tx_id) -->
-<!-- upset(fromList(x)) -->
-<!-- ``` -->
-<!-- # UPF3A OE  -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_OE_Control %>%  -->
-<!--   as.data.frame() %>%  -->
-<!--   dplyr::filter(Results != 0) %>% -->
-<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
-<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
-<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%  -->
-<!--       DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
-<!--             options = list(scrollX = TRUE,  -->
-<!--                            scrollCollapse = TRUE,  -->
-<!--                            pageLength = 5, autoWidth = TRUE,  -->
-<!--                            dom = 'Blfrtip', -->
-<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
-<!--                            lengthMenu = list(c(10,25,50,-1), -->
-<!--                                              c(10,25,50,"All")))) -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_OE_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
-<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
-<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
-<!--    inner_join(tx2gene, by = "tx_id") %>% -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
-<!--   inner_join(DEGenes$UPF3A_OE_vs_Control %>%  -->
-<!--               dplyr::rename("gene_id" = "ensembl_gene_id") %>%  -->
-<!--               dplyr::select(contains("UPF3A_OE_vs_Control"), gene_id), by = "gene_id") %>%  -->
-<!--      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
-<!--             options = list(scrollX = TRUE,  -->
-<!--                            scrollCollapse = TRUE,  -->
-<!--                            pageLength = 5, autoWidth = TRUE,  -->
-<!--                            dom = 'Blfrtip', -->
-<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
-<!--                            lengthMenu = list(c(10,25,50,-1), -->
-<!--                                              c(10,25,50,"All")))) -->
-<!-- ``` -->
-<!-- # UPF3A OE in UPF3B KD  -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_OE_UPF3B_KD_Control %>%  -->
-<!--   as.data.frame() %>%  -->
-<!--   dplyr::filter(Results != 0) %>% -->
-<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
-<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
-<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%  -->
-<!--       DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
-<!--             options = list(scrollX = TRUE,  -->
-<!--                            scrollCollapse = TRUE,  -->
-<!--                            pageLength = 5, autoWidth = TRUE,  -->
-<!--                            dom = 'Blfrtip', -->
-<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
-<!--                            lengthMenu = list(c(10,25,50,-1), -->
-<!--                                              c(10,25,50,"All")))) -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_OE_UPF3B_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
-<!--   inner_join(dplyr::rename(DEGenes$UPF3A_OE_UPF3B_KD_vs_Control, "gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
-<!--   ggscatter(y="logFC", x="Coef.UPF3A_OE_UPF3B_KD_vs_Control",  cor.coef = TRUE, add = "reg.line",  -->
-<!--               conf.int = TRUE, add.params = list(color = "blue", -->
-<!--                                                  fill = "lightgray")) +  -->
-<!--   xlab("UPF3A OE in UPF3B KD (gene level logFC)") + ylab("UPF3A OE in UPF3B KD (transcript level logFC)") -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_OE_UPF3B_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   dplyr::select(tx_id, Overdispersion, logFC,  -->
-<!--                 logCPM, PValue, FDR, NIF_dEJ, NIF_uORF, LENGTH_3utr,  -->
-<!--                 `NIF|__|GC(cds[-10:termination_codon])`) %>%  -->
-<!--    inner_join(tx2gene, by = "tx_id") %>% -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
-<!--   inner_join(DEGenes$UPF3A_OE_UPF3B_KD_vs_Control %>%  -->
-<!--               dplyr::rename("gene_id" = "ensembl_gene_id") %>%  -->
-<!--               dplyr::select(contains("UPF3A_OE_UPF3B_KD_vs_Control"), gene_id), by = "gene_id") %>%  -->
-<!--      DT::datatable(filter = 'top', extensions = c('Buttons', 'FixedColumns'), -->
-<!--             options = list(scrollX = TRUE,  -->
-<!--                            scrollCollapse = TRUE,  -->
-<!--                            pageLength = 5, autoWidth = TRUE,  -->
-<!--                            dom = 'Blfrtip', -->
-<!--                            buttons = c('copy', 'csv', 'excel', 'pdf', 'colvis'), -->
-<!--                            lengthMenu = list(c(10,25,50,-1), -->
-<!--                                              c(10,25,50,"All")))) -->
-<!-- ``` -->
-<!-- # Are DET shared between UPF3B KD and UPF3A KD?  -->
-<!-- ```{r} -->
-<!-- degs_b= res_dte$UPF3B_KD_Control %>% as.data.frame %>% -->
-<!--   dplyr::filter(FDR < .05) %>%  -->
-<!--   with(.,  -->
-<!--        table(sign.lfc=sign(logFC))) %>% as.data.frame() -->
-<!-- ``` -->
-<!-- In UPF3B KD, there are 1860 upregulated genes aand 1328 downregulated genes  -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_KD_Control %>% as.data.frame %>% -->
-<!--   dplyr::filter(FDR < .05) %>%  -->
-<!--   with(.,  -->
-<!--        table(sign.lfc=sign(logFC))) -->
-<!-- ``` -->
-<!-- In UPF3A KD, there are 1504 upregulated genes and 816 downregulated genes  -->
-<!-- ```{r} -->
-<!-- x = list( "UPF3B KD" = res_dte$UPF3B_KD_Control$tx_id[res_dte$UPF3B_KD_Control$FDR < 0.05],   -->
-<!--     "UPF3A KD" = res_dte$UPF3A_KD_Control$tx_id[res_dte$UPF3A_KD_Control$FDR < 0.05],  -->
-<!--     "Double KD" = res_dte$UPF3A_KD_UPF3B_KD_Control$tx_id[res_dte$UPF3A_KD_UPF3B_KD_Contro$FDR < 0.05], -->
-<!--     "UPF3A OE" = res_dte$UPF3A_OE_Control$tx_id[res_dte$UPF3A_OE_Control$FDR < 0.05],  -->
-<!--     "UPF3A OE UPF3B KD" = res_dte$UPF3A_OE_UPF3B_KD_Control$tx_id[res_dte$UPF3A_OE_UPF3B_KD_Control$FDR < 0.05]) -->
-<!-- ggvenn(x[c(1,2)]) -->
-<!-- ``` -->
-<!-- ```{r fig.height=8, fig.width=15} -->
-<!-- grid.arrange((res_dte$UPF3B_KD_Control %>% as.data.frame() %>%  -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   dplyr::rename("logFC.UPF3B" = "logFC") %>%  -->
-<!--   dplyr::select(tx_id, logFC.UPF3B) %>%  -->
-<!--   inner_join(dplyr::filter(as.data.frame(res_dte$UPF3A_KD_Control), FDR < 0.05), by = "tx_id")  %>%  -->
-<!--    ggscatter(., x = "logFC.UPF3B", y = "logFC", color = "NIF_uORF", -->
-<!--               cor.coef = TRUE, add = "reg.line",  -->
-<!--               conf.int = TRUE, add.params = list(color = "blue", -->
-<!--                                                  fill = "lightgray")) +  -->
-<!--     theme_bw()  +  -->
-<!--   geom_xsidedensity(aes(у = after_stat(density), fill = NIF_uORF), alpha = 0.5,  -->
-<!--                     size = 1,position = "stack") + geom_ysidedensity(aes(x=after_stat(density),  -->
-<!--                                                                          fill = NIF_uORF),  -->
-<!--                                                                      alpha=0.5, size = 1) + -->
-<!--     xlab("UPF3B KD (log2FC)") + ylab("UPF3A KD (log2FC)")), -->
-<!-- (res_dte$UPF3B_KD_Control %>% as.data.frame() %>%  -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   dplyr::rename("logFC.UPF3B" = "logFC") %>%  -->
-<!--   dplyr::select(tx_id, logFC.UPF3B) %>%  -->
-<!--   inner_join(dplyr::filter(as.data.frame(res_dte$UPF3A_KD_Control), FDR < 0.05), by = "tx_id")  %>%  -->
-<!--    ggscatter(., x = "logFC.UPF3B", y = "logFC", color = "NIF_dEJ", -->
-<!--               cor.coef = TRUE, add = "reg.line",  -->
-<!--               conf.int = TRUE, add.params = list(color = "blue", -->
-<!--                                                  fill = "lightgray")) +  -->
-<!--     theme_bw()  +  -->
-<!--   geom_xsidedensity(aes(у = after_stat(density), fill = NIF_dEJ), alpha = 0.5,  -->
-<!--                     size = 1,position = "stack") + geom_ysidedensity(aes(x=after_stat(density),  -->
-<!--                                                                          fill = NIF_dEJ),  -->
-<!--                                                                      alpha=0.5, size = 1)  -->
-<!--  + xlab("UPF3B KD (log2FC)")+ ylab("UPF3A KD (log2FC)")),  -->
-<!-- (res_dte$UPF3B_KD_Control %>% as.data.frame() %>%  -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   dplyr::rename("logFC.UPF3B" = "logFC") %>%  -->
-<!--   dplyr::select(tx_id, logFC.UPF3B) %>%  -->
-<!--   inner_join(dplyr::filter(as.data.frame(res_dte$UPF3A_KD_Control), FDR < 0.05), by = "tx_id")  %>%  -->
-<!--    ggscatter(., x = "logFC.UPF3B", y = "logFC", color = "NIF_long_3utr", -->
-<!--               cor.coef = TRUE, add = "reg.line",  -->
-<!--               conf.int = TRUE, add.params = list(color = "blue", -->
-<!--                                                  fill = "lightgray")) +  -->
-<!--     theme_bw()  +  -->
-<!--   geom_xsidedensity(aes(у = after_stat(density), fill = NIF_long_3utr), alpha = 0.5,  -->
-<!--                     size = 1,position = "stack") + geom_ysidedensity(aes(x=after_stat(density),  -->
-<!--                                                                          fill = NIF_long_3utr),  -->
-<!--                                                                      alpha=0.5, size = 1) + -->
-<!--    xlab("UPF3B KD (log2FC)") + ylab("UPF3A KD (log2FC)") ),  -->
-<!-- ncol=3 -->
-<!-- ) -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3B_KD_Control %>% as.data.frame() %>%  -->
-<!--   dplyr::filter(Results != 0) %>%  -->
-<!--   dplyr::rename("logFC.UPF3B" = "logFC") %>%  -->
-<!--   dplyr::select(tx_id, logFC.UPF3B) %>%  -->
-<!--   left_join(dplyr::filter(as.data.frame(res_dte$UPF3A_KD_Control), Results != 0), by = "tx_id")  %>%  -->
-<!--    ggscatter(., x = "logFC.UPF3B", y = "logFC", color= "nif_feature",  -->
-<!--               cor.coef = TRUE, add = "reg.line",  -->
-<!--               conf.int = TRUE, add.params = list(color = "blue", -->
-<!--                                                  fill = "lightgray")) +  -->
-<!--     theme_bw()    -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3A_KD_Control %>% as.data.frame() %>%  -->
-<!--   dplyr::filter(Results != 0) %>%  -->
-<!--   dplyr::rename("logFC.UPF3A" = "logFC") %>%  -->
-<!--   dplyr::select(tx_id, logFC.UPF3A) %>%  -->
-<!--   left_join(dplyr::filter(as.data.frame(res_dte$UPF3B_KD_Control), Results == 0), by = "tx_id")  %>%  -->
-<!--    ggscatter(., x = "logFC.UPF3A", y = "logFC", -->
-<!--               cor.coef = TRUE, add = "reg.line",  -->
-<!--               conf.int = TRUE, add.params = list(color = "blue", -->
-<!--                                                  fill = "lightgray")) +  -->
-<!--     theme_bw()   -->
-<!-- ``` -->
-<!-- ### What is the distribution between transcripts in UPF3B KD and UPF3A OE?  -->
-<!-- ```{r} -->
-<!-- ggvenn(x[c(1, 4)]) -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3B_KD_Control %>% as.data.frame() %>%  -->
-<!--   dplyr::filter(Results != 0) %>%  -->
-<!--   dplyr::rename("logFC.UPF3B" = "logFC") %>%  -->
-<!--   dplyr::select(tx_id, logFC.UPF3B) %>%  -->
-<!--   left_join(as.data.frame(res_dte$UPF3A_OE_Control, by = "tx_id")) %>%  -->
-<!--    ggscatter(., x = "logFC.UPF3B", y = "logFC", color = "nif_feature", -->
-<!--               cor.coef = TRUE, add = "reg.line",  -->
-<!--               conf.int = TRUE, add.params = list(color = "blue", -->
-<!--                                                  fill = "lightgray")) +  -->
-<!--     theme_bw()  + xlab("UPF3B KD") + ylab("UPF3A OE") +  -->
-<!--   geom_xsidedensity(aes(у = after_stat(density), fill = nif_feature), alpha = 0.5,  -->
-<!--                     size = 1,position = "stack") + geom_ysidedensity(aes(x=after_stat(density),  -->
-<!--                                                                          fill = nif_feature),  -->
-<!--                                                                      alpha=0.5, size = 1) + -->
-<!--   scale_color_tq()  + scale_fill_tq() + geom_hline(yintercept = 0 ) -->
-<!-- ``` -->
-<!-- ### Transcripts arising from a single gene  -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3B_KD_Control %>% as.data.frame() %>%  -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>% -->
-<!--   dplyr::rename("logFC.UPF3B" = "logFC") %>%  -->
-<!--   dplyr::select(tx_id, logFC.UPF3B, gene_id) %>%  -->
-<!--   inner_join(res_dte$UPF3A_KD_Control %>%  -->
-<!--                dplyr::filter(FDR < 0.05) %>%  -->
-<!--                inner_join(tx2gene, by = "tx_id"),  -->
-<!--              by = "gene_id", relationship = "many-to-many")  -->
-<!-- overlap_single_genes = overlap[duplicated(overlap$gene_id) |  -->
-<!--                                  duplicated(overlap$gene_id, fromLast=TRUE),] %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>%  -->
-<!--   dplyr::select(tx_id, logFC.UPF3B, logFC, gene_id, gene) %>%  -->
-<!--   ggscatter(., x = "logFC.UPF3B", y = "logFC", label = "gene", -->
-<!--               cor.coef = TRUE,  -->
-<!--               conf.int = TRUE) + -->
-<!--   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) -->
-<!-- my_gg = overlap_single_genes + geom_point_interactive(aes(tooltip = gene, data_id = gene), -->
-<!--                                             size = 1, hover_nearest = TRUE) -->
-<!-- #overlap[duplicated(overlap$gene_id),] -->
-<!-- ``` -->
-<!-- ### Overlapping transcripts that were dysregulated at gene level -->
-<!-- ```{r} -->
-<!-- UPF3B_trans_overlap = res_dte$UPF3B_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
-<!--   inner_join(DEGenes$UPF3B_vs_Control %>%  -->
-<!--                dplyr::filter(Res.UPF3B_vs_Control !=0, Res.UPF3A_vs_Control !=0) %>% -->
-<!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by= "gene_id") -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- UPF3A_trans_overlap = res_dte$UPF3A_KD_Control %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>%  -->
-<!--   inner_join(tx2gene, by = "tx_id") %>%  -->
-<!--   mutate(gene = mapIds(org.Mm.eg.db, keys=gene_id,  -->
-<!--                        column="SYMBOL",keytype="ENSEMBL", multiVals="first")) %>% -->
-<!--   inner_join(DEGenes$UPF3A_vs_Control %>%  -->
-<!--                dplyr::filter(Res.UPF3B_vs_Control !=0, Res.UPF3A_vs_Control !=0) %>% -->
-<!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by= "gene_id") -->
-<!-- write.csv(UPF3B_trans_overlap,  -->
-<!--           file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/UPF3B_trans_overlap.csv") -->
-<!-- write.csv(UPF3A_trans_overlap,  -->
-<!--           file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/UPF3A_trans_overlap.csv") -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- ggvenn(data = list("UPF3A" = UPF3A_trans_overlap$gene_id,  -->
-<!--                    "UPF3B" = UPF3B_trans_overlap$gene_id)) -->
-<!-- overlap_list =calculate.overlap(x=list("UPF3A" = UPF3A_trans_overlap$gene_id,  -->
-<!--                    "UPF3B" = UPF3B_trans_overlap$gene_id)) -->
-<!-- subset(b, !(y %in% a$x)) -->
-<!-- overlap_list$a1[!overlap_list$a1 %in% overlap_list$a3]  -->
-<!-- overlap_list_transcript = calculate.overlap(x=list("UPF3A" = UPF3A_trans_overlap$tx_id,  -->
-<!--                    "UPF3B" = UPF3B_trans_overlap$tx_id)) -->
-<!-- overlap_list_transcript$a2[!overlap_list_transcript$a2 %in% overlap_list_transcript$a3]  -->
-<!-- ggvenn(data = list("UPF3A" = UPF3A_trans_overlap$tx_id,  -->
-<!--                    "UPF3B" = UPF3B_trans_overlap$tx_id)) -->
-<!-- ``` -->
-<!-- ## Genes and transcripts correlation  -->
-<!-- ```{r fig.cap = " All transcripts with upregulated genes and their biotypes"} -->
-<!-- ## Upregulated genes with DETs that may be protein coding  -->
-<!-- ## UPF3B   -->
-<!-- res_dte$UPF3B_KD_Control %>%  -->
-<!--   left_join(tx2gene) %>%  -->
-<!--   dplyr::filter(nif_feature != "None") %>%  -->
-<!--   left_join(DEGenes$UPF3B_vs_Control %>%  -->
-<!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
-<!--   dplyr::filter(Res.UPF3B_vs_Control == 1) %>% -->
-<!--   dplyr::count(tx_biotype) %>% -->
-<!--     mutate(sum=sum(n),frac = n / sum(n)) %>%  -->
-<!--   ggplot(aes(x = as.factor(tx_biotype), y = n)) + -->
-<!--     geom_bar( stat = "identity") + -->
-<!--     coord_flip() + -->
-<!--     theme_bw() + -->
-<!--     theme(axis.text.x = element_text(angle = -90)) + -->
-<!--     labs(x = "Transcript biotype (Ensembl v75)", y = "Count") + -->
-<!-- theme(panel.spacing = unit(1, "lines")) + -->
-<!-- theme(strip.background = element_rect(fill = "black"))+ -->
-<!-- theme(strip.text = element_text(color = "white", face = "bold")) -->
-<!-- ``` -->
-<!-- ```{r fig.cap = " All transcripts with upregulated genes and their biotypes - genes only"} -->
-<!-- ## Upregulated genes with DETs that may be protein coding  -->
-<!-- ## UPF3B   -->
-<!-- res_dte$UPF3B_KD_Control %>%  -->
-<!--   left_join(tx2gene) %>%  -->
-<!--   dplyr::filter(nif_feature != "None") %>%  -->
-<!--   left_join(DEGenes$UPF3B_vs_Control %>%  -->
-<!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
-<!--   dplyr::filter(Res.UPF3B_vs_Control == 1) %>% -->
-<!--   distinct(gene_id, .keep_all=TRUE) %>% -->
-<!--   dplyr::count(tx_biotype) %>% -->
-<!--     mutate(sum=sum(n),frac = n / sum(n)) %>%  -->
-<!--   ggplot(aes(x = as.factor(tx_biotype), y = n)) + -->
-<!--     geom_bar( stat = "identity") + -->
-<!--     coord_flip() + -->
-<!--     theme_bw() + -->
-<!--     theme(axis.text.x = element_text(angle = -90)) + -->
-<!--     labs(x = "Transcript biotype (Ensembl v75)", y = "Count") + -->
-<!-- theme(panel.spacing = unit(1, "lines")) + -->
-<!-- theme(strip.background = element_rect(fill = "black"))+ -->
-<!-- theme(strip.text = element_text(color = "white", face = "bold")) -->
-<!-- ``` -->
-<!-- ### UPF3A  -->
-<!-- ```{r fig.cap = " All transcripts with upregulated genes and their biotypes"} -->
-<!-- ## Upregulated genes with DETs that may be protein coding  -->
-<!-- ## UPF3B   -->
-<!-- res_dte$UPF3A_KD_Control %>%  -->
-<!--   left_join(tx2gene) %>%  -->
-<!--   dplyr::filter(nif_feature != "None") %>%  -->
-<!--   left_join(DEGenes$UPF3A_vs_Control %>%  -->
-<!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
-<!--   dplyr::filter(Res.UPF3B_vs_Control == 1) %>% -->
-<!--   dplyr::count(tx_biotype) %>% -->
-<!--     mutate(sum=sum(n),frac = n / sum(n)) %>%  -->
-<!--   ggplot(aes(x = as.factor(tx_biotype), y = n)) + -->
-<!--     geom_bar( stat = "identity") + -->
-<!--     coord_flip() + -->
-<!--     theme_bw() + -->
-<!--     theme(axis.text.x = element_text(angle = -90)) + -->
-<!--     labs(x = "Transcript biotype (Ensembl v75)", y = "Count") + -->
-<!-- theme(panel.spacing = unit(1, "lines")) + -->
-<!-- theme(strip.background = element_rect(fill = "black"))+ -->
-<!-- theme(strip.text = element_text(color = "white", face = "bold")) -->
-<!-- ``` -->
-<!-- ```{r fig.cap = " All transcripts with upregulated genes and their biotypes - genes only"} -->
-<!-- ## Upregulated genes with DETs that may be protein coding  -->
-<!-- ## UPF3B   -->
-<!-- res_dte$UPF3A_KD_Control %>%  -->
-<!--   left_join(tx2gene) %>%  -->
-<!--   dplyr::filter(nif_feature != "None") %>%  -->
-<!--   left_join(DEGenes$UPF3A_vs_Control %>%  -->
-<!--               dplyr::rename("gene_id" = "ensembl_gene_id"), by = "gene_id") %>%  -->
-<!--   dplyr::filter(Res.UPF3B_vs_Control == 1) %>% -->
-<!--   distinct(gene_id, .keep_all=TRUE) %>% -->
-<!--   dplyr::count(tx_biotype) %>% -->
-<!--     mutate(sum=sum(n),frac = n / sum(n)) %>%  -->
-<!--   ggplot(aes(x = as.factor(tx_biotype), y = n)) + -->
-<!--     geom_bar( stat = "identity") + -->
-<!--     coord_flip() + -->
-<!--     theme_bw() + -->
-<!--     theme(axis.text.x = element_text(angle = -90)) + -->
-<!--     labs(x = "Transcript biotype (Ensembl v75)", y = "Count") + -->
-<!-- theme(panel.spacing = unit(1, "lines")) + -->
-<!-- theme(strip.background = element_rect(fill = "black"))+ -->
-<!-- theme(strip.text = element_text(color = "white", face = "bold")) -->
-<!-- ``` -->
-<!-- * Majority of transcripts are protein coding  -->
-<!-- * Not looking at transcripts that are pseudogenes  -->
-<!-- * Gene ontology on the protein coding genes - with transcripts  -->
-<!-- ** All conditions - transcript and gene level comparison  -->
-<!-- ** Capacity to do genes with isoforms with different NIFs - try in UPF3B  -->
-<!-- ** Is NMD a cell-type specific thing? --? Maybe UPF1 work with brain coexp networks  -->
-<!-- Any transcript that is expression - 40k  -->
-<!-- transcripts that have multiple transcripts and have a look at the CPM - Just do it in UPF3B - average of the three samples -->
-<!-- ## Data export  -->
-<!-- ```{r} -->
-<!-- save(res_dte, file=here::here("output/DET-list.Rda")) -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!--   temp = res_dte$UPF3B_KD_Control -->
-<!--   message("Counting NIFs in upregulated transcripts for ", name) -->
-<!--   sig_up = temp %>%  as.data.frame() %>%   -->
-<!--         dplyr::filter(FDR < 0.05, logFC > log2(1))  -->
-<!--   utr = table(sig_up$NIF_long_3utr)[2] -->
-<!--   dej = table(sig_up$NIF_dEJ)[2] -->
-<!--   uorf = table(sig_up$NIF_uORF)[2] -->
-<!--   none = table(sig_up$nif_feature)[1] -->
-<!--   total_nif_up  = rbind(utr, dej, uorf, none) %>%  -->
-<!--     as.data.frame() %>%  -->
-<!--     rownames_to_column("NIF_feature") %>%  -->
-<!--     mutate(Condition = name,  -->
-<!--            Expression = "Up") %>%  -->
-<!--     dplyr::rename("Count" = "1") -->
-<!--   message("Counting NIFs in downregulated transcripts for ", name) -->
-<!--   sig_down = temp %>%  as.data.frame() %>%   -->
-<!--         dplyr::filter(FDR < 0.05, logFC < log2(1))  -->
-<!--   utr = table(sig_down$NIF_long_3utr)[2] -->
-<!--   dej = table(sig_down$NIF_dEJ)[2] -->
-<!--   uorf = table(sig_down$NIF_uORF)[2] -->
-<!--   total_nif_down  = rbind(utr, dej, uorf) %>%  -->
-<!--     as.data.frame() %>%  -->
-<!--     rownames_to_column("NIF_feature") %>%  -->
-<!--     mutate(Condition = name,  -->
-<!--            Expression = "Down") %>%  -->
-<!--     dplyr::rename("Count" = "1") -->
-<!--   nif_features= rbind(nif_features, total_nif_up, total_nif_down, stringsAsFactors = FALSE) -->
-<!-- ``` -->
-<!-- # Plots to finalise  -->
-<!-- # Transcript types - count -->
-<!-- ```{r fig.cap = " All transcripts with upregulated genes and their biotypes - genes only"} -->
-<!-- transcript_types = res_dte$UPF3A_KD_Control %>%  -->
-<!--   left_join(tx2gene) %>%  -->
-<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
-<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>% -->
-<!--   dplyr::count(tx_biotype) %>% -->
-<!--     mutate(sum=sum(n),frac = n / sum(n),  -->
-<!--            label = "Upf3a targets") %>% -->
-<!--   rbind(res_dte$UPF3B_KD_Control %>%  -->
-<!--   left_join(tx2gene) %>%  -->
-<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
-<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>% -->
-<!--   dplyr::count(tx_biotype) %>% -->
-<!--     mutate(sum=sum(n),frac = n / sum(n), -->
-<!--            label = "Upf3b targets")) %>%  -->
-<!--   dplyr::filter(n > 40) %>% -->
-<!--   ggplot(aes(x = as.factor(tx_biotype), y = n, fill = label)) + -->
-<!--     geom_bar( stat = "identity", alpha = 0.6, color = "black") + -->
-<!--     coord_flip() + -->
-<!--     theme_bw() + -->
-<!--     theme(axis.text.x = element_text(angle = -90)) + -->
-<!--     labs(x = "Transcript biotype (Ensembl v79)", y = "Transcript Count") + -->
-<!-- theme(panel.spacing = unit(1, "lines")) + -->
-<!-- theme(strip.background = element_rect(fill = "black")) + -->
-<!-- theme(strip.text = element_text(color = "white", face = "bold"),  -->
-<!--       legend.position = "none") + -->
-<!--   scale_fill_manual(values= c("#EA2A5F", "#2F124B")) + -->
-<!-- geom_text(aes(label=n), hjust=-.5, size=3.5) + ylim(0, 2800) +  -->
-<!--   facet_grid(~label) -->
-<!-- transcript_types_up = res_dte$UPF3A_KD_Control %>%  -->
-<!--   left_join(tx2gene) %>%  -->
-<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
-<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% -->
-<!--   dplyr::filter(FDR < 0.05, logFC > 0) %>% -->
-<!--   dplyr::count(tx_biotype) %>% -->
-<!--     mutate(sum=sum(n),frac = n / sum(n),  -->
-<!--            label = "Upf3a targets") %>% -->
-<!--   rbind(res_dte$UPF3B_KD_Control %>%  -->
-<!--   left_join(tx2gene) %>%  -->
-<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
-<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% -->
-<!--   dplyr::filter(FDR < 0.05, logFC > 0) %>% -->
-<!--   dplyr::count(tx_biotype) %>% -->
-<!--     mutate(sum=sum(n),frac = n / sum(n), -->
-<!--            label = "Upf3b targets")) %>%  -->
-<!--   dplyr::filter(n > 40) %>% -->
-<!--   ggplot(aes(x = as.factor(tx_biotype), y = n, fill = label)) + -->
-<!--     geom_bar( stat = "identity", alpha = 0.6, color = "black") + -->
-<!--     coord_flip() + -->
-<!--     theme_bw() + -->
-<!--     theme(axis.text.x = element_text(angle = -90)) + -->
-<!--     labs(x = "Transcript biotype (Ensembl v79)", y = "Transcript Count") + -->
-<!-- theme(panel.spacing = unit(1, "lines")) + -->
-<!-- theme(strip.background = element_rect(fill = "black")) + -->
-<!-- theme(strip.text = element_text(color = "white", face = "bold"),  -->
-<!--       legend.position = "none") + -->
-<!--   scale_fill_manual(values= c("#EA2A5F", "#2F124B")) + -->
-<!-- geom_text(aes(label=n), hjust=-.5, size=3.5) + ylim(0, 2800) +  -->
-<!--   facet_grid(~label) -->
-<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/transcript_types_all.svg", plot = transcript_types,  -->
-<!--        units = c("in"), height = 5.85, width = 10.29) -->
-<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/transcript_types_up.svg", plot = transcript_types_up,  -->
-<!--        units = c("in"), height = 5.85, width = 10.29) -->
-<!-- ``` -->
-<!-- # Transcript types cumulative frequency  -->
-<!-- ## UPF3A -->
-<!-- ```{r} -->
-<!-- cf_upf3a = res_dte$UPF3A_KD_Control %>%  -->
-<!--   left_join(tx2gene) %>%  -->
-<!--   mutate(CF_types = ifelse(tx_biotype == "retained_intron", "Retained Intron",  -->
-<!--                            ifelse(tx_biotype == "protein_coding", "Protein Coding",  -->
-<!--                                   ifelse(tx_biotype == "processed_transcript", "Processed Transcript",  -->
-<!--                                          ifelse(tx_biotype == "nonsense_mediated_decay", "NMD", "All other types"))))) %>%  -->
-<!--   drop_na(CF_types) %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>% -->
-<!--   ggplot(aes(x=logFC, color = CF_types)) + stat_ecdf(geom = "step", size=1) + -->
-<!--   scale_color_manual(values = c("#585A58","#5800FF" ,"#F5EB13", "#EE3224", "#22B58C")) +  -->
-<!--   theme_bw() +  -->
-<!--   ylab("Cumulative Frequency") + xlab("Log FC") +  -->
-<!--   geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +  -->
-<!--   ggtitle("Transcript type")  -->
-<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/cf_upf3a.svg", plot = cf_upf3a,  -->
-<!--        units = c("in"), height = 5.83, width = 7.52) -->
-<!-- ``` -->
-<!-- ## UPF3B -->
-<!-- ```{r} -->
-<!-- cf_upf3b = res_dte$UPF3B_KD_Control %>%  -->
-<!--   left_join(tx2gene) %>%  -->
-<!--   mutate(CF_types = ifelse(tx_biotype == "retained_intron", "Retained Intron",  -->
-<!--                            ifelse(tx_biotype == "protein_coding", "Protein Coding",  -->
-<!--                                   ifelse(tx_biotype == "processed_transcript", "Processed Transcript",  -->
-<!--                                          ifelse(tx_biotype == "nonsense_mediated_decay", "NMD", "All other types"))))) %>%  -->
-<!--   drop_na(CF_types) %>% -->
-<!--   dplyr::filter(FDR < 0.05) %>% -->
-<!--   ggplot(aes(x=logFC, color = CF_types)) + stat_ecdf(geom = "step", size=1) + -->
-<!--   scale_color_manual(values = c("#585A58","#5800FF" ,"#F5EB13", "#EE3224", "#22B58C"))+  -->
-<!--   theme_bw() +  -->
-<!--   ylab("Cumulative Frequency") + xlab("Log FC") +  -->
-<!--   geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +  -->
-<!--   ggtitle("Transcript type")  -->
-<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/cf_upf3b.svg", plot = cf_upf3b,  -->
-<!--        units = c("in"), height = 5.83, width = 7.52) -->
-<!-- ``` -->
-<!-- ## Transcript length  -->
-<!-- ```{r} -->
-<!-- res_dte$UPF3B_KD_Control %>%  -->
-<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
-<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>%  -->
-<!--   mutate(normalized_3utr = LENGTH_3utr/Length ) %>% -->
-<!--   ggplot(aes(x=Length, color = sig)) + stat_ecdf(geom = "point", size=0.8) + -->
-<!--   scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +  -->
-<!--   ylab("Cumulative Frequency") + xlab("") + theme(legend.position = "none") +  -->
-<!--   geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") + xlim(0, 25000) +  -->
-<!--   ggtitle("Transcript length") -->
-<!-- ``` -->
-<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3b_5utr.svg", plot = upf3b_5utr,  -->
-<!--        units = c("in"), height = 5.83, width = 7.52) -->
-<!-- ``` -->
-<!-- * dEJ and logFC -->
-<!-- ```{r} -->
-<!--  res_dte$UPF3B_KD_Control %>%  -->
-<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
-<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% -->
-<!--     mutate_if(is.numeric, ~replace_na(., 0)) %>% -->
-<!--   drop_na(NIF_dEJ) %>% -->
-<!--   ggplot(aes(x=logFC, color = NIF_dEJ)) + stat_ecdf(geom = "step", size=0.8) + -->
-<!--   scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +  -->
-<!--   ylab("Cumulative Frequency") + xlab("") +# theme(legend.position = "none") +  -->
-<!--   geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +  -->
-<!--   ggtitle("LogfC and dEJ") -->
-<!-- res_dte$UPF3A_KD_Control %>%  -->
-<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
-<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>% -->
-<!--     mutate_if(is.numeric, ~replace_na(., 0)) %>% -->
-<!--   drop_na(NIF_dEJ) %>% -->
-<!--   ggplot(aes(x=logFC, color = NIF_dEJ)) + stat_ecdf(geom = "step", size=0.8) + -->
-<!--   scale_color_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) + theme_bw() +  -->
-<!--   ylab("Cumulative Frequency") + xlab("") +# theme(legend.position = "none") +  -->
-<!--   geom_hline(yintercept = c(1, 0),  linetype = "dashed", color = "grey") +  -->
-<!--   ggtitle("LogfC and dEJ") -->
-<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3a_3utr.svg", plot= upf3a_3utr,  -->
-<!--        units = c("in"), height = 5.83, width = 7.52) -->
-<!-- ``` -->
-<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3a_5utr.svg", plot= upf3a_5utr,  -->
-<!--        units = c("in"), height = 5.83, width = 7.52) -->
-<!-- ``` -->
-<!-- #### GC content in the 3'UTR region  -->
-<!-- ggsave(filename = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/upf3a_3utr_gc.svg", plot= upf3a_3utr_gc,  -->
-<!--        units = c("in"), height = 5.83, width = 7.52) -->
-<!-- ``` -->
-<!-- ## Bins of uORFs  -->
-<!-- ```{r} -->
-<!-- uorfs_upf3a = res_dte$UPF3A_KD_Control %>% -->
-<!--   mutate(count_uORF = `uORFs|__|count`) %>%  -->
-<!--   mutate(uORF_count_bins = case_when(count_uORF == 0 ~ "0",  -->
-<!--                                      between(count_uORF, 1, 2) ~"1-2",  -->
-<!--                                      between(count_uORF, 3,4 ) ~ "3-4",  -->
-<!--                                      count_uORF > 5 ~ ">5")) %>%  -->
-<!--   drop_na(uORF_count_bins) %>% -->
-<!--   mutate(uORF_count_bins = factor(uORF_count_bins, levels = c("0",  -->
-<!--                                                   "1-2", -->
-<!--                                                   "3-4",  -->
-<!--                                                   ">5"))) %>% -->
-<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
-<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>%  -->
-<!--   ggplot(aes(x=uORF_count_bins, fill = sig)) + geom_bar(stat="count", position = "dodge", color = "white") +  -->
-<!--   theme_bw() + scale_fill_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) +  -->
-<!--   coord_cartesian(ylim=c(0,1200)) + theme(legend.position = "none") -->
-<!-- total = res_dte$UPF3A_KD_Control %>% -->
-<!--   mutate(count_uORF = `uORFs|__|count`) %>%  -->
-<!--   mutate(uORF_count_bins = case_when(count_uORF == 0 ~ "0",  -->
-<!--                                      between(count_uORF, 1, 2) ~"1-2",  -->
-<!--                                      between(count_uORF, 3,4 ) ~ "3-4",  -->
-<!--                                      count_uORF > 5 ~ ">5"),  -->
-<!--          sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
-<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulated", "Not Sig"))) %>%  -->
-<!--   drop_na(uORF_count_bins) %>% -->
-<!--   mutate(uORF_count_bins = factor(uORF_count_bins, levels = c("0",  -->
-<!--                                                   "1-2", -->
-<!--                                                   "3-4",  -->
-<!--                                                   ">5"))) %>% -->
-<!--   ggplot(aes(x=uORF_count_bins, fill = sig)) +  -->
-<!--   geom_bar(stat="count", position = "dodge", color = "white") +  -->
-<!--   theme_bw() + scale_fill_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) +  -->
-<!--   coord_cartesian(ylim=c(4500,16000)) + theme(legend.position = "none") -->
-<!-- ggsave(file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3a.svg",  -->
-<!--        units = "in",  height = 5.83, width = 7.52, plot = uorfs_upf3a ) -->
-<!-- ggsave(file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3a_total.svg",  -->
-<!--        units = "in",  height = 3, width = 7.52, plot = total) -->
-<!-- ``` -->
-<!-- ### Upf3b  -->
-<!-- ```{r} -->
-<!-- uorfs_upf3b = res_dte$UPF3B_KD_Control %>% -->
-<!--   mutate(count_uORF = `uORFs|__|count`) %>%  -->
-<!--   mutate(uORF_count_bins = case_when(count_uORF == 0 ~ "0",  -->
-<!--                                      between(count_uORF, 1, 2) ~"1-2",  -->
-<!--                                      between(count_uORF, 3,4 ) ~ "3-4",  -->
-<!--                                      count_uORF > 5 ~ ">5")) %>%  -->
-<!--   drop_na(uORF_count_bins) %>% -->
-<!--   mutate(uORF_count_bins = factor(uORF_count_bins, levels = c("0",  -->
-<!--                                                   "1-2", -->
-<!--                                                   "3-4",  -->
-<!--                                                   ">5"))) %>% -->
-<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
-<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>%  -->
-<!--   ggplot(aes(x=uORF_count_bins, fill = sig)) + geom_bar(stat="count", position = "dodge", color = "white") +  -->
-<!--   theme_bw() + scale_fill_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) +  -->
-<!--   coord_cartesian(ylim=c(0,1200)) + theme(legend.position = "none") -->
-<!-- total = res_dte$UPF3B_KD_Control %>% -->
-<!--   mutate(count_uORF = `uORFs|__|count`) %>%  -->
-<!--   mutate(uORF_count_bins = case_when(count_uORF == 0 ~ "0",  -->
-<!--                                      between(count_uORF, 1, 2) ~"1-2",  -->
-<!--                                      between(count_uORF, 3,4 ) ~ "3-4",  -->
-<!--                                      count_uORF > 5 ~ ">5")) %>%  -->
-<!--   drop_na(uORF_count_bins) %>% -->
-<!--   mutate(uORF_count_bins = factor(uORF_count_bins, levels = c("0",  -->
-<!--                                                   "1-2", -->
-<!--                                                   "3-4",  -->
-<!--                                                   ">5"))) %>% -->
-<!--   mutate(sig = ifelse(logFC > 0 & FDR < 0.05, "Upregulated",  -->
-<!--                       ifelse(logFC < 0 & FDR < 0.05, "Downregulaated", "Not Sig"))) %>%  -->
-<!--   ggplot(aes(x=uORF_count_bins, fill = sig)) +  -->
-<!--   geom_bar(stat="count", position = "dodge", color = "white") +  -->
-<!--   theme_bw() + scale_fill_manual(values = c("#2F124B", "#FD9675", "#EA2A5F")) +  -->
-<!--   coord_cartesian(ylim=c(4500,16000)) + theme(legend.position = "none") -->
-<!-- ggsave(file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3b.svg",  -->
-<!--        units = "in",  height = 5.83, width = 7.52, plot = uorfs_upf3b) -->
-<!-- ggsave(file = "/home/neuro/Documents/NMD_analysis/Analysis/NMD-analysis/output/Transcript/Thesis_figures/NIF-analysis/uORFs_upf3b_total.svg",  -->
-<!--        units = "in",  height = 3, width = 7.52, plot = total) -->
-<!-- ``` -->
-</div>
-</div>
-</div>
-<div id="differences-between-targets-of-upf3a-and-upf3b-kds"
-class="section level1">
-<h1>Differences between targets of Upf3a and Upf3b KDs</h1>
-<p>In this section I will perform a cumulative frequency analysis of the
-transcript features of Upf3a KD targets and Upf3b KD targets to better
-show the differences in impact. Subsequently, I will perform the KS
-statistic to see the significance of the difference.</p>
-<ul>
-<li>3’UTR</li>
-</ul>
-<p>One of the most prominant features in this analysis was the long
-3’UTR. I want to see how the fold changes differ of the target
-transcripts containing the long 3’UTR, as well as the length and the GC
-content.</p>
-<ul>
-<li>Fold change</li>
-</ul>
-<pre><code>
-    Asymptotic two-sample Kolmogorov-Smirnov test
-
-data:  upf3b_fc$logFC and upf3a_fc$logFC
-D = 0.082061, p-value = 0.001182
-alternative hypothesis: two-sided</code></pre>
-<ul>
-<li>Length</li>
-</ul>
-<pre><code>
-    Asymptotic two-sample Kolmogorov-Smirnov test
-
-data:  upf3b_length$LENGTH_3utr and upf3a_length$LENGTH_3utr
-D = 0.019988, p-value = 0.7015
-alternative hypothesis: two-sided</code></pre>
-<ul>
-<li>GC content</li>
-</ul>
-<pre><code>
-    Asymptotic two-sample Kolmogorov-Smirnov test
-
-data:  upf3b_GC$GC_3utr and upf3a_GC$GC_3utr
-D = 0.04864, p-value = 0.005478
-alternative hypothesis: two-sided</code></pre>
-<ul>
-<li>Downstream exon junction</li>
-</ul>
-<pre><code>
-    Exact two-sample Kolmogorov-Smirnov test
-
-data:  upf3b_dEJ$logFC and upf3a_dEJ$logFC
-D = 0.2718, p-value = 0.002387
-alternative hypothesis: two-sided</code></pre>
-<ul>
-<li>upstream ORF</li>
-</ul>
-<pre><code>
-    Asymptotic two-sample Kolmogorov-Smirnov test
-
-data:  upf3b_uORF$logFC and upf3a_uORF$logFC
-D = 0.07284, p-value = 0.0658
-alternative hypothesis: two-sided</code></pre>
-<ul>
-<li><p>Number of uORFs per comparison
-<img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-77-1.png" width="672" style="display: block; margin: auto;" /></p></li>
-<li><p>Previously annotated transcripts</p></li>
-</ul>
-<p>Using the ensembl transcript annotations, I annotated the biotypes of
-transcripts. For the purpose of this, transcripts labelled with NMD and
-intron retention for grouped into one category</p>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-78-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>
-    Asymptotic two-sample Kolmogorov-Smirnov test
-
-data:  upf3b_NMD$logFC and upf3a_NMD$logFC
-D = 0.18402, p-value = 0.003432
-alternative hypothesis: two-sided</code></pre>
-</div>
-<div id="variable-importance" class="section level1">
-<h1>Variable importance</h1>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-79-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>
-     Random Forest using Conditional Inference Trees
-
-Number of trees:  50 
-
-Response:  logFC 
-Inputs:  GC_3utr, GC_5utr, GC_cds, LENGTH_3utr, LENGTH_5utr, LENGTH_cds, uORFs|__|count, Length, dEJs|__|penultimate-exon&gt;=55(nts) 
-Number of observations:  1684 </code></pre>
-<p><img src="figure/Differential-transcript-expression.Rmd/unnamed-chunk-79-2.png" width="672" style="display: block; margin: auto;" /></p>
+0.7398205 </code></pre>
+<pre><code>[1] 8.901172e-117</code></pre>
+<pre><code>[1] 14.36747</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -2854,7 +1434,7 @@ Session information
 </button>
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
-<pre><code>R version 4.5.2 (2025-10-31)
+<pre><code>R version 4.6.1 (2026-06-24)
 Platform: x86_64-pc-linux-gnu
 Running under: Ubuntu 22.04.5 LTS
 
@@ -2878,153 +1458,139 @@ attached base packages:
  [8] datasets  methods   base     
 
 other attached packages:
-  [1] party_1.3-18                strucchange_1.5-4          
-  [3] sandwich_3.1-1              modeltools_0.2-24          
-  [5] mvtnorm_1.3-3               ggstatsplot_0.13.2         
-  [7] bigPint_1.14.0              naniar_1.1.0               
-  [9] glmpca_0.2.0                broom_1.0.10               
- [11] glue_1.8.0                  ggfortify_0.4.19           
- [13] stargazer_5.2.3             PerformanceAnalytics_2.0.8 
- [15] quantmod_0.4.28             TTR_0.24.4                 
- [17] xts_0.14.1                  zoo_1.8-14                 
- [19] tidyquant_1.0.11            ggside_0.4.0               
- [21] GeneOverlap_1.44.0          fishpond_2.14.0            
- [23] IsoformSwitchAnalyzeR_2.8.0 pfamAnalyzeR_1.8.0         
- [25] sva_3.56.0                  genefilter_1.90.0          
- [27] mgcv_1.9-3                  nlme_3.1-168               
- [29] satuRn_1.16.0               DEXSeq_1.54.1              
- [31] BiocParallel_1.42.2         ggrepel_0.9.6              
- [33] pander_0.6.6                msigdbr_25.1.1             
- [35] cowplot_1.2.0               ngsReports_2.10.1          
- [37] patchwork_1.3.2             VennDiagram_1.7.3          
- [39] futile.logger_1.4.3         UpSetR_1.4.0               
- [41] fgsea_1.34.2                GOplot_1.0.2               
- [43] RColorBrewer_1.1-3          gridExtra_2.3              
- [45] ggdendro_0.2.0              AnnotationHub_3.16.1       
- [47] BiocFileCache_2.16.2        dbplyr_2.5.1               
- [49] openxlsx_4.2.8              ggiraph_0.9.1              
- [51] wasabi_1.0.1                sleuth_0.30.1              
- [53] DT_0.34.0                   VennDetail_1.23.0          
- [55] msigdb_1.16.0               GSEABase_1.70.1            
- [57] graph_1.86.0                annotate_1.86.1            
- [59] XML_3.99-0.19               pheatmap_1.0.13            
- [61] ggvenn_0.1.10               MetBrewer_0.2.0            
- [63] ggpubr_0.6.1                venn_1.12                  
- [65] viridis_0.6.5               viridisLite_0.4.2          
- [67] tximeta_1.26.2              tximport_1.36.1            
- [69] goseq_1.60.0                geneLenDataBase_1.44.0     
- [71] BiasedUrn_2.0.12            org.Mm.eg.db_3.21.0        
- [73] EnsDb.Mmusculus.v79_2.99.0  ensembldb_2.32.0           
- [75] AnnotationFilter_1.32.0     GenomicFeatures_1.60.0     
- [77] AnnotationDbi_1.70.0        biomaRt_2.64.0             
- [79] edgeR_4.6.3                 limma_3.64.3               
- [81] DESeq2_1.48.2               SummarizedExperiment_1.38.1
- [83] Biobase_2.68.0              MatrixGenerics_1.20.0      
- [85] matrixStats_1.5.0           GenomicRanges_1.60.0       
- [87] GenomeInfoDb_1.44.3         IRanges_2.42.0             
- [89] S4Vectors_0.46.0            BiocGenerics_0.54.0        
- [91] generics_0.1.4              corrplot_0.95              
- [93] lubridate_1.9.4             forcats_1.0.0              
- [95] purrr_1.1.0                 readr_2.1.5                
- [97] tidyverse_2.0.0             stringr_1.5.2              
- [99] tidyr_1.3.1                 scales_1.4.0               
-[101] data.table_1.17.8           readxl_1.4.5               
-[103] tibble_3.3.0                magrittr_2.0.4             
-[105] reshape2_1.4.4              ggplot2_4.0.0              
-[107] dplyr_1.1.4                
+  [1] IsoformSwitchAnalyzeR_2.12.0 pfamAnalyzeR_1.12.0         
+  [3] sva_3.60.0                   genefilter_1.94.0           
+  [5] mgcv_1.9-4                   nlme_3.1-169                
+  [7] satuRn_1.20.0                DEXSeq_1.58.0               
+  [9] BiocParallel_1.46.0          ggrepel_0.9.8               
+ [11] pander_0.6.6                 msigdbr_26.1.0              
+ [13] ngsReports_2.14.0            patchwork_1.3.2             
+ [15] VennDiagram_1.8.2            futile.logger_1.4.9         
+ [17] UpSetR_1.4.0                 fgsea_1.38.0                
+ [19] GOplot_1.0.2                 RColorBrewer_1.1-3          
+ [21] gridExtra_2.3.1              ggdendro_0.2.0              
+ [23] AnnotationHub_4.2.0          BiocFileCache_3.2.0         
+ [25] dbplyr_2.6.0                 openxlsx_4.2.8.1            
+ [27] ggiraph_0.9.6                wasabi_1.0.1                
+ [29] sleuth_0.30.1                DT_0.34.0                   
+ [31] VennDetail_1.28.0            msigdb_1.20.0               
+ [33] GSEABase_1.74.0              graph_1.90.0                
+ [35] annotate_1.90.0              XML_3.99-0.23               
+ [37] pheatmap_1.0.13              ggvenn_0.1.19               
+ [39] MetBrewer_0.2.0              ggpubr_0.6.3                
+ [41] venn_1.13                    viridis_0.6.5               
+ [43] viridisLite_0.4.3            tximport_1.40.0             
+ [45] goseq_1.64.0                 geneLenDataBase_1.48.0      
+ [47] BiasedUrn_2.0.12             org.Mm.eg.db_3.23.0         
+ [49] EnsDb.Mmusculus.v79_2.99.0   ensembldb_2.36.0            
+ [51] AnnotationFilter_1.36.0      GenomicFeatures_1.64.0      
+ [53] AnnotationDbi_1.74.0         biomaRt_2.68.0              
+ [55] DESeq2_1.52.0                SummarizedExperiment_1.42.0 
+ [57] Biobase_2.72.0               MatrixGenerics_1.24.0       
+ [59] matrixStats_1.5.0            GenomicRanges_1.64.0        
+ [61] Seqinfo_1.2.0                IRanges_2.46.0              
+ [63] S4Vectors_0.50.0             BiocGenerics_0.58.1         
+ [65] generics_0.1.4               corrplot_0.95               
+ [67] lubridate_1.9.5              forcats_1.0.1               
+ [69] purrr_1.2.2                  readr_2.2.0                 
+ [71] tidyverse_2.0.0              stringr_1.6.0               
+ [73] tidyr_1.3.2                  scales_1.4.0                
+ [75] data.table_1.18.4            readxl_1.5.0                
+ [77] tibble_3.3.1                 reshape2_1.4.5              
+ [79] bigPint_1.14.0               dplyr_1.2.1                 
+ [81] naniar_1.1.0                 glmpca_0.2.0                
+ [83] broom_1.0.13                 cowplot_1.2.0               
+ [85] edgeR_4.10.0                 limma_3.68.4                
+ [87] glue_1.8.1                   ggfortify_0.4.19            
+ [89] stargazer_5.2.3              PerformanceAnalytics_2.1.0  
+ [91] quantmod_0.4.29              TTR_0.24.4                  
+ [93] xts_0.14.2                   zoo_1.8-15                  
+ [95] tidyquant_1.0.12             ggside_0.4.1                
+ [97] ggplot2_4.0.3                GeneOverlap_1.48.0          
+ [99] tximeta_1.30.0               fishpond_2.18.0             
+[101] magrittr_2.0.5              
 
 loaded via a namespace (and not attached):
-  [1] plotly_4.11.0               Formula_1.2-5              
-  [3] rematch2_2.1.2              tidyselect_1.2.1           
-  [5] bit_4.6.0                   BWStest_0.2.3              
-  [7] lattice_0.22-7              rjson_0.2.23               
-  [9] blob_1.2.4                  S4Arrays_1.8.1             
- [11] parallel_4.5.2              dichromat_2.0-0.1          
- [13] correlation_0.8.8           png_0.1-8                  
- [15] cli_3.6.5                   bayestestR_0.17.0          
- [17] ProtGenerics_1.40.0         RobStatTM_1.0.11           
- [19] textshaping_1.0.3           BiocIO_1.18.0              
- [21] curl_7.0.0                  mime_0.13                  
- [23] evaluate_1.0.5              coin_1.4-3                 
- [25] stringi_1.8.7               backports_1.5.0            
- [27] PMCMRplus_1.9.12            httpuv_1.6.16              
- [29] paletteer_1.6.0             rappdirs_0.3.3             
- [31] splines_4.5.2               DBI_1.2.3                  
- [33] jquerylib_0.1.4             withr_3.0.2                
- [35] git2r_0.36.2                svMisc_1.4.3               
- [37] systemfonts_1.2.3           rprojroot_2.1.1            
- [39] formatR_1.14                rtracklayer_1.68.0         
- [41] BiocManager_1.30.26         SuppDists_1.1-9.9          
- [43] htmlwidgets_1.6.4           fs_1.6.6                   
- [45] SingleCellExperiment_1.30.1 labeling_0.4.3             
- [47] SparseArray_1.8.1           cellranger_1.1.0           
- [49] shinycssloaders_1.1.0       effectsize_1.0.1           
- [51] hexbin_1.28.5               GGally_2.4.0               
- [53] XVector_0.48.0              knitr_1.50                 
- [55] UCSC.utils_1.4.0            timechange_0.3.0           
- [57] caTools_1.18.3              rhdf5_2.52.1               
- [59] pwalign_1.4.0               lazyeval_0.2.2             
- [61] yaml_2.3.10                 survival_3.8-3             
- [63] BiocVersion_3.21.1          crayon_1.5.3               
- [65] later_1.4.4                 codetools_0.2-20           
- [67] base64enc_0.1-3             KEGGREST_1.48.1            
- [69] estimability_1.5.1          Rsamtools_2.24.1           
- [71] filelock_1.0.3              foreign_0.8-90             
- [73] pkgconfig_2.0.3             xml2_1.4.0                 
- [75] GenomicAlignments_1.44.0    BSgenome_1.76.0            
- [77] performance_0.15.1          xtable_1.8-4               
- [79] hwriter_1.3.2.1             car_3.1-3                  
- [81] plyr_1.8.9                  httr_1.4.7                 
- [83] htmlTable_2.4.3             checkmate_2.3.3            
- [85] lambda.r_1.2.4              MatrixModels_0.5-4         
- [87] assertthat_0.2.1            digest_0.6.37              
- [89] Matrix_1.7-4                farver_2.1.2               
- [91] tzdb_0.5.0                  rpart_4.1.24               
- [93] cachem_1.1.0                Hmisc_5.2-3                
- [95] Biostrings_2.76.0           visdat_0.6.0               
- [97] txdbmaker_1.4.2             statmod_1.5.0              
- [99] here_1.0.2                  ragg_1.4.0                 
-[101] carData_3.0-5               pbapply_1.7-4              
-[103] httr2_1.2.1                 vroom_1.6.6                
-[105] gtools_3.9.5                datawizard_1.2.0           
-[107] ggsignif_0.6.4              shiny_1.11.1               
-[109] GenomeInfoDbData_1.2.14     rhdf5filters_1.20.0        
-[111] parameters_0.28.2           RCurl_1.98-1.17            
-[113] memoise_2.0.1               rmarkdown_2.29             
-[115] locfdr_1.1-8                svglite_2.2.1              
-[117] reshape_0.8.10              rstudioapi_0.17.1          
-[119] cluster_2.1.8.1             whisker_0.4.1              
-[121] rstantools_2.5.0            hms_1.1.3                  
-[123] colorspace_2.1-2            rlang_1.1.6                
-[125] quadprog_1.5-8              shinydashboard_0.7.3       
-[127] xfun_0.53                   multcompView_0.1-10        
-[129] coda_0.19-4.1               TH.data_1.1-4              
-[131] emmeans_1.11.2-8            abind_1.4-8                
-[133] libcoin_1.0-10              gmp_0.7-5                  
-[135] Rhdf5lib_1.30.0             geneplotter_1.86.0         
-[137] futile.options_1.0.1        bitops_1.0-9               
-[139] promises_1.3.3              RSQLite_2.4.3              
-[141] DelayedArray_0.34.1         Rmpfr_1.1-1                
-[143] GO.db_3.21.0                compiler_4.5.2             
-[145] statsExpressions_1.7.1      admisc_0.38                
-[147] prettyunits_1.2.0           boot_1.3-32                
-[149] Rcpp_1.1.0                  workflowr_1.7.2            
-[151] kSamples_1.2-12             MASS_7.3-65                
-[153] progress_1.2.3              uuid_1.2-1                 
-[155] insight_1.4.2               babelgene_22.9             
-[157] R6_2.6.1                    fastmap_1.2.0              
-[159] multcomp_1.4-28             fastmatch_1.1-6            
-[161] rstatix_0.7.2               BayesFactor_0.9.12-4.7     
-[163] ggstats_0.11.0              nnet_7.3-20                
-[165] gtable_0.3.6                KernSmooth_2.23-26         
-[167] htmltools_0.5.8.1           RcppParallel_5.1.11-1      
-[169] bit64_4.6.0-1               lifecycle_1.0.4            
-[171] S7_0.2.0                    zip_2.3.3                  
-[173] restfulr_0.0.16             sass_0.4.10                
-[175] vctrs_0.6.5                 zeallot_0.2.0              
-[177] bslib_0.9.0                 pillar_1.11.1              
-[179] gplots_3.2.0                locfit_1.5-9.12            
-[181] jsonlite_2.0.0             </code></pre>
+  [1] dichromat_2.0-0.1           vroom_1.7.1                
+  [3] progress_1.2.3              locfdr_1.1-8               
+  [5] nnet_7.3-20                 Biostrings_2.80.0          
+  [7] vctrs_0.7.3                 digest_0.6.39              
+  [9] png_0.1-9                   git2r_0.36.2               
+ [11] MASS_7.3-65                 fontLiberation_0.1.0       
+ [13] reshape_0.8.10              httpuv_1.6.17              
+ [15] withr_3.0.3                 xfun_0.60                  
+ [17] survival_3.8-9              memoise_2.0.1              
+ [19] hexbin_1.28.5               systemfonts_1.3.2          
+ [21] ragg_1.5.2                  gtools_3.9.5               
+ [23] pbapply_1.7-4               Formula_1.2-5              
+ [25] GGally_2.4.0                prettyunits_1.2.0          
+ [27] KEGGREST_1.52.0             promises_1.5.0             
+ [29] otel_0.2.0                  httr_1.4.8                 
+ [31] rstatix_1.0.0               restfulr_0.0.16            
+ [33] rhdf5filters_1.24.0         rhdf5_2.56.0               
+ [35] rstudioapi_0.19.0           UCSC.utils_1.8.0           
+ [37] base64enc_0.1-6             babelgene_22.9             
+ [39] curl_7.1.0                  quadprog_1.5-8             
+ [41] SparseArray_1.12.2          xtable_1.8-8               
+ [43] evaluate_1.0.5              S4Arrays_1.12.0            
+ [45] hms_1.1.4                   colorspace_2.1-3           
+ [47] filelock_1.0.3              later_1.4.8                
+ [49] lattice_0.22-9              Hmisc_5.2-6                
+ [51] pillar_1.11.1               pwalign_1.8.0              
+ [53] caTools_1.18.3              compiler_4.6.1             
+ [55] stringi_1.8.7               shinycssloaders_1.1.0      
+ [57] GenomicAlignments_1.48.0    plyr_1.8.9                 
+ [59] crayon_1.5.3                abind_1.4-8                
+ [61] BiocIO_1.22.0               locfit_1.5-9.12            
+ [63] bit_4.6.0                   fastmatch_1.1-8            
+ [65] whisker_0.4.1               textshaping_1.0.5          
+ [67] codetools_0.2-20            bslib_0.11.0               
+ [69] plotly_4.12.0               mime_0.13                  
+ [71] splines_4.6.1               Rcpp_1.1.2                 
+ [73] cellranger_1.1.0            knitr_1.51                 
+ [75] blob_1.3.0                  here_1.0.2                 
+ [77] BiocVersion_3.23.1          fs_2.1.0                   
+ [79] checkmate_2.3.4             admisc_0.40                
+ [81] ggsignif_0.6.4              Matrix_1.7-5               
+ [83] statmod_1.5.2               svglite_2.2.2              
+ [85] tzdb_0.5.0                  visdat_0.6.0               
+ [87] pkgconfig_2.0.3             cachem_1.1.0               
+ [89] cigarillo_1.2.0             RSQLite_3.53.3             
+ [91] DBI_1.3.0                   fastmap_1.2.0              
+ [93] rmarkdown_2.31              geneplotter_1.90.0         
+ [95] shinydashboard_0.7.3        Rsamtools_2.28.0           
+ [97] sass_0.4.10                 BiocManager_1.30.27        
+ [99] ggstats_0.13.0              carData_3.0-6              
+[101] rpart_4.1.27                farver_2.1.2               
+[103] yaml_2.3.12                 workflowr_1.7.2            
+[105] foreign_0.8-91              rtracklayer_1.72.0         
+[107] cli_3.6.6                   txdbmaker_1.8.0            
+[109] lifecycle_1.0.5             lambda.r_1.2.4             
+[111] backports_1.5.1             timechange_0.4.0           
+[113] gtable_0.3.6                rjson_0.2.23               
+[115] parallel_4.6.1              jsonlite_2.0.0             
+[117] bitops_1.0-9                svMisc_1.4.3               
+[119] bit64_4.8.2                 assertthat_0.2.1           
+[121] zip_3.0.1                   futile.options_1.0.1       
+[123] jquerylib_0.1.4             lazyeval_0.2.3             
+[125] shiny_1.13.0                htmltools_0.5.9            
+[127] GO.db_3.23.1                rappdirs_0.3.4             
+[129] formatR_1.14                httr2_1.3.0                
+[131] XVector_0.52.0              gdtools_0.5.1              
+[133] RCurl_1.98-1.19             rprojroot_2.1.1            
+[135] BSgenome_1.80.0             boot_1.3-32                
+[137] R6_2.6.1                    SingleCellExperiment_1.34.0
+[139] gplots_3.3.0                labeling_0.4.3             
+[141] cluster_2.1.8.2             Rhdf5lib_2.0.0             
+[143] GenomeInfoDb_1.48.0         DelayedArray_0.38.1        
+[145] tidyselect_1.2.1            ProtGenerics_1.44.0        
+[147] htmlTable_2.5.0             fontBitstreamVera_0.1.1    
+[149] car_3.1-5                   KernSmooth_2.23-26         
+[151] S7_0.2.2                    fontquiver_0.2.1           
+[153] htmlwidgets_1.6.4           hwriter_1.3.2.1            
+[155] rlang_1.3.0                 RobStatTM_1.0.11           </code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
